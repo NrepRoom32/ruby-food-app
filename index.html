@@ -173,7 +173,8 @@
 
         .input-group input[type="text"],
         .input-group input[type="password"],
-        .input-group input[type="number"] {
+        .input-group input[type="number"],
+        .input-group select { /* Style for select dropdowns */
             width: calc(100% - 20px);
             padding: 10px;
             border: 1px solid #ccc;
@@ -181,11 +182,20 @@
             font-size: 1em;
             box-shadow: inset 0 1px 3px var(--shadow-light);
             transition: border-color 0.3s ease;
+            background-color: white; /* Ensure consistent background */
+            -webkit-appearance: none; /* Remove default arrow on select for custom styling */
+            -moz-appearance: none;
+            appearance: none;
+            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007BB5%22%20d%3D%22M287%2C197.942L146.2%2C57.042L5.4%2C197.942H287z%22%2F%3E%3C%2Fsvg%3E'); /* Custom arrow for select */
+            background-repeat: no-repeat;
+            background-position: right 10px top 50%;
+            background-size: 10px auto;
         }
 
         .input-group input[type="text"]:focus,
         .input-group input[type="password"]:focus,
-        .input-group input[type="number"]:focus {
+        .input-group input[type="number"]:focus,
+        .input-group select:focus {
             border-color: var(--primary-color);
             outline: none;
         }
@@ -409,14 +419,90 @@
             max-width: 900px;
             box-sizing: border-box;
             max-height: 80vh;
-            overflow-y: auto;
-            padding-right: 15px;
+            overflow: hidden; /* Manage internal tab content overflow */
+            padding-right: 0; /* No right padding here */
+            display: flex;
+            flex-direction: column;
         }
 
         #admin-dashboard h2 {
             color: var(--primary-color);
             margin-bottom: 20px;
             text-align: center;
+        }
+
+        /* Admin Tabs Navigation */
+        .admin-tabs {
+            display: flex;
+            justify-content: center; /* Center tabs horizontally */
+            width: 100%;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* Allow tabs to wrap on smaller screens */
+        }
+
+        .admin-tab-button {
+            padding: 15px 20px;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            font-size: 1.1em;
+            color: var(--text-color-dark);
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            margin-bottom: -2px; /* Pull up to hide border of parent */
+            white-space: nowrap; /* Prevent text wrap */
+        }
+
+        .admin-tab-button.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            font-weight: bold;
+            background-color: #e8f5e9;
+        }
+
+        .admin-tab-button:hover:not(.active) {
+            background-color: #f0f0f0;
+        }
+
+        /* Date Filters */
+        .date-filters {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap; /* Allow filters to wrap */
+            width: 100%;
+        }
+        .date-filters .input-group {
+            margin-bottom: 0;
+            max-width: 120px; /* Adjust width for select boxes */
+            width: auto; /* Allow auto width based on content */
+            flex-grow: 1; /* Allow inputs to grow if space available */
+            min-width: 80px; /* Minimum width for filters */
+        }
+        .date-filters label {
+            font-size: 0.9em; /* Smaller label for filters */
+        }
+        .date-filters select {
+            width: 100%; /* Make select boxes take full width of their group */
+        }
+
+
+        /* Admin Tab Content */
+        .admin-tab-content {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            width: 100%;
+            flex-grow: 1; /* Take remaining space */
+            overflow-y: auto; /* Scroll individual tab content */
+            padding-right: 5px; /* Account for scrollbar */
+            box-sizing: border-box;
+        }
+
+        .admin-tab-content.active {
+            display: flex;
         }
 
         .admin-grid {
@@ -812,6 +898,28 @@
             #order-review-popup .popup-content {
                 max-width: 95%;
             }
+            .admin-tabs {
+                flex-direction: column; /* Stack admin tabs vertically on small screens */
+                align-items: center;
+            }
+            .admin-tab-button {
+                width: 100%; /* Full width for stacked tabs */
+                border-bottom: none; /* Remove bottom border */
+                border-right: 3px solid transparent; /* Add a side border for selected tab */
+            }
+            .admin-tab-button.active {
+                border-right-color: var(--primary-color);
+                border-bottom-color: transparent; /* Ensure no bottom border */
+            }
+            .date-filters {
+                flex-direction: column; /* Stack date filters vertically */
+                align-items: center;
+                gap: 5px;
+            }
+            .date-filters .input-group {
+                width: 100%;
+                max-width: 250px; /* Limit width of stacked filters */
+            }
         }
 
         /* iPads (Portrait and Landscape - 768px to 1024px wide) */
@@ -845,7 +953,7 @@
                 margin-bottom: 5px;
             }
             .tab-button.active {
-                border-right-color: var(--primary-color); /* For vertical */
+                border-right-color: var(--primary-color);
                 border-bottom-color: transparent;
             }
             .main-content {
@@ -856,6 +964,12 @@
             }
             .admin-grid {
                 grid-template-columns: 1fr; /* Single column for admin on tablets, can be 2 if needed */
+            }
+            .admin-tabs {
+                flex-wrap: wrap; /* Allow tabs to wrap if too many */
+            }
+            .date-filters {
+                justify-content: center;
             }
         }
 
@@ -966,7 +1080,28 @@
         <div id="admin-dashboard">
             <h2>ແດດບອດແອັດມິ້ນ</h2>
 
-            <div class="admin-grid">
+            <div class="admin-tabs">
+                <button class="admin-tab-button active" data-tab="pending-orders">ອໍເດີ້ທີ່ຍັງຄ້າງ</button>
+                <button class="admin-tab-button" data-tab="completed-orders">ອໍເດີ້ທີ່ສຳເລັດ</button>
+                <button class="admin-tab-button" data-tab="accounting">ຕົ້ນທຶນ ແລະ ສະຫຼຸບກຳໄລ-ຂາດທຶນ</button>
+            </div>
+
+            <div class="date-filters">
+                <div class="input-group">
+                    <label for="filter-day">ວັນທີ:</label>
+                    <select id="filter-day"></select>
+                </div>
+                <div class="input-group">
+                    <label for="filter-month">ເດືອນ:</label>
+                    <select id="filter-month"></select>
+                </div>
+                <div class="input-group">
+                    <label for="filter-year">ປີ:</label>
+                    <select id="filter-year"></select>
+                </div>
+            </div>
+
+            <div id="admin-pending-tab" class="admin-tab-content active">
                 <div class="admin-card">
                     <h3>
                         <span>ອໍເດີ້ທີ່ຍັງຄ້າງ</span>
@@ -976,7 +1111,9 @@
                         <p>ຍັງບໍ່ມີອໍເດີ້.</p>
                     </ul>
                 </div>
+            </div>
 
+            <div id="admin-completed-tab" class="admin-tab-content">
                 <div class="admin-card">
                     <h3>
                         <span>ອໍເດີ້ທີ່ສຳເລັດ</span>
@@ -990,7 +1127,9 @@
                         <span id="total-revenue">0 ກີບ</span>
                     </div>
                 </div>
+            </div>
 
+            <div id="admin-accounting-tab" class="admin-tab-content">
                 <div class="admin-card">
                     <h3>ການຄຸ້ມຄອງຕົ້ນທຶນ</h3>
                     <div class="accounting-form">
@@ -1094,13 +1233,6 @@
             const confirmOrderButton = document.getElementById('confirm-order-button'); // This is the new "ຢືນຢັນ" button
             const cancelOrderReviewButton = document.getElementById('cancel-order-review-button');
 
-            // Removed order-confirm-popup elements as they are replaced by order-review-popup
-            // const orderConfirmPopup = document.getElementById('order-confirm-popup');
-            // const confirmPopupTableNumber = document.getElementById('confirm-popup-table-number');
-            // const confirmPopupTotalPrice = document.getElementById('confirm-popup-total-price');
-            // const placeOrderButton = document.getElementById('place-order-button');
-            // const cancelOrderButton = document.getElementById('cancel-order-button');
-
             const orderConfirmationPopup = document.getElementById('order-confirmation-popup');
             const confirmedTableNumberSpan = document.getElementById('confirmed-table-number');
             const confirmedTotalPriceSpan = document.getElementById('confirmed-total-price');
@@ -1111,10 +1243,17 @@
             const cartItemsDiv = document.getElementById('cart-items');
             const totalPriceSpan = document.getElementById('total-price');
             const checkoutButton = document.getElementById('checkout-button');
-            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabButtons = document.querySelectorAll('.tab-button'); // Customer page tabs
 
             const adminUsernameInput = document.getElementById('admin-username');
             const adminPasswordInput = document.getElementById('admin-password');
+            
+            // Admin Dashboard Tab elements
+            const adminTabButtons = document.querySelectorAll('.admin-tab-button');
+            const adminPendingTab = document.getElementById('admin-pending-tab');
+            const adminCompletedTab = document.getElementById('admin-completed-tab');
+            const adminAccountingTab = document.getElementById('admin-accounting-tab');
+
             const adminOrderList = document.getElementById('admin-order-list');
             const adminCompletedOrderList = document.getElementById('admin-completed-order-list');
             const pendingOrdersCountSpan = document.getElementById('pending-orders-count');
@@ -1127,6 +1266,11 @@
             const costDescriptionInput = document.getElementById('cost-description');
             const costAmountInput = document.getElementById('cost-amount');
             const costListUl = document.getElementById('cost-list');
+
+            // Date filter elements
+            const filterDaySelect = document.getElementById('filter-day');
+            const filterMonthSelect = document.getElementById('filter-month');
+            const filterYearSelect = document.getElementById('filter-year');
 
             let currentTableNumber = null;
             let cart = {}; // { menuId: { item: {}, quantity: N } }
@@ -1194,6 +1338,8 @@
                     updateCartDisplay();
                 }
                 if (pageId === 'admin-dashboard') {
+                    setActiveAdminTab('pending-orders'); // Default to pending orders tab
+                    populateDateFilters(); // Populate date filters when entering admin dashboard
                     renderAdminDashboardContent(); // New function for all admin updates
                 }
             }
@@ -1243,7 +1389,7 @@
                 }
             });
 
-            // --- Menu Rendering and Interactions ---
+            // --- Menu Rendering and Interactions (Customer Side) ---
             function renderMenuItems(type) {
                 const targetDiv = type === 'food' ? foodMenuDiv : drinksMenuDiv;
                 targetDiv.innerHTML = '';
@@ -1398,7 +1544,7 @@
                         pricePerUnit: i.item.price
                     })),
                     total: orderTotal,
-                    timestamp: new Date().toLocaleString('lo-LA'),
+                    timestamp: new Date().toLocaleString('lo-LA'), // Store full timestamp
                     status: 'ລໍຖ້າ'
                 };
                 orders.push(newOrder);
@@ -1433,17 +1579,117 @@
                 }
             });
 
-            // --- Admin Dashboard RENDER ---
-            function renderAdminDashboardContent() {
-                renderAdminOrders();
-                renderCompletedOrders();
-                renderCosts();
-                updateAdminSummaries();
+            // --- Admin Dashboard Tabs ---
+            function setActiveAdminTab(tabId) {
+                adminTabButtons.forEach(button => {
+                    if (button.dataset.tab === tabId) {
+                        button.classList.add('active');
+                    } else {
+                        button.classList.remove('active');
+                    }
+                });
+
+                document.querySelectorAll('.admin-tab-content').forEach(content => {
+                    if (content.id === `admin-${tabId}-tab`) {
+                        content.classList.add('active');
+                    } else {
+                        content.classList.remove('active');
+                    }
+                });
+                renderAdminDashboardContent(); // Re-render content based on active tab
             }
 
-            function renderAdminOrders() {
+            adminTabButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    setActiveAdminTab(e.currentTarget.dataset.tab);
+                });
+            });
+
+            // --- Date Filter Population ---
+            function populateDateFilters() {
+                // Days (1-31)
+                filterDaySelect.innerHTML = '<option value="">ທັງໝົດ</option>';
+                for (let i = 1; i <= 31; i++) {
+                    const day = i < 10 ? '0' + i : i;
+                    filterDaySelect.innerHTML += `<option value="${day}">${day}</option>`;
+                }
+
+                // Months (1-12)
+                const monthNames = [
+                    'ມັງກອນ', 'ກຸມພາ', 'ມີນາ', 'ເມສາ', 'ພຶດສະພາ', 'ມິຖຸນາ',
+                    'ກໍລະກົດ', 'ສິງຫາ', 'ກັນຍາ', 'ຕຸລາ', 'ພະຈິກ', 'ທັນວາ'
+                ];
+                filterMonthSelect.innerHTML = '<option value="">ທັງໝົດ</option>';
+                monthNames.forEach((name, index) => {
+                    const monthValue = (index + 1) < 10 ? '0' + (index + 1) : (index + 1);
+                    filterMonthSelect.innerHTML += `<option value="${monthValue}">${name}</option>`;
+                });
+
+                // Years (current year and a few past years)
+                const currentYear = new Date().getFullYear();
+                filterYearSelect.innerHTML = '<option value="">ທັງໝົດ</option>';
+                for (let i = currentYear; i >= currentYear - 5; i--) { // Show current year and past 5 years
+                    filterYearSelect.innerHTML += `<option value="${i}">${i}</option>`;
+                }
+
+                // Set default to current month/year if available
+                const today = new Date();
+                const currentMonth = (today.getMonth() + 1).toString().padStart(2, '0');
+                const currentYearStr = today.getFullYear().toString();
+                
+                // filterMonthSelect.value = currentMonth; // Uncomment to default to current month
+                // filterYearSelect.value = currentYearStr; // Uncomment to default to current year
+
+                // Add event listeners for filter changes
+                filterDaySelect.addEventListener('change', renderAdminDashboardContent);
+                filterMonthSelect.addEventListener('change', renderAdminDashboardContent);
+                filterYearSelect.addEventListener('change', renderAdminDashboardContent);
+            }
+
+            // --- Admin Dashboard RENDER with Filters ---
+            function renderAdminDashboardContent() {
+                const activeTab = document.querySelector('.admin-tab-button.active').dataset.tab;
+                const selectedDay = filterDaySelect.value;
+                const selectedMonth = filterMonthSelect.value;
+                const selectedYear = filterYearSelect.value;
+
+                const filterCriteria = { day: selectedDay, month: selectedMonth, year: selectedYear };
+                
+                if (activeTab === 'pending-orders') {
+                    renderAdminOrders(filterCriteria);
+                } else if (activeTab === 'completed-orders') {
+                    renderCompletedOrders(filterCriteria);
+                } else if (activeTab === 'accounting') {
+                    renderCosts(filterCriteria);
+                    updateAdminSummaries(filterCriteria);
+                }
+            }
+
+            function isDateMatch(timestamp, filters) {
+                if (!timestamp) return false;
+                const date = new Date(timestamp.replace(' ', 'T') + '+07:00'); // Assuming ISO format or similar
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = (date.getMonth() + 1).toString().padStart(2, '0');
+                const year = date.getFullYear().toString();
+
+                let match = true;
+                if (filters.day && filters.day !== '' && filters.day !== day) {
+                    match = false;
+                }
+                if (filters.month && filters.month !== '' && filters.month !== month) {
+                    match = false;
+                }
+                if (filters.year && filters.year !== '' && filters.year !== year) {
+                    match = false;
+                }
+                return match;
+            }
+
+            function renderAdminOrders(filters) {
                 adminOrderList.innerHTML = '';
-                const pendingOrders = orders.filter(order => order.status === 'ລໍຖ້າ');
+                const pendingOrders = orders.filter(order => 
+                    order.status === 'ລໍຖ້າ' && isDateMatch(order.timestamp, filters)
+                );
                 pendingOrdersCountSpan.textContent = pendingOrders.length;
 
                 if (pendingOrders.length === 0) {
@@ -1476,9 +1722,11 @@
                 attachAdminOrderListeners();
             }
 
-            function renderCompletedOrders() {
+            function renderCompletedOrders(filters) {
                 adminCompletedOrderList.innerHTML = '';
-                const completedOrders = orders.filter(order => order.status === 'ສຳເລັດ');
+                const completedOrders = orders.filter(order => 
+                    order.status === 'ສຳເລັດ' && isDateMatch(order.timestamp, filters)
+                );
                 completedOrdersCountSpan.textContent = completedOrders.length;
 
                 if (completedOrders.length === 0) {
@@ -1551,13 +1799,15 @@
                 }
             });
 
-            function renderCosts() {
+            function renderCosts(filters) {
                 costListUl.innerHTML = '';
-                if (costs.length === 0) {
+                const filteredCosts = costs.filter(cost => isDateMatch(cost.timestamp, filters));
+
+                if (filteredCosts.length === 0) {
                     costListUl.innerHTML = '<p>ຍັງບໍ່ມີລາຍການຕົ້ນທຶນ.</p>';
                     return;
                 }
-                costs.forEach((cost, index) => {
+                filteredCosts.forEach((cost) => { // No index needed for removal by ID
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `
                         <span>${cost.description}: ${cost.amount.toLocaleString('lo-LA')} ກີບ</span>
@@ -1581,13 +1831,15 @@
                 });
             }
 
-            function updateAdminSummaries() {
+            function updateAdminSummaries(filters) {
                 const totalRevenue = orders
-                    .filter(order => order.status === 'ສຳເລັດ')
+                    .filter(order => order.status === 'ສຳເລັດ' && isDateMatch(order.timestamp, filters))
                     .reduce((sum, order) => sum + order.total, 0);
                 totalRevenueSpan.textContent = totalRevenue.toLocaleString('lo-LA') + ' ກີບ';
 
-                const totalCost = costs.reduce((sum, cost) => sum + cost.amount, 0);
+                const totalCost = costs
+                    .filter(cost => isDateMatch(cost.timestamp, filters))
+                    .reduce((sum, cost) => sum + cost.amount, 0);
                 totalCostSpan.textContent = totalCost.toLocaleString('lo-LA') + ' ກີບ';
 
                 const netProfit = totalRevenue - totalCost;
@@ -1596,7 +1848,9 @@
             }
 
             // --- Initial Data Load & Render ---
-            renderAdminDashboardContent(); // Initial render for admin data
+            // Removed initial renderAdminDashboardContent() call from here
+            // It will be called when admin dashboard is first shown via showPage('admin-dashboard')
+            // which also calls populateDateFilters() and setActiveAdminTab().
         });
     </script>
 </body>
