@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ruby Food</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous" defer></script>
     <style>
         /* CSS styles will go here */
         :root {
@@ -71,7 +73,7 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            transition: opacity 1s ease-out;
+            transition: opacity 0.5s ease-out; /* Faster transition */
         }
 
         .spinner {
@@ -1298,7 +1300,7 @@
             { category: 'food', name: 'ข้าวผัด (ເຂົ້າຜັດ)', price: 50000, description: 'ข้าวผัดอร่อยๆ' },
             { category: 'food', name: 'ผัดไทย (ຜັດໄທ)', price: 45000, description: 'ผัดไทยเส้นเหนียวนุ่ม' },
             { category: 'food', name: 'ต้มยำกุ้ง (ຕົ້ມຍຳກຸ້ງ)', price: 60000, description: 'ต้มยำกุ้งรสจัดจ้าน' },
-            { category: 'food', name: 'ลาบหมู (ລາບໝູ)', price: 55000, description: 'ลาบหมูรสแซ่บ' },
+            { category: 'food', name: 'ลาบหมู (ລາບໝູ)', price: 55000, description: 'ลาบหมูรสแซ່ບ' },
             { category: 'food', name: 'ไก่ย่าง (ໄກ່ປີ້ງ)', price: 70000, description: 'ไก่ย่างหอมๆ' },
             { category: 'drinks', name: 'น้ำเปล่า (ນ້ຳເປົ່າ)', price: 10000, description: 'น้ำดื่มสะอาด' },
             { category: 'drinks', name: 'โค้ก (ໂຄ້ກ)', price: 15000, description: 'เครื่องดื่มซ่าชื่นใจ' },
@@ -1331,6 +1333,16 @@
 
         // --- Page Navigation Functions ---
         let currentPage = 'splash'; // Keep track of current page for conditional rendering/updates
+        const splashScreen = document.getElementById('splash-screen');
+        const mainContainer = document.getElementById('main-container');
+        const startOrderingButton = document.getElementById('start-ordering-button');
+        const adminModeButton = document.getElementById('admin-mode-button');
+        const adminLoginButton = document.getElementById('admin-login-button');
+        const backToHomeFromAdminLogin = document.getElementById('back-to-home-from-admin-login');
+        const backToHomeFromCustomerOrderButton = document.getElementById('back-to-home-from-customer-order');
+        const backToHomeFromAdminDashboard = document.getElementById('back-to-home-from-admin-dashboard');
+        const adminTabButtons = document.querySelectorAll('.admin-tab-button');
+
 
         function showPage(pageId) {
             const pages = document.querySelectorAll('.page'); // This selector includes #home-page, #admin-login-page etc.
@@ -1363,7 +1375,7 @@
         const customerCartTotalSpan = document.getElementById('customer-cart-total');
         const cartItemCountSpan = document.getElementById('cart-item-count');
         const placeOrderButton = document.getElementById('place-order-button');
-        const backToHomeFromCustomerOrderButton = document.getElementById('back-to-home-from-customer-order');
+        
 
         function renderMenu() {
             customerMenuListDiv.innerHTML = '';
@@ -1498,8 +1510,10 @@
 
         function showTableNumberPopup() {
             tableNumberPopup.classList.add('active');
-            tableNumberInput.value = ''; // Clear previous input
-            tableNumberInput.focus();
+            // Assuming table-number-input for popup and customer page are different if needed
+            // For now, let's assume the one in the popup is not used if we directly use customer-table-number-input
+            document.getElementById('table-number-input').value = ''; // Clear previous input for this specific popup input
+            document.getElementById('table-number-input').focus();
         }
 
         function hideTableNumberPopup() {
@@ -1599,9 +1613,12 @@
             }
 
             // Set current date as default filter
+            // This might make sense if the dashboard usually shows today's data
+            // If you want "All" as default, comment these two lines out
             filterDaySelect.value = today.getDate().toString().padStart(2, '0');
             filterMonthSelect.value = (today.getMonth() + 1).toString().padStart(2, '0');
             filterYearSelect.value = currentYear.toString();
+
 
             // Update currentAdminFilters to reflect default
             currentAdminFilters.day = filterDaySelect.value;
@@ -1642,6 +1659,7 @@
             if (pendingOrders.length === 0) {
                 adminOrderList.innerHTML = '<p>ຍັງບໍ່ມີອໍເດີ້ທີ່ຍັງຄ້າງ.</p>';
             } else {
+                pendingOrders.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)); // Sort by oldest first
                 pendingOrders.forEach(order => {
                     const li = document.createElement('li');
                     li.className = 'order-item-admin';
@@ -1672,6 +1690,7 @@
             if (completedOrders.length === 0) {
                 adminCompletedOrderList.innerHTML = '<p>ຍັງບໍ່ມີອໍເດີ້ທີ່ສຳເລັດ.</p>';
             } else {
+                completedOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // Sort by newest first
                 completedOrders.forEach(order => {
                     const li = document.createElement('li');
                     li.className = 'order-item-admin';
@@ -1703,6 +1722,7 @@
             if (filteredCosts.length === 0) {
                 costListUl.innerHTML = '<p>ຍັງບໍ່ມີລາຍການຕົ້ນທຶນ.</p>';
             } else {
+                filteredCosts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // Sort by newest first
                 filteredCosts.forEach(cost => {
                     const li = document.createElement('li');
                     const costDate = new Date(cost.timestamp).toLocaleString('lo-LA', { dateStyle: 'short' });
@@ -1800,14 +1820,15 @@
             loadOrders(); // Load existing orders on startup
             loadCosts();  // Load existing costs on startup
 
-            // Simulate splash screen loading
+            // Hide splash screen immediately, then fade out
+            splashScreen.style.opacity = '0';
+            // Use a short delay for smooth fade-out effect, then hide completely
             setTimeout(() => {
-                splashScreen.style.opacity = '0';
                 splashScreen.style.visibility = 'hidden';
                 mainContainer.style.opacity = '1';
                 mainContainer.style.transform = 'translateY(0)';
                 showPage('home-page'); // Show home page after splash
-            }, 1500); // 1.5 seconds splash screen
+            }, 500); // 0.5 seconds for fade-out
 
             startOrderingButton.addEventListener('click', () => {
                 showPage('customer-order-page'); // Show the new customer order page
