@@ -4,10 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ruby Food</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous" defer></script>
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
     <style>
         /* CSS styles will go here */
         :root {
@@ -73,7 +71,7 @@
             justify-content: center;
             align-items: center;
             z-index: 1000;
-            transition: opacity 0.5s ease-out; /* Faster transition */
+            transition: opacity 1s ease-out;
         }
 
         .spinner {
@@ -97,7 +95,7 @@
         }
 
         /* Home Page, Admin Login, Admin Dashboard common styles */
-        #home-page, #admin-login-page, #admin-dashboard, #customer-order-page {
+        #home-page, #admin-login-page, #admin-dashboard {
             display: none;
             flex-direction: column;
             align-items: center;
@@ -1090,7 +1088,9 @@
 
     <div class="container" id="main-container">
         <div id="home-page">
-            <div class="app-icon"> 😊 </div>
+            <div class="app-icon">
+                😊
+            </div>
             <h1>Ruby Food</h1>
             <button class="button" id="start-ordering-button">ເລີ່ມສັ່ງອາຫານ</button>
             <button class="button" id="admin-mode-button">ໂໝດແອັດມິ້ນ</button>
@@ -1110,27 +1110,7 @@
             <button class="button" id="back-to-home-from-admin-login">ກັບຄືນ</button>
         </div>
 
-        <div id="customer-order-page">
-            <h2>ສັ່ງອາຫານ</h2>
-            <div class="input-group">
-                <label for="customer-table-number-input">ໝາຍເລກໂຕະ:</label>
-                <input type="text" id="customer-table-number-input" placeholder="ເຊັ່ນ A1, 101" maxlength="2">
-            </div>
-
-            <h3>ເມນູອາຫານ</h3>
-            <div id="customer-menu-list" class="menu-content">
-                </div>
-
-            <h3>ກະຕ່າສິນຄ້າ (<span id="cart-item-count">0</span> ລາຍການ)</h3>
-            <ul id="customer-cart-list" class="order-list">
-                <p>ຍັງບໍ່ມີລາຍການໃນກະຕ່າ.</p>
-            </ul>
-            <p style="font-weight: bold; font-size: 1.2em; text-align: right; padding-right: 10px;">ລວມ: <span id="customer-cart-total">0 ກີບ</span></p>
-
-            <button class="button primary-button" id="place-order-button" style="width: 100%;">ຢືນຢັນການສັ່ງຊື້</button>
-            <button class="button" id="back-to-home-from-customer-order" style="background-color: #f44336; margin-top: 10px; width: 100%;">ກັບຄືນໜ້າຫຼັກ</button>
-        </div>
-        <div id="customer-page" style="display: none;">
+        <div id="customer-page">
             <div class="order-summary">
                 <h3>ລາຍການສັ່ງຊື້</h3>
                 <div id="cart-items">
@@ -1141,6 +1121,7 @@
                     <span id="total-price">0 ກີບ</span>
                 </div>
             </div>
+
             <div class="customer-page-layout">
                 <div class="sidebar-tabs">
                     <button class="tab-button active" data-tab="food">ອາຫານ</button>
@@ -1148,23 +1129,27 @@
                 </div>
                 <div class="main-content">
                     <div id="food-menu" class="menu-content">
-                    </div>
+                        </div>
                     <div id="drinks-menu" class="menu-content" style="display: none;">
-                    </div>
+                        </div>
                 </div>
             </div>
+
             <div class="checkout-button-container">
                 <button class="button checkout-button" id="checkout-button">ສັ່ງເລີຍ</button>
                 <button class="button" id="back-to-home-from-customer" style="background-color: #f44336;">ກັບຄືນໜ້າຫຼັກ</button>
             </div>
         </div>
+
         <div id="admin-dashboard">
             <h2>ແດດບອດແອັດມິ້ນ</h2>
+
             <div class="admin-tabs">
                 <button class="admin-tab-button active" data-tab="pending-orders">ອໍເດີ້ທີ່ຍັງຄ້າງ</button>
                 <button class="admin-tab-button" data-tab="completed-orders">ອໍເດີ້ທີ່ສຳເລັດ</button>
                 <button class="admin-tab-button" data-tab="accounting">ຕົ້ນທຶນ ແລະ ສະຫຼຸບກຳໄລ-ຂາດທຶນ</button>
             </div>
+
             <div class="filter-and-search-container">
                 <div class="date-filters">
                     <div class="input-group">
@@ -1230,12 +1215,13 @@
                     </div>
                     <h4>ລາຍການຕົ້ນທຶນ</h4>
                     <ul id="cost-list">
-                    </ul>
+                        </ul>
                     <div class="admin-total-summary">
                         <span>ຕົ້ນທຶນລວມ:</span>
                         <span id="total-cost">0 ກີບ</span>
                     </div>
                 </div>
+
                 <div class="admin-card">
                     <h3>ສະຫຼຸບກຳໄລ-ຂາດທຶນ</h3>
                     <div class="admin-total-summary" style="font-size: 1.3em;">
@@ -1247,6 +1233,7 @@
                     </p>
                 </div>
             </div>
+
             <button class="button" id="back-to-home-from-admin-dashboard" style="background-color: #f44336; margin-top: 20px;">ກັບຄືນໜ້າຫຼັກ</button>
         </div>
     </div>
@@ -1267,7 +1254,7 @@
             <h3>ກວດສອບລາຍການສັ່ງຊື້</h3>
             <p>ໝາຍເລກໂຕະ: <strong id="review-popup-table-number"></strong></p>
             <ul id="order-review-items">
-            </ul>
+                </ul>
             <div class="order-review-total">
                 <span>ລວມທັງໝົດ:</span>
                 <span id="review-popup-total-price">0 ກີບ</span>
@@ -1289,563 +1276,571 @@
     </div>
 
     <script>
-        // Global variables for data
-        let orders = []; // Stores all orders
-        let costs = [];   // Stores all costs (for accounting)
-        let customerCart = []; // Current customer's cart
-        let currentTableNumber = ''; // Current table number for the customer's order
+        document.addEventListener('DOMContentLoaded', () => {
+            const splashScreen = document.getElementById('splash-screen');
+            const mainContainer = document.getElementById('main-container');
+            const homePage = document.getElementById('home-page');
+            const customerPage = document.getElementById('customer-page');
+            const adminLoginPage = document.getElementById('admin-login-page');
+            const adminDashboard = document.getElementById('admin-dashboard');
 
-        // Menu items definition (can be loaded from a backend or JSON file in a real app)
-        const menuItems = [
-            { category: 'food', name: 'ข้าวผัด (ເຂົ້າຜັດ)', price: 50000, description: 'ข้าวผัดอร่อยๆ' },
-            { category: 'food', name: 'ผัดไทย (ຜັດໄທ)', price: 45000, description: 'ผัดไทยเส้นเหนียวนุ่ม' },
-            { category: 'food', name: 'ต้มยำกุ้ง (ຕົ້ມຍຳກຸ້ງ)', price: 60000, description: 'ต้มยำกุ้งรสจัดจ้าน' },
-            { category: 'food', name: 'ลาบหมู (ລາບໝູ)', price: 55000, description: 'ลาบหมูรสแซ່ບ' },
-            { category: 'food', name: 'ไก่ย่าง (ໄກ່ປີ້ງ)', price: 70000, description: 'ไก่ย่างหอมๆ' },
-            { category: 'drinks', name: 'น้ำเปล่า (ນ້ຳເປົ່າ)', price: 10000, description: 'น้ำดื่มสะอาด' },
-            { category: 'drinks', name: 'โค้ก (ໂຄ້ກ)', price: 15000, description: 'เครื่องดื่มซ่าชื่นใจ' },
-            { category: 'drinks', name: 'เบียร์ลาว (ເບຍລາວ)', price: 25000, description: 'เบียร์ลาวยอดนิยม' }
-        ];
+            const startOrderingButton = document.getElementById('start-ordering-button');
+            const adminModeButton = document.getElementById('admin-mode-button');
+            const adminLoginButton = document.getElementById('admin-login-button');
+            const backToHomeFromAdminLogin = document.getElementById('back-to-home-from-admin-login');
+            const backToHomeFromCustomer = document.getElementById('back-to-home-from-customer');
+            const backToHomeFromAdminDashboard = document.getElementById('back-to-home-from-admin-dashboard');
 
-        // Utility functions for localStorage
-        function saveOrders() {
-            localStorage.setItem('orders', JSON.stringify(orders));
-        }
+            const tableNumberPopup = document.getElementById('table-number-popup');
+            const tableNumberInput = document.getElementById('table-number-input');
+            const confirmTableNumberButton = document.getElementById('confirm-table-number');
 
-        function loadOrders() {
-            const storedOrders = localStorage.getItem('orders');
-            orders = storedOrders ? JSON.parse(storedOrders) : [];
-        }
+            // NEW: Order Review Popup elements
+            const orderReviewPopup = document.getElementById('order-review-popup');
+            const reviewPopupTableNumber = document.getElementById('review-popup-table-number');
+            const orderReviewItemsUl = document.getElementById('order-review-items');
+            const reviewPopupTotalPrice = document.getElementById('review-popup-total-price');
+            const confirmOrderButton = document.getElementById('confirm-order-button'); // This is the new "ຢືນຢັນ" button
+            const cancelOrderReviewButton = document.getElementById('cancel-order-review-button');
 
-        function saveCosts() {
-            localStorage.setItem('costs', JSON.stringify(costs));
-        }
+            const orderConfirmationPopup = document.getElementById('order-confirmation-popup');
+            const confirmedTableNumberSpan = document.getElementById('confirmed-table-number');
+            const confirmedTotalPriceSpan = document.getElementById('confirmed-total-price');
+            const closeConfirmationPopupButton = document.getElementById('close-confirmation-popup');
 
-        function loadCosts() {
-            const storedCosts = localStorage.getItem('costs');
-            costs = storedCosts ? JSON.parse(storedCosts) : [];
-        }
+            const foodMenuDiv = document.getElementById('food-menu');
+            const drinksMenuDiv = document.getElementById('drinks-menu');
+            const cartItemsDiv = document.getElementById('cart-items');
+            const totalPriceSpan = document.getElementById('total-price');
+            const checkoutButton = document.getElementById('checkout-button');
+            const tabButtons = document.querySelectorAll('.tab-button'); // Customer page tabs
 
-        // Helper to format currency
-        function formatCurrency(amount) {
-            return amount.toLocaleString('lo-LA') + ' ກີບ';
-        }
+            const adminUsernameInput = document.getElementById('admin-username');
+            const adminPasswordInput = document.getElementById('admin-password');
 
-        // --- Page Navigation Functions ---
-        let currentPage = 'splash'; // Keep track of current page for conditional rendering/updates
-        const splashScreen = document.getElementById('splash-screen');
-        const mainContainer = document.getElementById('main-container');
-        const startOrderingButton = document.getElementById('start-ordering-button');
-        const adminModeButton = document.getElementById('admin-mode-button');
-        const adminLoginButton = document.getElementById('admin-login-button');
-        const backToHomeFromAdminLogin = document.getElementById('back-to-home-from-admin-login');
-        const backToHomeFromCustomerOrderButton = document.getElementById('back-to-home-from-customer-order');
-        const backToHomeFromAdminDashboard = document.getElementById('back-to-home-from-admin-dashboard');
-        const adminTabButtons = document.querySelectorAll('.admin-tab-button');
+            // Admin Dashboard Tab elements
+            const adminTabButtons = document.querySelectorAll('.admin-tab-button');
+            const adminPendingTab = document.getElementById('admin-pending-tab');
+            const adminCompletedTab = document.getElementById('admin-completed-tab');
+            const adminAccountingTab = document.getElementById('admin-accounting-tab');
 
+            // Admin Dashboard filter and search elements
+            const filterDaySelect = document.getElementById('filter-day');
+            const filterMonthSelect = document.getElementById('filter-month');
+            const filterYearSelect = document.getElementById('filter-year');
+            const adminSearchInput = document.getElementById('admin-search-input');
+            const adminSearchButton = document.getElementById('admin-search-button');
 
-        function showPage(pageId) {
-            const pages = document.querySelectorAll('.page'); // This selector includes #home-page, #admin-login-page etc.
-            pages.forEach(page => page.style.display = 'none');
-            const targetPage = document.getElementById(pageId);
-            if (targetPage) {
-                targetPage.style.display = 'flex'; // Use flex for pages that are flex containers
-                currentPage = pageId; // Update current page state
+            // Admin Dashboard list elements
+            const adminOrderList = document.getElementById('admin-order-list');
+            const adminCompletedOrderList = document.getElementById('admin-completed-order-list');
+            const pendingOrdersCountSpan = document.getElementById('pending-orders-count');
+            const completedOrdersCountSpan = document.getElementById('completed-orders-count');
+            const totalRevenueSpan = document.getElementById('total-revenue');
+            const totalCostSpan = document.getElementById('total-cost');
+            const netProfitSpan = document.getElementById('net-profit');
 
-                // Specific actions for each page
-                if (pageId === 'home-page') {
-                    // Reset admin login fields on return to home
-                    document.getElementById('admin-username').value = '';
-                    document.getElementById('admin-password').value = '';
-                } else if (pageId === 'admin-dashboard') {
-                    populateDateFilters(); // Ensure filters are populated
-                    renderAdminDashboardContent(); // Render dashboard content on show
-                    setActiveAdminTab('pending-orders'); // Default to pending orders tab
-                } else if (pageId === 'customer-order-page') {
-                    renderMenu(); // Render menu for customer
-                    renderCart(); // Render customer cart
-                }
-            }
-        }
+            // Accounting elements
+            const costDescriptionInput = document.getElementById('cost-description');
+            const costAmountInput = document.getElementById('cost-amount');
+            const addCostButton = document.getElementById('add-cost-button');
+            const costListUl = document.getElementById('cost-list');
 
-        // --- Customer Ordering Logic ---
-        const customerTableNumberInput = document.getElementById('customer-table-number-input');
-        const customerMenuListDiv = document.getElementById('customer-menu-list');
-        const customerCartListUl = document.getElementById('customer-cart-list');
-        const customerCartTotalSpan = document.getElementById('customer-cart-total');
-        const cartItemCountSpan = document.getElementById('cart-item-count');
-        const placeOrderButton = document.getElementById('place-order-button');
-        
+            // --- Data Storage (using LocalStorage for persistence) ---
+            let cart = JSON.parse(localStorage.getItem('cart')) || [];
+            let orders = JSON.parse(localStorage.getItem('orders')) || []; // Stores pending orders
+            let completedOrders = JSON.parse(localStorage.getItem('completedOrders')) || []; // Stores completed orders for revenue calculation
+            let costs = JSON.parse(localStorage.getItem('costs')) || [];
 
-        function renderMenu() {
-            customerMenuListDiv.innerHTML = '';
-            menuItems.forEach(item => {
-                const menuItemDiv = document.createElement('div');
-                menuItemDiv.className = 'menu-item-card';
-                menuItemDiv.innerHTML = `
-                    <h3>${item.name}</h3>
-                    <p>${item.description}</p>
-                    <div class="price">${formatCurrency(item.price)}</div>
-                    <div class="add-to-cart-controls">
-                        <button class="add-to-cart-button" onclick="addToCart('${item.name}', ${item.price})">ເພີ່ມໃສ່ກະຕ່າ</button>
-                    </div>
-                `;
-                customerMenuListDiv.appendChild(menuItemDiv);
-            });
-        }
+            let currentTableNumber = '';
+            const ADMIN_USERNAME = 'admin';
+            const ADMIN_PASSWORD = '123'; // In a real app, never hardcode passwords and use secure authentication
 
-        function addToCart(itemName, itemPrice) {
-            const existingItem = customerCart.find(item => item.name === itemName);
-            if (existingItem) {
-                existingItem.quantity++;
-            } else {
-                customerCart.push({ name: itemName, price: itemPrice, quantity: 1 });
-            }
-            renderCart();
-        }
-
-        function removeFromCart(itemName) {
-            const itemIndex = customerCart.findIndex(item => item.name === itemName);
-            if (itemIndex > -1) {
-                if (customerCart[itemIndex].quantity > 1) {
-                    customerCart[itemIndex].quantity--;
-                } else {
-                    customerCart.splice(itemIndex, 1);
-                }
-            }
-            renderCart();
-        }
-
-        function renderCart() {
-            customerCartListUl.innerHTML = '';
-            let total = 0;
-            if (customerCart.length === 0) {
-                customerCartListUl.innerHTML = '<p>ຍັງບໍ່ມີລາຍການໃນກະຕ່າ.</p>';
-            } else {
-                customerCart.forEach(item => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-                        ${item.name} x ${item.quantity} - ${formatCurrency(item.price * item.quantity)}
-                        <button class="remove-cost-btn" onclick="removeFromCart('${item.name}')"><i class="fas fa-minus-circle"></i></button>
-                    `;
-                    customerCartListUl.appendChild(li);
-                    total += item.price * item.quantity;
-                });
-            }
-            customerCartTotalSpan.textContent = formatCurrency(total);
-            cartItemCountSpan.textContent = customerCart.reduce((sum, item) => sum + item.quantity, 0);
-        }
-
-        function placeOrder() {
-            const tableNumber = customerTableNumberInput.value.trim();
-            if (customerCart.length === 0) {
-                alert('ກະລຸນາເລືອກອາຫານກ່ອນທີ່ຈະຢືນຢັນການສັ່ງຊື້.');
-                return;
-            }
-            if (tableNumber === '') {
-                alert('ກະລຸນາໃສ່ໝາຍເລກໂຕະ.');
-                return;
-            }
-
-            // Show order review popup before final confirmation
-            showOrderReviewPopup(tableNumber, customerCart);
-        }
-
-        function confirmOrderFinal() {
-            const tableNumber = customerTableNumberInput.value.trim();
-            const totalAmount = customerCart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-
-            const newOrder = {
-                id: Date.now(), // Unique ID for the order
-                tableNumber: tableNumber,
-                items: customerCart.map(item => ({
-                    name: item.name,
-                    quantity: item.quantity,
-                    price: item.price
-                })),
-                total: totalAmount,
-                timestamp: new Date().toISOString(), // ISO 8601 format
-                status: 'pending' // Initial status
+            // --- Menu Data ---
+            const menuItems = {
+                food: [
+                    { id: 'f1', name: 'ເຂົ້າປຽກ', price: 25000, isFavorite: false },
+                    { id: 'f2', name: 'ເຝີ', price: 20000, isFavorite: false },
+                    { id: 'f3', name: 'ເຂົ້າຜັດ', price: 22000, isFavorite: false },
+                    { id: 'f4', name: 'ຕຳໝາກຫຸ່ງ', price: 18000, isFavorite: false },
+                    { id: 'f5', name: 'ລາບປາ', price: 30000, isFavorite: false },
+                    { id: 'f6', name: 'ໝີ່ກອບ', price: 28000, isFavorite: false }
+                ],
+                drinks: [
+                    { id: 'd1', name: 'ນ້ຳອັດລົມ', price: 10000, isFavorite: false },
+                    { id: 'd2', name: 'ນ້ຳໝາກໄມ້', price: 15000, isFavorite: false },
+                    { id: 'd3', name: 'ກາເຟເຢັນ', price: 12000, isFavorite: false },
+                    { id: 'd4', name: 'ຊາເຢັນ', price: 10000, isFavorite: false }
+                ]
             };
 
-            orders.push(newOrder); // Add to the global orders array
-            saveOrders(); // Save to localStorage
+            // --- Helper Functions ---
 
-            // Show confirmation popup
-            confirmedTableNumberSpan.textContent = tableNumber;
-            confirmedTotalPriceSpan.textContent = formatCurrency(totalAmount);
-            orderConfirmationPopup.classList.add('active');
+            // Function to generate unique IDs for orders
+            function generateUniqueId() {
+                return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
+            }
 
-            // Clear cart and input after successful order
-            customerCart = [];
-            customerTableNumberInput.value = '';
-            renderCart(); // Update UI
+            function saveCart() {
+                localStorage.setItem('cart', JSON.stringify(cart));
+            }
 
-            // Close review popup
-            orderReviewPopup.classList.remove('active');
+            function saveOrders() {
+                localStorage.setItem('orders', JSON.stringify(orders));
+            }
 
-            // If admin is on dashboard, refresh it
-            if (currentPage === 'admin-dashboard') {
+            function saveCompletedOrders() {
+                localStorage.setItem('completedOrders', JSON.stringify(completedOrders));
+            }
+
+            function saveCosts() {
+                localStorage.setItem('costs', JSON.stringify(costs));
+            }
+
+            function formatCurrency(amount) {
+                return amount.toLocaleString('lo-LA') + ' ກີບ';
+            }
+
+            function showPopup(popupElement) {
+                popupElement.classList.add('active');
+            }
+
+            function hidePopup(popupElement) {
+                popupElement.classList.remove('active');
+            }
+
+            function showPage(pageId) {
+                const pages = [homePage, customerPage, adminLoginPage, adminDashboard];
+                pages.forEach(page => {
+                    if (page.id === pageId) {
+                        page.style.display = 'flex';
+                        page.classList.add('fadeInScale');
+                    } else {
+                        page.style.display = 'none';
+                        page.classList.remove('fadeInScale');
+                    }
+                });
+
+                if (pageId === 'admin-dashboard') {
+                    // Re-render admin dashboard content when shown
+                    renderAdminDashboardContent();
+                    populateDateFilters();
+                    setActiveAdminTab('pending-orders'); // Default to pending orders tab
+                } else if (pageId === 'customer-page') {
+                    renderCart();
+                    populateMenu('food'); // Default to food menu
+                    setActiveCustomerTab('food');
+                }
+            }
+
+            function setActiveCustomerTab(tabName) {
+                tabButtons.forEach(button => {
+                    if (button.dataset.tab === tabName) {
+                        button.classList.add('active');
+                    } else {
+                        button.classList.remove('active');
+                    }
+                });
+                document.querySelectorAll('.menu-content').forEach(content => {
+                    if (content.id === `${tabName}-menu`) {
+                        content.style.display = 'flex';
+                    } else {
+                        content.style.display = 'none';
+                    }
+                });
+            }
+
+            function setActiveAdminTab(tabName) {
+                adminTabButtons.forEach(button => {
+                    if (button.dataset.tab === tabName) {
+                        button.classList.add('active');
+                    } else {
+                        button.classList.remove('active');
+                    }
+                });
+
+                const adminTabContents = [adminPendingTab, adminCompletedTab, adminAccountingTab];
+                adminTabContents.forEach(content => {
+                    if (content.id === `admin-${tabName}-tab`) {
+                        content.classList.add('active');
+                    } else {
+                        content.classList.remove('active');
+                    }
+                });
+                renderAdminDashboardContent(); // Re-render content when tab changes
+            }
+
+            // --- Menu Rendering (Customer Page) ---
+            function populateMenu(category) {
+                const menuDiv = category === 'food' ? foodMenuDiv : drinksMenuDiv;
+                menuDiv.innerHTML = ''; // Clear previous items
+
+                menuItems[category].forEach(item => {
+                    const card = document.createElement('div');
+                    card.classList.add('menu-item-card');
+                    card.innerHTML = `
+                        <h3>${item.name}</h3>
+                        <p class="price">${formatCurrency(item.price)}</p>
+                        <div class="add-to-cart-controls">
+                            <button class="add-to-cart-button" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}">
+                                ເພີ່ມໃສ່ກະຕ່າ
+                            </button>
+                        </div>
+                    `;
+                    menuDiv.appendChild(card);
+                });
+
+                // Add event listeners for "Add to Cart" buttons
+                menuDiv.querySelectorAll('.add-to-cart-button').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const id = event.target.dataset.id;
+                        const name = event.target.dataset.name;
+                        const price = parseFloat(event.target.dataset.price);
+                        addToCart({ id, name, price });
+                    });
+                });
+            }
+
+            // --- Cart Management (Customer Page) ---
+            function addToCart(item) {
+                const existingItem = cart.find(cartItem => cartItem.id === item.id);
+                if (existingItem) {
+                    existingItem.quantity++;
+                } else {
+                    cart.push({ ...item, quantity: 1 });
+                }
+                saveCart();
+                renderCart();
+            }
+
+            function removeFromCart(itemId) {
+                cart = cart.filter(item => item.id !== itemId);
+                saveCart();
+                renderCart();
+            }
+
+            function updateCartQuantity(itemId, change) {
+                const item = cart.find(cartItem => cartItem.id === itemId);
+                if (item) {
+                    item.quantity += change;
+                    if (item.quantity <= 0) {
+                        removeFromCart(itemId);
+                    } else {
+                        saveCart();
+                        renderCart();
+                    }
+                }
+            }
+
+            function renderCart() {
+                cartItemsDiv.innerHTML = '';
+                if (cart.length === 0) {
+                    cartItemsDiv.innerHTML = '<p>ຍັງບໍ່ມີລາຍການໃນກະຕ່າ.</p>';
+                    checkoutButton.disabled = true;
+                } else {
+                    let fragment = document.createDocumentFragment();
+                    cart.forEach(item => {
+                        const itemElement = document.createElement('div');
+                        itemElement.classList.add('cart-item');
+                        itemElement.innerHTML = `
+                            <span>${item.name} x ${item.quantity}</span>
+                            <span>${formatCurrency(item.price * item.quantity)}</span>
+                            <div class="cart-item-actions" style="display: flex; gap: 5px; margin-left: 10px;">
+                                <button class="button small-button" data-id="${item.id}" data-action="decrease" style="padding: 5px 10px; font-size: 0.8em; background-color: #f44336;">-</button>
+                                <button class="button small-button" data-id="${item.id}" data-action="increase" style="padding: 5px 10px; font-size: 0.8em;">+</button>
+                            </div>
+                        `;
+                        fragment.appendChild(itemElement);
+                    });
+                    cartItemsDiv.appendChild(fragment);
+                    checkoutButton.disabled = false;
+                }
+                updateTotalPrice();
+
+                cartItemsDiv.querySelectorAll('.small-button').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const itemId = event.target.dataset.id;
+                        const action = event.target.dataset.action;
+                        if (action === 'decrease') {
+                            updateCartQuantity(itemId, -1);
+                        } else if (action === 'increase') {
+                            updateCartQuantity(itemId, 1);
+                        }
+                    });
+                });
+            }
+
+            function updateTotalPrice() {
+                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+                totalPriceSpan.textContent = formatCurrency(total);
+            }
+
+            function clearCart() {
+                cart = [];
+                saveCart();
+                renderCart();
+            }
+
+            // --- Admin Dashboard Functions ---
+            function renderAdminDashboardContent() {
+                const currentActiveTab = document.querySelector('.admin-tab-button.active').dataset.tab;
+                let filteredOrders = [];
+                let filteredCosts = [];
+
+                const filters = {
+                    day: filterDaySelect.value,
+                    month: filterMonthSelect.value,
+                    year: filterYearSelect.value,
+                    search: adminSearchInput.value.toLowerCase()
+                };
+
+                const isDateMatch = (timestamp, filters) => {
+                    const date = new Date(timestamp);
+                    const dayMatch = filters.day === 'all' || date.getDate().toString() === filters.day;
+                    const monthMatch = filters.month === 'all' || (date.getMonth() + 1).toString() === filters.month;
+                    const yearMatch = filters.year === 'all' || date.getFullYear().toString() === filters.year;
+                    return dayMatch && monthMatch && yearMatch;
+                };
+
+                // Render Pending Orders
+                if (currentActiveTab === 'pending-orders') {
+                    filteredOrders = orders.filter(order =>
+                        order.status === 'pending' &&
+                        isDateMatch(order.timestamp, filters) &&
+                        (filters.search === '' ||
+                         order.tableNumber.toLowerCase().includes(filters.search) ||
+                         order.items.some(item => item.name.toLowerCase().includes(filters.search)))
+                    );
+
+                    adminOrderList.innerHTML = '';
+                    if (filteredOrders.length === 0) {
+                        adminOrderList.innerHTML = '<p>ຍັງບໍ່ມີອໍເດີ້ທີ່ຍັງຄ້າງ.</p>';
+                    } else {
+                        filteredOrders.forEach(order => {
+                            const orderElement = document.createElement('li');
+                            orderElement.classList.add('order-item-admin');
+                            orderElement.innerHTML = `
+                                <div class="order-details">
+                                    <span><strong>ໂຕະ:</strong> ${order.tableNumber}</span>
+                                    <span><strong>ວັນທີ:</strong> ${new Date(order.timestamp).toLocaleString('lo-LA')}</span>
+                                    <span><strong>ລວມ:</strong> ${formatCurrency(order.total)}</span>
+                                </div>
+                                <h4>ລາຍການ:</h4>
+                                <ul class="order-items-list">
+                                    ${order.items.map(item => `<li>${item.name} x ${item.quantity} (${formatCurrency(item.price * item.quantity)})</li>`).join('')}
+                                </ul>
+                                <div class="order-actions">
+                                    <button class="action-button success-button" data-id="${order.id}" data-action="complete">ສຳເລັດ</button>
+                                </div>
+                            `;
+                            adminOrderList.appendChild(orderElement);
+                        });
+                    }
+                    pendingOrdersCountSpan.textContent = filteredOrders.length;
+                }
+                // Render Completed Orders
+                else if (currentActiveTab === 'completed-orders') {
+                    filteredOrders = completedOrders.filter(order =>
+                        isDateMatch(order.timestamp, filters) &&
+                        (filters.search === '' ||
+                         order.tableNumber.toLowerCase().includes(filters.search) ||
+                         order.items.some(item => item.name.toLowerCase().includes(filters.search)))
+                    );
+
+                    adminCompletedOrderList.innerHTML = '';
+                    if (filteredOrders.length === 0) {
+                        adminCompletedOrderList.innerHTML = '<p>ຍັງບໍ່ມີອໍເດີ້ທີ່ສຳເລັດ.</p>';
+                    } else {
+                        filteredOrders.forEach(order => {
+                            const orderElement = document.createElement('li');
+                            orderElement.classList.add('order-item-admin');
+                            orderElement.innerHTML = `
+                                <div class="order-details">
+                                    <span><strong>ໂຕະ:</strong> ${order.tableNumber}</span>
+                                    <span><strong>ວັນທີ:</strong> ${new Date(order.timestamp).toLocaleString('lo-LA')}</span>
+                                    <span><strong>ລວມ:</strong> ${formatCurrency(order.total)}</span>
+                                </div>
+                                <h4>ລາຍການ:</h4>
+                                <ul class="order-items-list">
+                                    ${order.items.map(item => `<li>${item.name} x ${item.quantity} (${formatCurrency(item.price * item.quantity)})</li>`).join('')}
+                                </ul>
+                                <div class="order-actions">
+                                    <button class="action-button clear-button" data-id="${order.id}" data-action="clear">ລຶບ</button>
+                                </div>
+                            `;
+                            adminCompletedOrderList.appendChild(orderElement);
+                        });
+                    }
+                    completedOrdersCountSpan.textContent = filteredOrders.length;
+
+                    // Calculate and display total revenue for completed orders
+                    const totalRevenue = filteredOrders.reduce((sum, order) => sum + order.total, 0);
+                    totalRevenueSpan.textContent = formatCurrency(totalRevenue);
+                }
+                // Render Accounting Tab
+                else if (currentActiveTab === 'accounting') {
+                    filteredCosts = costs.filter(cost =>
+                        isDateMatch(cost.timestamp, filters) &&
+                        (filters.search === '' || cost.description.toLowerCase().includes(filters.search))
+                    );
+
+                    costListUl.innerHTML = '';
+                    if (filteredCosts.length === 0) {
+                        costListUl.innerHTML = '<p>ຍັງບໍ່ມີລາຍການຕົ້ນທຶນ.</p>';
+                    } else {
+                        filteredCosts.forEach(cost => {
+                            const costItem = document.createElement('li');
+                            costItem.innerHTML = `
+                                <span>${cost.description} (${new Date(cost.timestamp).toLocaleDateString('lo-LA')})</span>
+                                <span>${formatCurrency(cost.amount)} <button class="remove-cost-btn" data-id="${cost.id}">ລຶບ</button></span>
+                            `;
+                            costListUl.appendChild(costItem);
+                        });
+                    }
+
+                    // Calculate and display total cost and net profit
+                    const totalCost = filteredCosts.reduce((sum, cost) => sum + cost.amount, 0);
+                    totalCostSpan.textContent = formatCurrency(totalCost);
+
+                    const currentRevenue = completedOrders
+                        .filter(order => isDateMatch(order.timestamp, filters))
+                        .reduce((sum, order) => sum + order.total, 0);
+                    
+                    const netProfit = currentRevenue - totalCost;
+                    netProfitSpan.textContent = formatCurrency(netProfit);
+                    netProfitSpan.style.color = netProfit >= 0 ? 'var(--primary-color)' : '#f44336'; // Green for profit, Red for loss
+                }
+
+                // Attach event listeners for admin actions
+                adminOrderList.querySelectorAll('.action-button[data-action="complete"]').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const orderId = event.target.dataset.id;
+                        completeOrder(orderId);
+                    });
+                });
+
+                adminCompletedOrderList.querySelectorAll('.action-button[data-action="clear"]').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const orderId = event.target.dataset.id;
+                        clearCompletedOrder(orderId);
+                    });
+                });
+
+                costListUl.querySelectorAll('.remove-cost-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        const costId = event.target.dataset.id;
+                        removeCost(costId);
+                    });
+                });
+            }
+
+            function completeOrder(orderId) {
+                const index = orders.findIndex(order => order.id === orderId);
+                if (index > -1) {
+                    const [completedOrder] = orders.splice(index, 1);
+                    completedOrder.status = 'completed';
+                    completedOrders.push(completedOrder);
+                    saveOrders();
+                    saveCompletedOrders();
+                    renderAdminDashboardContent(); // Re-render to update lists
+                }
+            }
+
+            function clearCompletedOrder(orderId) {
+                completedOrders = completedOrders.filter(order => order.id !== orderId);
+                saveCompletedOrders();
                 renderAdminDashboardContent();
             }
-        }
 
-        // --- Popups Logic (including new order review popup) ---
-        const tableNumberPopup = document.getElementById('table-number-popup');
-        // Removed tableNumberInput (already defined for customer page)
-        const confirmTableNumberButton = document.getElementById('confirm-table-number');
+            function addCost() {
+                const description = costDescriptionInput.value.trim();
+                const amount = parseFloat(costAmountInput.value);
 
-        const orderReviewPopup = document.getElementById('order-review-popup');
-        const reviewPopupTableNumber = document.getElementById('review-popup-table-number');
-        const orderReviewItemsUl = document.getElementById('order-review-items');
-        const reviewPopupTotalPrice = document.getElementById('review-popup-total-price');
-        const confirmOrderButton = document.getElementById('confirm-order-button');
-        const cancelOrderReviewButton = document.getElementById('cancel-order-review-button');
-
-        const orderConfirmationPopup = document.getElementById('order-confirmation-popup');
-        const confirmedTableNumberSpan = document.getElementById('confirmed-table-number');
-        const confirmedTotalPriceSpan = document.getElementById('confirmed-total-price');
-        const closeConfirmationPopupButton = document.getElementById('close-confirmation-popup');
-
-
-        function showTableNumberPopup() {
-            tableNumberPopup.classList.add('active');
-            // Assuming table-number-input for popup and customer page are different if needed
-            // For now, let's assume the one in the popup is not used if we directly use customer-table-number-input
-            document.getElementById('table-number-input').value = ''; // Clear previous input for this specific popup input
-            document.getElementById('table-number-input').focus();
-        }
-
-        function hideTableNumberPopup() {
-            tableNumberPopup.classList.remove('active');
-        }
-
-        function showOrderReviewPopup(tableNum, cartItems) {
-            reviewPopupTableNumber.textContent = tableNum;
-            orderReviewItemsUl.innerHTML = '';
-            let totalReview = 0;
-
-            if (cartItems.length === 0) {
-                orderReviewItemsUl.innerHTML = '<li>ไม่มีรายการในตะกร้า.</li>';
-            } else {
-                cartItems.forEach(item => {
-                    const li = document.createElement('li');
-                    li.innerHTML = `
-                        <span class="item-name">${item.name}</span>
-                        <span class="item-qty">x${item.quantity}</span>
-                        <span class="item-subtotal">${formatCurrency(item.price * item.quantity)}</span>
-                    `;
-                    orderReviewItemsUl.appendChild(li);
-                    totalReview += item.price * item.quantity;
-                });
-            }
-            reviewPopupTotalPrice.textContent = formatCurrency(totalReview);
-            orderReviewPopup.classList.add('active');
-        }
-
-
-        // --- Admin Dashboard Logic ---
-        const adminUsernameInput = document.getElementById('admin-username');
-        const adminPasswordInput = document.getElementById('admin-password');
-        const adminOrderList = document.getElementById('admin-order-list');
-        const adminCompletedOrderList = document.getElementById('admin-completed-order-list');
-        const pendingOrdersCountSpan = document.getElementById('pending-orders-count');
-        const completedOrdersCountSpan = document.getElementById('completed-orders-count');
-        const totalRevenueSpan = document.getElementById('total-revenue');
-        const totalCostSpan = document.getElementById('total-cost');
-        const netProfitSpan = document.getElementById('net-profit');
-
-        // Accounting elements
-        const costDescriptionInput = document.getElementById('cost-description');
-        const costAmountInput = document.getElementById('cost-amount');
-        const addCostButton = document.getElementById('add-cost-button');
-        const costListUl = document.getElementById('cost-list');
-
-        // Filter elements
-        const filterDaySelect = document.getElementById('filter-day');
-        const filterMonthSelect = document.getElementById('filter-month');
-        const filterYearSelect = document.getElementById('filter-year');
-        const adminSearchInput = document.getElementById('admin-search-input');
-        const adminSearchButton = document.getElementById('admin-search-button');
-
-        let currentAdminFilters = {
-            day: '',
-            month: '',
-            year: '',
-            search: ''
-        };
-
-        function populateDateFilters() {
-            const today = new Date();
-            const currentYear = today.getFullYear();
-
-            // Clear previous options
-            filterDaySelect.innerHTML = '<option value="">ທັງໝົດ</option>';
-            filterMonthSelect.innerHTML = '<option value="">ທັງໝົດ</option>';
-            filterYearSelect.innerHTML = '<option value="">ທັງໝົດ</option>';
-
-            // Populate days (1-31)
-            for (let i = 1; i <= 31; i++) {
-                const option = document.createElement('option');
-                option.value = i.toString().padStart(2, '0');
-                option.textContent = i.toString().padStart(2, '0');
-                filterDaySelect.appendChild(option);
-            }
-
-            // Populate months (1-12)
-            const monthNames = [
-                'ມັງກອນ', 'ກຸມພາ', 'ມີນາ', 'ເມສາ', 'ພຶດສະພາ', 'ມິຖຸນາ',
-                'ກໍລະກົດ', 'ສິງຫາ', 'ກັນຍາ', 'ຕຸລາ', 'ພະຈິກ', 'ທັນວາ'
-            ];
-            monthNames.forEach((name, index) => {
-                const option = document.createElement('option');
-                option.value = (index + 1).toString().padStart(2, '0');
-                option.textContent = name;
-                filterMonthSelect.appendChild(option);
-            });
-
-            // Populate years (e.g., current year - 5 to current year + 1)
-            for (let i = currentYear - 5; i <= currentYear + 1; i++) {
-                const option = document.createElement('option');
-                option.value = i.toString();
-                option.textContent = i.toString();
-                filterYearSelect.appendChild(option);
-            }
-
-            // Set current date as default filter
-            // This might make sense if the dashboard usually shows today's data
-            // If you want "All" as default, comment these two lines out
-            filterDaySelect.value = today.getDate().toString().padStart(2, '0');
-            filterMonthSelect.value = (today.getMonth() + 1).toString().padStart(2, '0');
-            filterYearSelect.value = currentYear.toString();
-
-
-            // Update currentAdminFilters to reflect default
-            currentAdminFilters.day = filterDaySelect.value;
-            currentAdminFilters.month = filterMonthSelect.value;
-            currentAdminFilters.year = filterYearSelect.value;
-        }
-
-        function isDateMatch(timestamp, filters) {
-            const date = new Date(timestamp);
-            const day = date.getDate().toString().padStart(2, '0');
-            const month = (date.getMonth() + 1).toString().padStart(2, '0');
-            const year = date.getFullYear().toString();
-
-            const dayMatch = filters.day === '' || day === filters.day;
-            const monthMatch = filters.month === '' || month === filters.month;
-            const yearMatch = filters.year === '' || year === filters.year;
-
-            return dayMatch && monthMatch && yearMatch;
-        }
-
-        function renderAdminDashboardContent() {
-            loadOrders(); // Always load the latest orders
-            loadCosts();  // Always load the latest costs
-
-            const filteredOrders = orders.filter(order =>
-                isDateMatch(order.timestamp, currentAdminFilters) &&
-                (currentAdminFilters.search === '' ||
-                 order.tableNumber.toLowerCase().includes(currentAdminFilters.search.toLowerCase()) ||
-                 order.items.some(item => item.name.toLowerCase().includes(currentAdminFilters.search.toLowerCase()))
-                )
-            );
-
-            const pendingOrders = filteredOrders.filter(order => order.status === 'pending');
-            const completedOrders = filteredOrders.filter(order => order.status === 'completed');
-
-            adminOrderList.innerHTML = '';
-            pendingOrdersCountSpan.textContent = pendingOrders.length;
-            if (pendingOrders.length === 0) {
-                adminOrderList.innerHTML = '<p>ຍັງບໍ່ມີອໍເດີ້ທີ່ຍັງຄ້າງ.</p>';
-            } else {
-                pendingOrders.sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)); // Sort by oldest first
-                pendingOrders.forEach(order => {
-                    const li = document.createElement('li');
-                    li.className = 'order-item-admin';
-                    const orderDate = new Date(order.timestamp).toLocaleString('lo-LA', { dateStyle: 'short', timeStyle: 'short' });
-                    li.innerHTML = `
-                        <div class="order-details">
-                            <span><strong>ໂຕະ:</strong> ${order.tableNumber}</span>
-                            <span><strong>ເວລາ:</strong> ${orderDate}</span>
-                            <span><strong>ລວມ:</strong> ${formatCurrency(order.total)}</span>
-                        </div>
-                        <div class="order-items-list">
-                            <h4>ລາຍການ:</h4>
-                            <ul>
-                                ${order.items.map(item => `<li>${item.name} x ${item.quantity} (${formatCurrency(item.price * item.quantity)})</li>`).join('')}
-                            </ul>
-                        </div>
-                        <div class="order-actions">
-                            <button class="action-button success-button" onclick="markOrderCompleted(${order.id})">ສຳເລັດ</button>
-                            <button class="action-button clear-button" onclick="cancelOrder(${order.id})">ຍົກເລີກ</button>
-                        </div>
-                    `;
-                    adminOrderList.appendChild(li);
-                });
-            }
-
-            adminCompletedOrderList.innerHTML = '';
-            completedOrdersCountSpan.textContent = completedOrders.length;
-            if (completedOrders.length === 0) {
-                adminCompletedOrderList.innerHTML = '<p>ຍັງບໍ່ມີອໍເດີ້ທີ່ສຳເລັດ.</p>';
-            } else {
-                completedOrders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // Sort by newest first
-                completedOrders.forEach(order => {
-                    const li = document.createElement('li');
-                    li.className = 'order-item-admin';
-                    const orderDate = new Date(order.timestamp).toLocaleString('lo-LA', { dateStyle: 'short', timeStyle: 'short' });
-                    li.innerHTML = `
-                        <div class="order-details">
-                            <span><strong>ໂຕະ:</strong> ${order.tableNumber}</span>
-                            <span><strong>ເວລາ:</strong> ${orderDate}</span>
-                            <span><strong>ລວມ:</strong> ${formatCurrency(order.total)}</span>
-                        </div>
-                        <div class="order-items-list">
-                            <h4>ລາຍການ:</h4>
-                            <ul>
-                                ${order.items.map(item => `<li>${item.name} x ${item.quantity} (${formatCurrency(item.price * item.quantity)})</li>`).join('')}
-                            </ul>
-                        </div>
-                    `;
-                    adminCompletedOrderList.appendChild(li);
-                });
-            }
-
-            // Render Costs
-            costListUl.innerHTML = '';
-            const filteredCosts = costs.filter(cost =>
-                isDateMatch(cost.timestamp, currentAdminFilters) &&
-                (currentAdminFilters.search === '' || cost.description.toLowerCase().includes(currentAdminFilters.search.toLowerCase()))
-            );
-
-            if (filteredCosts.length === 0) {
-                costListUl.innerHTML = '<p>ຍັງບໍ່ມີລາຍການຕົ້ນທຶນ.</p>';
-            } else {
-                filteredCosts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // Sort by newest first
-                filteredCosts.forEach(cost => {
-                    const li = document.createElement('li');
-                    const costDate = new Date(cost.timestamp).toLocaleString('lo-LA', { dateStyle: 'short' });
-                    li.innerHTML = `
-                        <span>${costDate}: ${cost.description}</span>
-                        <span>${formatCurrency(cost.amount)} <button class="remove-cost-btn" onclick="removeCost(${cost.id})"><i class="fas fa-times-circle"></i></button></span>
-                    `;
-                    costListUl.appendChild(li);
-                });
-            }
-
-            // Calculate & Display Summary
-            const totalRevenue = completedOrders.reduce((sum, order) => sum + order.total, 0);
-            totalRevenueSpan.textContent = formatCurrency(totalRevenue);
-
-            const totalCost = filteredCosts.reduce((sum, cost) => sum + cost.amount, 0);
-            totalCostSpan.textContent = formatCurrency(totalCost);
-
-            const netProfit = totalRevenue - totalCost;
-            netProfitSpan.textContent = formatCurrency(netProfit);
-            netProfitSpan.style.color = netProfit >= 0 ? 'var(--primary-color)' : '#f44336';
-        }
-
-        function markOrderCompleted(orderId) {
-            const orderIndex = orders.findIndex(order => order.id === orderId);
-            if (orderIndex > -1) {
-                orders[orderIndex].status = 'completed';
-                saveOrders();
-                renderAdminDashboardContent(); // Re-render to update lists
-            }
-        }
-
-        function cancelOrder(orderId) {
-            // Option 1: Remove from list entirely
-            orders = orders.filter(order => order.id !== orderId);
-            // Option 2: Mark as 'cancelled' (if you want to keep a record)
-            // const orderIndex = orders.findIndex(order => order.id === orderId);
-            // if (orderIndex > -1) {
-            //     orders[orderIndex].status = 'cancelled';
-            // }
-            saveOrders();
-            renderAdminDashboardContent(); // Re-render to update lists
-        }
-
-        function addCost() {
-            const description = costDescriptionInput.value.trim();
-            const amount = parseFloat(costAmountInput.value);
-
-            if (!description || isNaN(amount) || amount <= 0) {
-                alert('ກະລຸນາໃສ່ລາຍລະອຽດ ແລະ ຈຳນວນຕົ້ນທຶນທີ່ຖືກຕ້ອງ.');
-                return;
-            }
-
-            const newCost = {
-                id: Date.now(),
-                description: description,
-                amount: amount,
-                timestamp: new Date().toISOString()
-            };
-
-            costs.push(newCost);
-            saveCosts();
-            costDescriptionInput.value = '';
-            costAmountInput.value = '0';
-            renderAdminDashboardContent(); // Re-render to update costs and profit
-        }
-
-        function removeCost(costId) {
-            costs = costs.filter(cost => cost.id !== costId);
-            saveCosts();
-            renderAdminDashboardContent(); // Re-render to update costs and profit
-        }
-
-        function setActiveAdminTab(tabId) {
-            document.querySelectorAll('.admin-tab-button').forEach(button => {
-                if (button.dataset.tab === tabId) {
-                    button.classList.add('active');
+                if (description && amount > 0) {
+                    const newCost = {
+                        id: generateUniqueId(),
+                        description,
+                        amount,
+                        timestamp: new Date().toISOString()
+                    };
+                    costs.push(newCost);
+                    saveCosts();
+                    costDescriptionInput.value = '';
+                    costAmountInput.value = '0';
+                    renderAdminDashboardContent(); // Re-render accounting tab
                 } else {
-                    button.classList.remove('active');
+                    alert('ກະລຸນາໃສ່ລາຍລະອຽດ ແລະ ຈຳນວນຕົ້ນທຶນທີ່ຖືກຕ້ອງ.');
                 }
-            });
-            document.querySelectorAll('.admin-tab-content').forEach(content => {
-                if (content.id === `admin-${tabId}-tab`) {
-                    content.classList.add('active');
-                } else {
-                    content.classList.remove('active');
+            }
+
+            function removeCost(costId) {
+                costs = costs.filter(cost => cost.id !== costId);
+                saveCosts();
+                renderAdminDashboardContent();
+            }
+
+
+            // --- Date Filtering (Admin Dashboard) ---
+            function populateDateFilters() {
+                const currentYear = new Date().getFullYear();
+                const years = Array.from({ length: 5 }, (_, i) => currentYear - i); // Current year and past 4 years
+                const months = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
+                const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString().padStart(2, '0'));
+
+                function populateSelect(selectElement, options, includeAll = true) {
+                    selectElement.innerHTML = '';
+                    if (includeAll) {
+                        const allOption = document.createElement('option');
+                        allOption.value = 'all';
+                        allOption.textContent = 'ທັງໝົດ';
+                        selectElement.appendChild(allOption);
+                    }
+                    options.forEach(optionValue => {
+                        const option = document.createElement('option');
+                        option.value = optionValue;
+                        option.textContent = optionValue;
+                        selectElement.appendChild(option);
+                    });
                 }
-            });
-            renderAdminDashboardContent(); // Re-render content when tab changes
-        }
 
+                populateSelect(filterDaySelect, days);
+                populateSelect(filterMonthSelect, months);
+                populateSelect(filterYearSelect, years);
+            }
 
-        // --- Event Listeners ---
-        document.addEventListener('DOMContentLoaded', () => {
-            loadOrders(); // Load existing orders on startup
-            loadCosts();  // Load existing costs on startup
+            // --- Event Listeners ---
 
-            // Hide splash screen immediately, then fade out
-            splashScreen.style.opacity = '0';
-            // Use a short delay for smooth fade-out effect, then hide completely
+            // Splash screen fades out
             setTimeout(() => {
+                splashScreen.style.opacity = 0;
                 splashScreen.style.visibility = 'hidden';
-                mainContainer.style.opacity = '1';
+                mainContainer.style.opacity = 1;
                 mainContainer.style.transform = 'translateY(0)';
-                showPage('home-page'); // Show home page after splash
-            }, 500); // 0.5 seconds for fade-out
+                showPage('home-page');
+            }, 2000); // 2 second splash
 
+            // Home Page buttons
             startOrderingButton.addEventListener('click', () => {
-                showPage('customer-order-page'); // Show the new customer order page
+                showPopup(tableNumberPopup);
+                tableNumberInput.value = ''; // Clear previous input
+                tableNumberInput.focus();
             });
 
             adminModeButton.addEventListener('click', () => {
                 showPage('admin-login-page');
             });
 
+            // Admin Login Page
             adminLoginButton.addEventListener('click', () => {
                 const username = adminUsernameInput.value;
                 const password = adminPasswordInput.value;
-                // Simple admin login (for demonstration, use a robust auth in production)
-                if (username === 'admin' && password === 'admin123') {
+
+                if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
                     showPage('admin-dashboard');
+                    adminUsernameInput.value = ''; // Clear fields
+                    adminPasswordInput.value = '';
                 } else {
-                    alert('ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ');
+                    alert('ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ!');
                 }
             });
 
@@ -1853,34 +1848,89 @@
                 showPage('home-page');
             });
 
-            // Re-assign back button for the new customer order page
-            backToHomeFromCustomerOrderButton.addEventListener('click', () => {
-                showPage('home-page');
-                customerCart = []; // Clear cart if going back to home
-                customerTableNumberInput.value = ''; // Clear table number
-                renderCart(); // Update cart display
+            // Table Number Popup
+            confirmTableNumberButton.addEventListener('click', () => {
+                const tableNum = tableNumberInput.value.trim();
+                if (tableNum) {
+                    currentTableNumber = tableNum;
+                    hidePopup(tableNumberPopup);
+                    showPage('customer-page');
+                } else {
+                    alert('ກະລຸນາໃສ່ໝາຍເລກໂຕະ.');
+                }
             });
 
+            // Customer Page buttons
+            backToHomeFromCustomer.addEventListener('click', () => {
+                clearCart(); // Clear cart when returning to home from customer page
+                showPage('home-page');
+            });
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    setActiveCustomerTab(button.dataset.tab);
+                });
+            });
+
+            checkoutButton.addEventListener('click', () => {
+                if (cart.length > 0) {
+                    // Populate order review popup
+                    reviewPopupTableNumber.textContent = currentTableNumber;
+                    orderReviewItemsUl.innerHTML = '';
+                    let reviewTotal = 0;
+                    cart.forEach(item => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `
+                            <span class="item-name">${item.name}</span>
+                            <span class="item-qty">x${item.quantity}</span>
+                            <span class="item-subtotal">${formatCurrency(item.price * item.quantity)}</span>
+                        `;
+                        orderReviewItemsUl.appendChild(li);
+                        reviewTotal += (item.price * item.quantity);
+                    });
+                    reviewPopupTotalPrice.textContent = formatCurrency(reviewTotal);
+                    showPopup(orderReviewPopup);
+                } else {
+                    alert('ກະລຸນາເພີ່ມລາຍການໃສ່ກະຕ່າກ່ອນ!');
+                }
+            });
+
+            confirmOrderButton.addEventListener('click', () => {
+                // Save order to the 'orders' array (pending orders)
+                const newOrder = {
+                    id: generateUniqueId(),
+                    tableNumber: currentTableNumber,
+                    items: [...cart], // Copy cart items
+                    total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+                    timestamp: new Date().toISOString(), // Store as ISO string
+                    status: 'pending'
+                };
+                orders.push(newOrder);
+                saveOrders(); // Save to local storage
+
+                // Display confirmation
+                confirmedTableNumberSpan.textContent = currentTableNumber;
+                confirmedTotalPriceSpan.textContent = formatCurrency(newOrder.total);
+                hidePopup(orderReviewPopup);
+                showPopup(orderConfirmationPopup);
+
+                clearCart(); // Clear the cart after order is placed
+            });
+
+            cancelOrderReviewButton.addEventListener('click', () => {
+                hidePopup(orderReviewPopup);
+            });
+
+            closeConfirmationPopupButton.addEventListener('click', () => {
+                hidePopup(orderConfirmationPopup);
+                showPage('home-page'); // Go back to home page after confirmation
+            });
+
+            // Admin Dashboard
             backToHomeFromAdminDashboard.addEventListener('click', () => {
                 showPage('home-page');
             });
 
-            // Customer order page place order button
-            placeOrderButton.addEventListener('click', placeOrder); // Triggers review popup
-
-            // Order Review Popup buttons
-            confirmOrderButton.addEventListener('click', confirmOrderFinal);
-            cancelOrderReviewButton.addEventListener('click', () => {
-                orderReviewPopup.classList.remove('active');
-            });
-
-            // Order Confirmation Popup close button
-            closeConfirmationPopupButton.addEventListener('click', () => {
-                orderConfirmationPopup.classList.remove('active');
-            });
-
-
-            // Admin Dashboard tab switching
             adminTabButtons.forEach(button => {
                 button.addEventListener('click', () => {
                     setActiveAdminTab(button.dataset.tab);
@@ -1888,31 +1938,28 @@
             });
 
             // Admin Filters and Search
-            filterDaySelect.addEventListener('change', (e) => {
-                currentAdminFilters.day = e.target.value;
-                renderAdminDashboardContent();
-            });
-            filterMonthSelect.addEventListener('change', (e) => {
-                currentAdminFilters.month = e.target.value;
-                renderAdminDashboardContent();
-            });
-            filterYearSelect.addEventListener('change', (e) => {
-                currentAdminFilters.year = e.target.value;
-                renderAdminDashboardContent();
-            });
-            adminSearchButton.addEventListener('click', () => {
-                currentAdminFilters.search = adminSearchInput.value.trim();
-                renderAdminDashboardContent();
-            });
-            adminSearchInput.addEventListener('keyup', (e) => {
-                if (e.key === 'Enter') {
-                    currentAdminFilters.search = adminSearchInput.value.trim();
+            filterDaySelect.addEventListener('change', renderAdminDashboardContent);
+            filterMonthSelect.addEventListener('change', renderAdminDashboardContent);
+            filterYearSelect.addEventListener('change', renderAdminDashboardContent);
+            adminSearchButton.addEventListener('click', renderAdminDashboardContent);
+            adminSearchInput.addEventListener('keyup', (event) => {
+                if (event.key === 'Enter') {
                     renderAdminDashboardContent();
                 }
             });
 
-            // Accounting add cost button
+            // Accounting
             addCostButton.addEventListener('click', addCost);
+            costAmountInput.addEventListener('keyup', (event) => {
+                if (event.key === 'Enter') {
+                    addCost();
+                }
+            });
+
+            // Initial Data Load & Render (after splash screen)
+            // No initial renderAdminDashboardContent() or populateDateFilters() call here.
+            // They will be called when admin dashboard is first shown via showPage('admin-dashboard')
+            // which also calls populateDateFilters() and setActiveAdminTab().
         });
     </script>
 </body>
