@@ -465,13 +465,20 @@
             background-color: #f0f0f0;
         }
 
-        /* Date Filters */
+        /* Date Filters and Search */
+        .filter-and-search-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
         .date-filters {
             display: flex;
             justify-content: center;
             align-items: center;
             gap: 10px;
-            margin-bottom: 20px;
             flex-wrap: wrap; /* Allow filters to wrap */
             width: 100%;
         }
@@ -487,6 +494,43 @@
         }
         .date-filters select {
             width: 100%; /* Make select boxes take full width of their group */
+        }
+
+        .search-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .search-group input {
+            flex-grow: 1;
+            max-width: 300px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: var(--border-radius);
+            font-size: 1em;
+            box-shadow: inset 0 1px 3px var(--shadow-light);
+            transition: border-color 0.3s ease;
+        }
+        .search-group input:focus {
+            border-color: var(--primary-color);
+            outline: none;
+        }
+
+        .search-button {
+            padding: 10px 20px;
+            background-color: var(--secondary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            font-size: 1em;
+            flex-shrink: 0; /* Prevent button from shrinking */
+        }
+        .search-button:hover {
+            background-color: #1a7bce;
         }
 
 
@@ -911,6 +955,9 @@
                 border-right-color: var(--primary-color);
                 border-bottom-color: transparent; /* Ensure no bottom border */
             }
+            .filter-and-search-container {
+                gap: 10px;
+            }
             .date-filters {
                 flex-direction: column; /* Stack date filters vertically */
                 align-items: center;
@@ -919,6 +966,19 @@
             .date-filters .input-group {
                 width: 100%;
                 max-width: 250px; /* Limit width of stacked filters */
+            }
+            .search-group {
+                flex-direction: column; /* Stack search input and button */
+                align-items: center;
+                gap: 5px;
+            }
+            .search-group input {
+                width: 100%;
+                max-width: 250px; /* Limit width of stacked search input */
+            }
+            .search-button {
+                width: 100%;
+                max-width: 250px; /* Limit width of stacked search button */
             }
         }
 
@@ -968,7 +1028,7 @@
             .admin-tabs {
                 flex-wrap: wrap; /* Allow tabs to wrap if too many */
             }
-            .date-filters {
+            .date-filters, .search-group {
                 justify-content: center;
             }
         }
@@ -1010,6 +1070,12 @@
             }
             .admin-grid {
                 grid-template-columns: 1fr 1fr; /* Two columns for admin on desktops */
+            }
+            .date-filters {
+                justify-content: center;
+            }
+            .search-group {
+                justify-content: center;
             }
         }
     </style>
@@ -1086,18 +1152,25 @@
                 <button class="admin-tab-button" data-tab="accounting">ຕົ້ນທຶນ ແລະ ສະຫຼຸບກຳໄລ-ຂາດທຶນ</button>
             </div>
 
-            <div class="date-filters">
-                <div class="input-group">
-                    <label for="filter-day">ວັນທີ:</label>
-                    <select id="filter-day"></select>
+            <div class="filter-and-search-container">
+                <div class="date-filters">
+                    <div class="input-group">
+                        <label for="filter-day">ວັນທີ:</label>
+                        <select id="filter-day"></select>
+                    </div>
+                    <div class="input-group">
+                        <label for="filter-month">ເດືອນ:</label>
+                        <select id="filter-month"></select>
+                    </div>
+                    <div class="input-group">
+                        <label for="filter-year">ປີ:</label>
+                        <select id="filter-year"></select>
+                    </div>
                 </div>
-                <div class="input-group">
-                    <label for="filter-month">ເດືອນ:</label>
-                    <select id="filter-month"></select>
-                </div>
-                <div class="input-group">
-                    <label for="filter-year">ປີ:</label>
-                    <select id="filter-year"></select>
+
+                <div class="search-group">
+                    <input type="text" id="admin-search-input" placeholder="ຄົ້ນຫາ (ເຊັ່ນ: ໂຕະ, ລາຍການ, ຕົ້ນທຶນ)">
+                    <button class="search-button" id="admin-search-button">ຄົ້ນຫາ</button>
                 </div>
             </div>
 
@@ -1271,6 +1344,10 @@
             const filterDaySelect = document.getElementById('filter-day');
             const filterMonthSelect = document.getElementById('filter-month');
             const filterYearSelect = document.getElementById('filter-year');
+
+            // NEW: Search elements
+            const adminSearchInput = document.getElementById('admin-search-input');
+            const adminSearchButton = document.getElementById('admin-search-button');
 
             let currentTableNumber = null;
             let cart = {}; // { menuId: { item: {}, quantity: N } }
@@ -1644,16 +1721,30 @@
                 filterDaySelect.addEventListener('change', renderAdminDashboardContent);
                 filterMonthSelect.addEventListener('change', renderAdminDashboardContent);
                 filterYearSelect.addEventListener('change', renderAdminDashboardContent);
+
+                // Add event listeners for search
+                adminSearchButton.addEventListener('click', renderAdminDashboardContent);
+                adminSearchInput.addEventListener('keyup', (event) => {
+                    if (event.key === 'Enter') {
+                        renderAdminDashboardContent();
+                    }
+                });
             }
 
-            // --- Admin Dashboard RENDER with Filters ---
+            // --- Admin Dashboard RENDER with Filters and Search ---
             function renderAdminDashboardContent() {
                 const activeTab = document.querySelector('.admin-tab-button.active').dataset.tab;
                 const selectedDay = filterDaySelect.value;
                 const selectedMonth = filterMonthSelect.value;
                 const selectedYear = filterYearSelect.value;
+                const searchQuery = adminSearchInput.value.trim().toLowerCase(); // Get search query
 
-                const filterCriteria = { day: selectedDay, month: selectedMonth, year: selectedYear };
+                const filterCriteria = { 
+                    day: selectedDay, 
+                    month: selectedMonth, 
+                    year: selectedYear,
+                    search: searchQuery
+                };
                 
                 if (activeTab === 'pending-orders') {
                     renderAdminOrders(filterCriteria);
@@ -1687,17 +1778,21 @@
 
             function renderAdminOrders(filters) {
                 adminOrderList.innerHTML = '';
-                const pendingOrders = orders.filter(order => 
-                    order.status === 'ລໍຖ້າ' && isDateMatch(order.timestamp, filters)
+                const filteredOrders = orders.filter(order => 
+                    order.status === 'ລໍຖ້າ' && 
+                    isDateMatch(order.timestamp, filters) &&
+                    (filters.search === '' || 
+                     order.tableNumber.toLowerCase().includes(filters.search) ||
+                     order.items.some(item => item.name.toLowerCase().includes(filters.search)))
                 );
-                pendingOrdersCountSpan.textContent = pendingOrders.length;
+                pendingOrdersCountSpan.textContent = filteredOrders.length;
 
-                if (pendingOrders.length === 0) {
+                if (filteredOrders.length === 0) {
                     adminOrderList.innerHTML = '<p>ຍັງບໍ່ມີອໍເດີ້ທີ່ຍັງຄ້າງ.</p>';
                     return;
                 }
 
-                pendingOrders.forEach(order => {
+                filteredOrders.forEach(order => {
                     const listItem = document.createElement('li');
                     listItem.className = 'order-item-admin';
                     listItem.dataset.orderId = order.orderId;
@@ -1724,17 +1819,21 @@
 
             function renderCompletedOrders(filters) {
                 adminCompletedOrderList.innerHTML = '';
-                const completedOrders = orders.filter(order => 
-                    order.status === 'ສຳເລັດ' && isDateMatch(order.timestamp, filters)
+                const filteredCompletedOrders = orders.filter(order => 
+                    order.status === 'ສຳເລັດ' && 
+                    isDateMatch(order.timestamp, filters) &&
+                    (filters.search === '' || 
+                     order.tableNumber.toLowerCase().includes(filters.search) ||
+                     order.items.some(item => item.name.toLowerCase().includes(filters.search)))
                 );
-                completedOrdersCountSpan.textContent = completedOrders.length;
+                completedOrdersCountSpan.textContent = filteredCompletedOrders.length;
 
-                if (completedOrders.length === 0) {
+                if (filteredCompletedOrders.length === 0) {
                     adminCompletedOrderList.innerHTML = '<p>ຍັງບໍ່ມີອໍເດີ້ທີ່ສຳເລັດ.</p>';
                     return;
                 }
 
-                completedOrders.forEach(order => {
+                filteredCompletedOrders.forEach(order => {
                     const listItem = document.createElement('li');
                     listItem.className = 'order-item-admin';
                     listItem.innerHTML = `
@@ -1801,13 +1900,16 @@
 
             function renderCosts(filters) {
                 costListUl.innerHTML = '';
-                const filteredCosts = costs.filter(cost => isDateMatch(cost.timestamp, filters));
+                const filteredCosts = costs.filter(cost => 
+                    isDateMatch(cost.timestamp, filters) &&
+                    (filters.search === '' || cost.description.toLowerCase().includes(filters.search))
+                );
 
                 if (filteredCosts.length === 0) {
                     costListUl.innerHTML = '<p>ຍັງບໍ່ມີລາຍການຕົ້ນທຶນ.</p>';
                     return;
                 }
-                filteredCosts.forEach((cost) => { // No index needed for removal by ID
+                filteredCosts.forEach((cost) => {
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `
                         <span>${cost.description}: ${cost.amount.toLocaleString('lo-LA')} ກີບ</span>
@@ -1833,12 +1935,21 @@
 
             function updateAdminSummaries(filters) {
                 const totalRevenue = orders
-                    .filter(order => order.status === 'ສຳເລັດ' && isDateMatch(order.timestamp, filters))
+                    .filter(order => 
+                        order.status === 'ສຳເລັດ' && 
+                        isDateMatch(order.timestamp, filters) &&
+                        (filters.search === '' || 
+                         order.tableNumber.toLowerCase().includes(filters.search) ||
+                         order.items.some(item => item.name.toLowerCase().includes(filters.search)))
+                    )
                     .reduce((sum, order) => sum + order.total, 0);
                 totalRevenueSpan.textContent = totalRevenue.toLocaleString('lo-LA') + ' ກີບ';
 
                 const totalCost = costs
-                    .filter(cost => isDateMatch(cost.timestamp, filters))
+                    .filter(cost => 
+                        isDateMatch(cost.timestamp, filters) &&
+                        (filters.search === '' || cost.description.toLowerCase().includes(filters.search))
+                    )
                     .reduce((sum, cost) => sum + cost.amount, 0);
                 totalCostSpan.textContent = totalCost.toLocaleString('lo-LA') + ' ກີບ';
 
