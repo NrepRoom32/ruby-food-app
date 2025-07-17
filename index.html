@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ruby Food</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* CSS styles will go here */
         :root {
@@ -47,6 +49,41 @@
             transform: translateY(20px);
             animation: fadeInScale 0.8s forwards;
             position: relative;
+            display: flex; /* Use flex for main container to manage pages */
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Specific styles for Customer Page to allow scrolling */
+        #customer-page {
+            display: none; /* Hidden by default */
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-height: 80vh; /* Limit height to allow scrolling for the whole page */
+            overflow-y: auto; /* Enable vertical scrolling for the page */
+            padding-right: 15px; /* Account for scrollbar */
+            box-sizing: border-box;
+        }
+
+        /* Make sure order summary sticks to bottom or is visible */
+        .order-summary {
+            background-color: #f9f9f9;
+            border-radius: var(--border-radius);
+            padding: 15px;
+            margin-top: 20px;
+            border: 1px solid #eee;
+            text-align: left;
+            width: 100%;
+            box-sizing: border-box;
+            box-shadow: 0 2px 10px var(--shadow-light);
+            /* Add some margin-bottom if needed to ensure button is not hidden */
+            margin-bottom: 20px;
+        }
+
+        .checkout-button-container {
+            width: 100%;
+            padding: 10px 0; /* Padding for the container of the button */
         }
 
         /* Splash Screen */
@@ -86,11 +123,12 @@
         }
 
         /* Home Page */
-        #home-page, #customer-page, #admin-login-page, #admin-dashboard {
+        #home-page, #admin-login-page, #admin-dashboard {
             display: none;
             flex-direction: column;
             align-items: center;
             padding: 20px;
+            width: 100%; /* Ensure these pages take full width of container */
         }
 
         .app-icon {
@@ -106,7 +144,16 @@
             color: white;
             box-shadow: 0 8px 16px var(--shadow-medium);
             animation: bounce 1s infinite alternate;
+            overflow: hidden; /* Ensure image doesn't overflow */
         }
+        
+        .app-icon img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Cover the area, cropping if necessary */
+            border-radius: 20%; /* Match parent border-radius */
+        }
+
 
         @keyframes bounce {
             0% { transform: translateY(0); }
@@ -206,9 +253,8 @@
             justify-content: center;
             gap: 20px;
             width: 100%;
-            max-height: 500px; /* Adjust height for scrolling if needed */
-            overflow-y: auto;
-            padding-right: 10px; /* For scrollbar */
+            /* No max-height here, let the #customer-page scroll */
+            padding-bottom: 20px; /* Add padding for bottom items */
         }
 
         .menu-item-card {
@@ -224,6 +270,9 @@
             position: relative;
             opacity: 0;
             animation: fadeIn 0.5s forwards;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between; /* Push controls to bottom */
         }
 
         .menu-item-card:hover {
@@ -274,34 +323,12 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            margin-top: 10px;
+            margin-top: auto; /* Push to bottom of card */
+            padding-top: 10px;
         }
 
         .quantity-control {
-            display: flex;
-            align-items: center;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            overflow: hidden;
-            margin-right: 10px;
-        }
-
-        .quantity-control button {
-            background-color: #f0f0f0;
-            border: none;
-            padding: 5px 10px;
-            cursor: pointer;
-            font-size: 1em;
-            transition: background-color 0.2s ease;
-        }
-
-        .quantity-control button:hover {
-            background-color: #e0e0e0;
-        }
-
-        .quantity-control span {
-            padding: 5px 10px;
-            font-weight: bold;
+            display: none; /* Hide quantity control as per new requirement */
         }
 
         .add-to-cart-button {
@@ -313,23 +340,12 @@
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
             font-size: 0.9em;
+            margin-left: auto; /* Push button to the right */
         }
 
         .add-to-cart-button:hover {
             background-color: #45a049;
             transform: translateY(-2px);
-        }
-
-        .order-summary {
-            background-color: #f9f9f9;
-            border-radius: var(--border-radius);
-            padding: 15px;
-            margin-top: 20px;
-            border: 1px solid #eee;
-            text-align: left;
-            width: 100%;
-            box-sizing: border-box;
-            box-shadow: 0 2px 10px var(--shadow-light);
         }
 
         .order-summary h3 {
@@ -343,6 +359,20 @@
             margin-bottom: 8px;
             padding-bottom: 5px;
             border-bottom: 1px dashed #eee;
+        }
+
+        .order-item .remove-item-btn {
+            background: none;
+            border: none;
+            color: #f44336;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 10px;
+            transition: color 0.2s ease;
+        }
+
+        .order-item .remove-item-btn:hover {
+            color: #da190b;
         }
 
         .order-total {
@@ -379,6 +409,9 @@
             width: 100%;
             max-width: 900px;
             box-sizing: border-box;
+            max-height: 80vh; /* Allow scrolling for dashboard if content is long */
+            overflow-y: auto;
+            padding-right: 15px; /* Account for scrollbar */
         }
 
         #admin-dashboard h2 {
@@ -539,8 +572,10 @@
             text-align: center;
             transform: scale(0.8);
             transition: transform 0.3s ease;
-            max-width: 400px;
+            max-width: 450px; /* Increased max-width for order confirmation */
             width: 90%;
+            max-height: 80vh; /* Allow popup content to scroll */
+            overflow-y: auto;
         }
 
         .popup-overlay.active .popup-content {
@@ -555,6 +590,22 @@
 
         .popup-content button {
             margin-top: 20px;
+        }
+        
+        .order-confirmation-items {
+            text-align: left;
+            margin-top: 15px;
+            border-top: 1px solid #eee;
+            padding-top: 10px;
+            max-height: 200px; /* Limit height for scrollable items */
+            overflow-y: auto;
+        }
+
+        .order-confirmation-items div {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+            font-size: 0.95em;
         }
 
         /* Animations */
@@ -641,7 +692,8 @@
     <div class="container" id="main-container">
         <div id="home-page">
             <div class="app-icon">
-                <span class="fas fa-utensils"></span> </div>
+                <img src="dreamina-2025-07-07-6231-white-background.jpg" alt="Ruby Food Icon">
+                </div>
             <h1>Ruby Food</h1>
             <button class="button" id="start-ordering-button">ເລີ່ມສັ່ງອາຫານ</button>
             <button class="button" id="admin-mode-button">ໂໝດແອັດມິ້ນ</button>
@@ -682,6 +734,8 @@
                     <span>ລວມທັງໝົດ:</span>
                     <span id="total-price">0 ກີບ</span>
                 </div>
+            </div>
+            <div class="checkout-button-container">
                 <button class="button checkout-button" id="checkout-button">ສັ່ງເລີຍ</button>
                 <button class="button" id="back-to-home-from-customer" style="background-color: #f44336;">ກັບຄືນໜ້າຫຼັກ</button>
             </div>
@@ -741,9 +795,24 @@
             <h3>ກະລຸນາໃສ່ໝາຍເລກໂຕະ</h3>
             <div class="input-group">
                 <label for="table-number-input">ໝາຍເລກໂຕະ:</label>
-                <input type="number" id="table-number-input" min="1" placeholder="ຕົວຢ່າງ: 101">
+                <input type="text" id="table-number-input" placeholder="ຕົວຢ່າງ: 01" maxlength="2">
             </div>
             <button class="button" id="confirm-table-number">ຢືນຢັນ</button>
+        </div>
+    </div>
+
+    <div id="order-confirm-popup" class="popup-overlay">
+        <div class="popup-content">
+            <h3>ຢືນຢັນລາຍການສັ່ງຊື້</h3>
+            <p>ໝາຍເລກໂຕະ: <strong id="confirm-popup-table-number"></strong></p>
+            <div class="order-confirmation-items" id="confirm-popup-items">
+                </div>
+            <p class="order-total">
+                <span>ລວມທັງໝົດ:</span>
+                <span id="confirm-popup-total-price">0 ກີບ</span>
+            </p>
+            <button class="button" id="place-order-button">ສັ່ງເລີຍ</button>
+            <button class="button" id="cancel-order-button" style="background-color: #f44336;">ຍົກເລີກ</button>
         </div>
     </div>
 
@@ -756,10 +825,7 @@
         </div>
     </div>
 
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // JavaScript code will go here
         document.addEventListener('DOMContentLoaded', () => {
             const splashScreen = document.getElementById('splash-screen');
             const mainContainer = document.getElementById('main-container');
@@ -779,7 +845,14 @@
             const tableNumberInput = document.getElementById('table-number-input');
             const confirmTableNumberButton = document.getElementById('confirm-table-number');
 
-            const orderConfirmationPopup = document.getElementById('order-confirmation-popup');
+            const orderConfirmPopup = document.getElementById('order-confirm-popup'); // New confirmation popup
+            const confirmPopupTableNumber = document.getElementById('confirm-popup-table-number');
+            const confirmPopupItems = document.getElementById('confirm-popup-items');
+            const confirmPopupTotalPrice = document.getElementById('confirm-popup-total-price');
+            const placeOrderButton = document.getElementById('place-order-button');
+            const cancelOrderButton = document.getElementById('cancel-order-button');
+
+            const orderConfirmationPopup = document.getElementById('order-confirmation-popup'); // Final success popup
             const confirmedTableNumberSpan = document.getElementById('confirmed-table-number');
             const confirmedTotalPriceSpan = document.getElementById('confirmed-total-price');
             const closeConfirmationPopupButton = document.getElementById('close-confirmation-popup');
@@ -825,8 +898,9 @@
             };
 
             let favorites = JSON.parse(localStorage.getItem('rubyFoodFavorites')) || [];
-            let storedOrders = JSON.parse(localStorage.getItem('rubyFoodOrders')) || [];
-            let storedCosts = JSON.parse(localStorage.getItem('rubyFoodCosts')) || [];
+            // Load initial orders and costs from localStorage, or initialize empty arrays
+            orders = JSON.parse(localStorage.getItem('rubyFoodOrders')) || [];
+            costs = JSON.parse(localStorage.getItem('rubyFoodCosts')) || [];
 
             // --- Initial Load and Splash Screen ---
             setTimeout(() => {
@@ -843,14 +917,23 @@
                 pages.forEach(page => {
                     if (page.id === pageId) {
                         page.style.display = 'flex';
-                        page.classList.add('slide-in-right'); // or other entry animation
+                        // Add animation class if transitioning from a different page
+                        if (!page.classList.contains('slide-in-right') && page.style.display === 'none') {
+                           page.classList.add('slide-in-right');
+                        }
                         page.classList.remove('slide-out-left');
                     } else {
-                        page.classList.add('slide-out-left'); // or other exit animation
-                        setTimeout(() => {
-                            page.style.display = 'none';
-                            page.classList.remove('slide-out-left');
-                        }, 500); // Match animation duration
+                        // Apply exit animation before hiding
+                        if (page.style.display === 'flex') {
+                            page.classList.add('slide-out-left');
+                            setTimeout(() => {
+                                page.style.display = 'none';
+                                page.classList.remove('slide-out-left');
+                                page.classList.remove('slide-in-right'); // Clean up entry animation class
+                            }, 500); // Match animation duration
+                        } else {
+                            page.style.display = 'none'; // Ensure it's hidden if not in view
+                        }
                     }
                 });
                 if (pageId === 'customer-page') {
@@ -866,6 +949,7 @@
 
             // --- Home Page Buttons ---
             startOrderingButton.addEventListener('click', () => {
+                tableNumberInput.value = '01'; // Set example value
                 tableNumberPopup.classList.add('active');
                 tableNumberInput.focus();
             });
@@ -893,14 +977,19 @@
 
             // --- Table Number Popup ---
             confirmTableNumberButton.addEventListener('click', () => {
-                const tableNum = tableNumberInput.value.trim();
-                if (tableNum && parseInt(tableNum) > 0) {
+                let tableNum = tableNumberInput.value.trim();
+                // Ensure table number is two digits if it's a single digit
+                if (tableNum.length === 1 && parseInt(tableNum) < 10) {
+                    tableNum = '0' + tableNum;
+                }
+
+                if (tableNum && tableNum.length <= 2 && parseInt(tableNum) > 0) { // Max 2 digits
                     currentTableNumber = tableNum;
                     tableNumberPopup.classList.remove('active');
                     showPage('customer-page');
                     tableNumberInput.value = '';
                 } else {
-                    alert('ກະລຸນາໃສ່ໝາຍເລກໂຕະທີ່ຖືກຕ້ອງ!');
+                    alert('ກະລຸນາໃສ່ໝາຍເລກໂຕະທີ່ຖືກຕ້ອງ (ຕົວຢ່າງ: 01, 10).');
                 }
             });
 
@@ -922,11 +1011,6 @@
                             <i class="${isFavorite ? 'fas' : 'far'} fa-heart"></i>
                         </button>
                         <div class="add-to-cart-controls">
-                            <div class="quantity-control">
-                                <button class="decrease-quantity" data-id="${item.id}">-</button>
-                                <span class="item-quantity" id="quantity-${item.id}">0</span>
-                                <button class="increase-quantity" data-id="${item.id}">+</button>
-                            </div>
                             <button class="add-to-cart-button" data-id="${item.id}">ເພີ່ມ</button>
                         </div>
                     `;
@@ -958,45 +1042,19 @@
                     });
                 });
 
-                document.querySelectorAll('.increase-quantity').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const id = e.currentTarget.dataset.id;
-                        const quantitySpan = document.getElementById(`quantity-${id}`);
-                        let quantity = parseInt(quantitySpan.textContent);
-                        quantity++;
-                        quantitySpan.textContent = quantity;
-                        updateCartItemQuantity(id, quantity);
-                    });
-                });
-
-                document.querySelectorAll('.decrease-quantity').forEach(button => {
-                    button.addEventListener('click', (e) => {
-                        const id = e.currentTarget.dataset.id;
-                        const quantitySpan = document.getElementById(`quantity-${id}`);
-                        let quantity = parseInt(quantitySpan.textContent);
-                        if (quantity > 0) {
-                            quantity--;
-                            quantitySpan.textContent = quantity;
-                            updateCartItemQuantity(id, quantity);
-                        }
-                    });
-                });
-
                 document.querySelectorAll('.add-to-cart-button').forEach(button => {
                     button.addEventListener('click', (e) => {
                         const id = e.currentTarget.dataset.id;
-                        const quantitySpan = document.getElementById(`quantity-${id}`);
-                        const quantity = parseInt(quantitySpan.textContent);
-                        if (quantity > 0) {
-                            const item = [...menuItems.food, ...menuItems.drinks].find(i => i.id === id);
-                            if (item) {
-                                cart[id] = { item: item, quantity: quantity };
-                                updateCartDisplay();
-                                quantitySpan.textContent = '0'; // Reset quantity after adding to cart
-                                alert(`${item.name} ${quantity} ລາຍການ ຖືກເພີ່ມເຂົ້າກະຕ່າແລ້ວ!`);
+                        const item = [...menuItems.food, ...menuItems.drinks].find(i => i.id === id);
+                        if (item) {
+                            if (cart[id]) {
+                                cart[id].quantity++;
+                            } else {
+                                cart[id] = { item: item, quantity: 1 };
                             }
-                        } else {
-                            alert('ກະລຸນາເລືອກຈຳນວນກ່ອນເພີ່ມເຂົ້າກະຕ່າ.');
+                            updateCartDisplay();
+                            // Optional: Show a quick feedback like "Added!"
+                            // console.log(`${item.name} added to cart. Current quantity: ${cart[id].quantity}`);
                         }
                     });
                 });
@@ -1019,14 +1077,6 @@
                 });
             });
 
-            function updateCartItemQuantity(id, quantity) {
-                if (cart[id]) {
-                    cart[id].quantity = quantity;
-                }
-                // If quantity drops to 0, remove from cart when updating display or on checkout
-                updateCartDisplay();
-            }
-
             function updateCartDisplay() {
                 cartItemsDiv.innerHTML = '';
                 let total = 0;
@@ -1044,7 +1094,9 @@
                         cartItemDiv.className = 'order-item';
                         cartItemDiv.innerHTML = `
                             <span>${item.name} x ${quantity}</span>
-                            <span>${itemTotal.toLocaleString('lo-LA')} ກີບ</span>
+                            <span>${itemTotal.toLocaleString('lo-LA')} ກີບ 
+                                <button class="remove-item-btn" data-id="${id}"><i class="fas fa-times-circle"></i></button>
+                            </span>
                         `;
                         cartItemsDiv.appendChild(cartItemDiv);
                     }
@@ -1052,6 +1104,17 @@
 
                 if (!hasItems) {
                     cartItemsDiv.innerHTML = '<p>ຍັງບໍ່ມີລາຍການໃນກະຕ່າ.</p>';
+                } else {
+                    // Attach remove item listeners
+                    document.querySelectorAll('.remove-item-btn').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const idToRemove = e.currentTarget.dataset.id;
+                            if (cart[idToRemove]) {
+                                delete cart[idToRemove]; // Remove the item completely
+                                updateCartDisplay();
+                            }
+                        });
+                    });
                 }
 
                 totalPriceSpan.textContent = total.toLocaleString('lo-LA') + ' ກີບ';
@@ -1072,6 +1135,26 @@
 
                 const orderTotal = orderedItems.reduce((sum, item) => sum + (item.item.price * item.quantity), 0);
 
+                // Populate confirmation popup
+                confirmPopupTableNumber.textContent = currentTableNumber;
+                confirmPopupItems.innerHTML = '';
+                orderedItems.forEach(item => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.innerHTML = `
+                        <span>${item.item.name} x ${item.quantity}</span>
+                        <span>${(item.item.price * item.quantity).toLocaleString('lo-LA')} ກີບ</span>
+                    `;
+                    confirmPopupItems.appendChild(itemDiv);
+                });
+                confirmPopupTotalPrice.textContent = orderTotal.toLocaleString('lo-LA') + ' ກີບ';
+
+                orderConfirmPopup.classList.add('active'); // Show confirmation popup
+            });
+
+            placeOrderButton.addEventListener('click', () => {
+                const orderedItems = Object.values(cart).filter(item => item.quantity > 0);
+                const orderTotal = orderedItems.reduce((sum, item) => sum + (item.item.price * item.quantity), 0);
+
                 const newOrder = {
                     orderId: Date.now(), // Unique ID for the order
                     tableNumber: currentTableNumber,
@@ -1087,13 +1170,18 @@
                 orders.push(newOrder);
                 localStorage.setItem('rubyFoodOrders', JSON.stringify(orders));
 
+                orderConfirmPopup.classList.remove('active'); // Hide confirmation popup
                 confirmedTableNumberSpan.textContent = currentTableNumber;
                 confirmedTotalPriceSpan.textContent = orderTotal.toLocaleString('lo-LA') + ' ກີບ';
-                orderConfirmationPopup.classList.add('active');
+                orderConfirmationPopup.classList.add('active'); // Show final success popup
 
                 // Clear cart after successful order
                 cart = {};
                 updateCartDisplay();
+            });
+
+            cancelOrderButton.addEventListener('click', () => {
+                orderConfirmPopup.classList.remove('active'); // Hide confirmation popup
             });
 
             closeConfirmationPopupButton.addEventListener('click', () => {
@@ -1115,7 +1203,7 @@
             // --- Admin Dashboard ---
             function renderAdminOrders() {
                 adminOrderList.innerHTML = '';
-                const pendingOrders = storedOrders.filter(order => order.status === 'ລໍຖ້າ');
+                const pendingOrders = orders.filter(order => order.status === 'ລໍຖ້າ');
                 pendingOrdersCountSpan.textContent = pendingOrders.length;
 
                 if (pendingOrders.length === 0) {
@@ -1153,10 +1241,10 @@
                 document.querySelectorAll('.success-button').forEach(button => {
                     button.addEventListener('click', (e) => {
                         const orderId = parseInt(e.currentTarget.dataset.id);
-                        const orderIndex = storedOrders.findIndex(order => order.orderId === orderId);
+                        const orderIndex = orders.findIndex(order => order.orderId === orderId);
                         if (orderIndex !== -1) {
-                            storedOrders[orderIndex].status = 'ສຳເລັດ'; // Completed
-                            localStorage.setItem('rubyFoodOrders', JSON.stringify(storedOrders));
+                            orders[orderIndex].status = 'ສຳເລັດ'; // Completed
+                            localStorage.setItem('rubyFoodOrders', JSON.stringify(orders));
                             renderAdminOrders();
                             updateCharts(); // Update charts after an order is completed
                         }
@@ -1167,8 +1255,8 @@
                     button.addEventListener('click', (e) => {
                         const orderId = parseInt(e.currentTarget.dataset.id);
                         if (confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບອໍເດີ້ນີ້?')) {
-                            storedOrders = storedOrders.filter(order => order.orderId !== orderId);
-                            localStorage.setItem('rubyFoodOrders', JSON.stringify(storedOrders));
+                            orders = orders.filter(order => order.orderId !== orderId);
+                            localStorage.setItem('rubyFoodOrders', JSON.stringify(orders));
                             renderAdminOrders();
                             updateCharts();
                         }
@@ -1178,13 +1266,17 @@
 
             // --- Dashboard Charts (Chart.js) ---
             function updateCharts() {
-                const completedOrders = storedOrders.filter(order => order.status === 'ສຳເລັດ');
+                const completedOrders = orders.filter(order => order.status === 'ສຳເລັດ');
                 const dailyRevenue = {};
                 const menuSales = {};
+                let totalRevenue = 0;
+                let totalCost = costs.reduce((sum, cost) => sum + cost.amount, 0);
 
                 completedOrders.forEach(order => {
-                    const date = new Date(order.timestamp).toLocaleDateString('lo-LA');
-                    dailyRevenue[date] = (dailyRevenue[date] || 0) + order.total;
+                    // Use a consistent date format for daily revenue (YYYY-MM-DD)
+                    const orderDate = new Date(order.timestamp).toISOString().split('T')[0];
+                    dailyRevenue[orderDate] = (dailyRevenue[orderDate] || 0) + order.total;
+                    totalRevenue += order.total;
 
                     order.items.forEach(item => {
                         menuSales[item.name] = (menuSales[item.name] || 0) + item.quantity;
@@ -1271,6 +1363,12 @@
                         }
                     }
                 });
+                
+                // Add profit/loss calculation to dashboard (you might need to create a dedicated display area)
+                const netProfit = totalRevenue - totalCost;
+                // console.log(`Total Revenue: ${totalRevenue}, Total Cost: ${totalCost}, Net Profit: ${netProfit}`);
+                // You can display this somewhere on the admin dashboard, e.g., in a new div.
+                // Example: document.getElementById('net-profit-display').textContent = `ກຳໄລສຸດທິ: ${netProfit.toLocaleString('lo-LA')} ກີບ`;
             }
 
             // --- Accounting System (Costs) ---
@@ -1302,21 +1400,33 @@
                     costListUl.innerHTML = '<p>ຍັງບໍ່ມີລາຍການຕົ້ນທຶນ.</p>';
                     return;
                 }
-                costs.forEach(cost => {
+                costs.forEach((cost, index) => {
                     const listItem = document.createElement('li');
                     listItem.innerHTML = `
                         <span>${cost.description}: ${cost.amount.toLocaleString('lo-LA')} ກີບ</span>
-                        <span style="font-size: 0.8em; color: #888;"> (${cost.timestamp})</span>
+                        <span style="font-size: 0.8em; color: #888;"> (${cost.timestamp}) 
+                            <button class="remove-cost-btn" data-id="${cost.id}" style="background: none; border: none; color: #f44336; cursor: pointer; margin-left: 5px;">
+                                <i class="fas fa-times-circle"></i>
+                            </button>
+                        </span>
                     `;
                     costListUl.appendChild(listItem);
                 });
+                // Attach remove cost listeners
+                document.querySelectorAll('.remove-cost-btn').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const costIdToRemove = parseInt(e.currentTarget.dataset.id);
+                        if (confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບຕົ້ນທຶນນີ້?')) {
+                            costs = costs.filter(cost => cost.id !== costIdToRemove);
+                            localStorage.setItem('rubyFoodCosts', JSON.stringify(costs));
+                            renderCosts();
+                            updateCharts();
+                        }
+                    });
+                });
             }
 
-            // --- Initial Data Load ---
-            orders = storedOrders; // Load orders from localStorage
-            costs = storedCosts; // Load costs from localStorage
-
-            // Initialize charts and render admin orders after data is loaded
+            // --- Initial Data Load & Render ---
             renderAdminOrders();
             updateCharts();
             renderCosts();
