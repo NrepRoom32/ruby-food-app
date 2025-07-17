@@ -1353,8 +1353,9 @@
             let costs = JSON.parse(localStorage.getItem('costs')) || [];
 
             let currentTableNumber = '';
-            const ADMIN_USERNAME = 'admin';
-            const ADMIN_PASSWORD = '123'; // In a real app, never hardcode passwords and use secure authentication
+            // MODIFIED: Admin Username and Password
+            const ADMIN_USERNAME = 'panda'; 
+            const ADMIN_PASSWORD = '123'; 
 
             // --- Menu Data ---
             const menuItems = {
@@ -1370,7 +1371,10 @@
                     { id: 'd1', name: 'ນ້ຳອັດລົມ', price: 10000, isFavorite: false },
                     { id: 'd2', name: 'ນ້ຳໝາກໄມ້', price: 15000, isFavorite: false },
                     { id: 'd3', name: 'ກາເຟເຢັນ', price: 12000, isFavorite: false },
-                    { id: 'd4', name: 'ຊາເຢັນ', price: 10000, isFavorite: false }
+                    { id: 'd4', name: 'ຊາເຢັນ', price: 10000, isFavorite: false },
+                    // NEW: Add more drink items here
+                    { id: 'd5', name: 'ນ້ຳດື່ມ', price: 5000, isFavorite: false },
+                    { id: 'd6', name: 'ໂຄກ', price: 8000, isFavorite: false }
                 ]
             };
 
