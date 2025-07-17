@@ -42,8 +42,8 @@
             box-shadow: 0 10px 30px var(--shadow-medium);
             padding: 20px;
             text-align: center;
-            max-width: 90%; /* Default for smaller screens */
-            width: 800px; /* Base width, will be overridden by media queries */
+            width: 95%; /* Default for smaller screens */
+            max-width: 1200px; /* Max width for very large screens */
             box-sizing: border-box;
             opacity: 0;
             transform: translateY(20px);
@@ -52,7 +52,8 @@
             display: flex; /* Use flex for main container to manage pages */
             flex-direction: column;
             align-items: center;
-            max-height: 95vh; /* Limit overall container height for larger screens */
+            max-height: 95vh; /* Limit overall container height */
+            min-height: 500px; /* Minimum height for better appearance */
         }
 
         /* --- Page Specific Layouts --- */
@@ -98,9 +99,9 @@
             display: none;
             flex-direction: column;
             align-items: center;
-            padding: 20px;
+            padding: 10px; /* Reduced padding here as container has it */
             width: 100%;
-            box-sizing: border-box; /* Ensure padding is included in width */
+            box-sizing: border-box;
             overflow-y: auto; /* Allow scrolling for content that overflows */
             max-height: calc(95vh - 40px); /* Adjust max-height to fit within container */
         }
@@ -192,76 +193,24 @@
         /* --- Customer Page Layout (Tabs on Side) --- */
         #customer-page {
             display: none; /* Hidden by default */
-            flex-direction: column; /* Default to column for small screens */
+            flex-direction: column; /* Default: stack header, layout, footer */
             width: 100%;
             box-sizing: border-box;
-            max-height: 95vh; /* Ensure the page fits within the container */
+            height: 100%; /* Take full height of container */
+            max-height: calc(95vh - 40px); /* Max height within container */
         }
 
-        .customer-page-layout {
-            display: flex;
-            flex-direction: column; /* Stack vertically by default */
-            width: 100%;
-            height: 100%; /* Take full height of customer-page */
-            overflow: hidden; /* Prevent internal scrollbars in this flex container */
-        }
-
-        .sidebar-tabs {
-            display: flex;
-            flex-direction: row; /* Horizontal tabs for small screens */
-            justify-content: center;
-            border-bottom: 2px solid #eee;
-            margin-bottom: 10px;
-            padding-bottom: 10px;
-            width: 100%;
-            flex-shrink: 0; /* Prevent shrinking */
-        }
-
-        .tab-button {
-            padding: 15px 25px;
-            cursor: pointer;
-            border: none;
-            background-color: transparent;
-            font-size: 1.1em;
-            color: var(--text-color-dark);
-            transition: all 0.3s ease;
-            border-bottom: 3px solid transparent; /* For horizontal */
-            flex-grow: 1; /* Distribute space evenly */
-            text-align: center;
-        }
-
-        .tab-button.active {
-            color: var(--primary-color);
-            border-bottom-color: var(--primary-color); /* For horizontal */
-            font-weight: bold;
-        }
-
-        .main-content {
-            flex-grow: 1; /* Take remaining space */
-            overflow-y: auto; /* Scrollable menu content */
-            padding-right: 15px; /* Account for scrollbar */
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 10px; /* Space from order summary */
-        }
-
-        /* Order Summary Position (Moved to top) */
+        /* Order Summary (Always at top of customer page) */
         .order-summary {
             background-color: #f9f9f9;
             border-radius: var(--border-radius);
             padding: 15px;
-            margin-bottom: 20px; /* Space below summary */
+            margin-bottom: 15px; /* Space below summary */
             border: 1px solid #eee;
             text-align: left;
             width: 100%;
             box-sizing: border-box;
             box-shadow: 0 2px 10px var(--shadow-light);
-            order: -1; /* Make it appear first in flex container */
-            position: sticky; /* Make it stick to top on scroll */
-            top: 0; /* Stick to the very top */
-            z-index: 10; /* Ensure it's above other content when scrolling */
             flex-shrink: 0; /* Prevent shrinking */
         }
 
@@ -279,36 +228,67 @@
             color: var(--primary-color);
         }
 
-        .checkout-button-container {
+        /* Main layout for tabs and menu content */
+        .customer-page-layout {
+            display: flex;
+            flex-grow: 1; /* Take up available space between header and footer */
             width: 100%;
-            padding: 10px 0;
-            position: sticky; /* Stick to bottom */
-            bottom: 0; /* Stick to the very bottom */
-            background-color: #fff; /* Cover content when scrolling */
-            z-index: 10;
-            border-top: 1px solid #eee; /* Visual separation */
-            box-shadow: 0 -2px 10px var(--shadow-light); /* Shadow above */
-            flex-shrink: 0; /* Prevent shrinking */
+            overflow: hidden; /* Manage internal scrolling */
         }
 
-        .checkout-button {
-            width: 100%;
-            margin-top: 0; /* No top margin needed inside container */
-            background-color: var(--secondary-color);
+        .sidebar-tabs {
+            display: flex;
+            flex-direction: column; /* Vertical tabs by default */
+            border-right: 2px solid #eee;
+            margin-right: 20px;
+            padding-right: 10px;
+            flex-shrink: 0; /* Don't shrink */
+            width: 150px; /* Fixed width for sidebar */
+            overflow-y: auto; /* If many tabs */
         }
 
-        .checkout-button:hover {
-            background-color: #1a7bce;
+        .tab-button {
+            padding: 15px 10px;
+            cursor: pointer;
+            border: none;
+            background-color: transparent;
+            font-size: 1.1em;
+            color: var(--text-color-dark);
+            transition: all 0.3s ease;
+            border-right: 3px solid transparent; /* For vertical */
+            text-align: left;
+            margin-bottom: 5px; /* Space between vertical tabs */
         }
 
-        /* Menu Content */
+        .tab-button.active {
+            color: var(--primary-color);
+            border-right-color: var(--primary-color); /* For vertical */
+            font-weight: bold;
+            background-color: #e8f5e9; /* Light background for active tab */
+        }
+
+        .tab-button:hover:not(.active) {
+            background-color: #f0f0f0;
+        }
+
+        .main-content {
+            flex-grow: 1; /* Take remaining space horizontally */
+            overflow-y: auto; /* Scrollable menu content */
+            padding-right: 5px; /* Account for scrollbar */
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column; /* Stack menu-content and any other elements */
+            align-items: center;
+        }
+
+        /* Menu Content Area (Retaining original card flow) */
         .menu-content {
             display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 20px;
+            flex-wrap: wrap; /* Allow items to wrap to next line */
+            justify-content: center; /* Center items within the available width */
+            gap: 20px; /* Space between menu cards */
             width: 100%; /* Take full width of main-content */
-            padding-bottom: 20px; /* Space for the bottom buttons */
+            padding-bottom: 10px; /* Space from bottom */
         }
 
         .menu-item-card {
@@ -317,7 +297,7 @@
             box-shadow: 0 5px 15px var(--shadow-light);
             padding: 15px;
             text-align: left;
-            width: calc(100% - 20px); /* 1 item per row by default (mobile) */
+            width: calc(100% - 20px); /* Default: 1 item per row (mobile) */
             max-width: 300px; /* Max width for a single card */
             box-sizing: border-box;
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -396,6 +376,30 @@
         .add-to-cart-button:hover {
             background-color: #45a049;
             transform: translateY(-2px);
+        }
+
+        /* Checkout Buttons (Always at bottom of customer page) */
+        .checkout-button-container {
+            width: 100%;
+            padding: 10px 0;
+            background-color: #fff; /* Cover content when scrolling */
+            z-index: 10;
+            border-top: 1px solid #eee; /* Visual separation */
+            box-shadow: 0 -2px 10px var(--shadow-light); /* Shadow above */
+            flex-shrink: 0; /* Prevent shrinking */
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .checkout-button {
+            width: 100%;
+            background-color: var(--secondary-color);
+        }
+
+        .checkout-button:hover {
+            background-color: #1a7bce;
         }
 
         /* Admin Dashboard NEW STYLES */
@@ -687,26 +691,35 @@
 
         /* --- Responsive Design (Media Queries) --- */
 
-        /* Smartphones (Portrait and Landscape) */
+        /* Smartphones (Portrait - max 767px wide, aiming for ~9:16 aspect ratio roughly) */
         @media (max-width: 767px) {
             .container {
                 width: 95%;
+                max-width: 400px; /* Limit width for phone screens */
+                height: 90vh; /* Take up most of the viewport height */
+                max-height: 700px; /* Cap the height even on very tall phones */
                 padding: 15px;
-                height: 95vh; /* Take more height on small screens */
             }
             #customer-page {
-                flex-direction: column; /* Stack tabs and content */
+                height: 100%; /* Take full height of its container */
+                max-height: unset; /* Remove specific max-height from default */
             }
             .sidebar-tabs {
-                flex-direction: row; /* Horizontal tabs */
+                flex-direction: row; /* Horizontal tabs for mobile */
                 border-right: none;
                 border-bottom: 2px solid #eee;
-                padding-right: 0;
                 margin-right: 0;
+                padding-right: 0;
+                width: 100%;
+                justify-content: space-around;
+                margin-bottom: 15px;
             }
             .tab-button {
                 border-right: none;
-                border-bottom: 3px solid transparent;
+                border-bottom: 3px solid transparent; /* For horizontal tabs */
+                text-align: center;
+                flex-grow: 1;
+                margin-bottom: 0;
             }
             .tab-button.active {
                 border-bottom-color: var(--primary-color);
@@ -737,33 +750,40 @@
             .popup-content {
                 padding: 20px;
             }
+            .checkout-button-container {
+                padding: 5px 0;
+            }
         }
 
-        /* Tablets (Portrait and Landscape) */
+        /* iPads (Portrait and Landscape - 768px to 1024px wide) */
         @media (min-width: 768px) and (max-width: 1024px) {
             .container {
                 width: 90%;
                 max-width: 900px;
                 height: 90vh; /* Fixed height for tablets */
+                max-height: 800px;
             }
             #customer-page {
+                height: 100%;
+            }
+            .customer-page-layout {
                 flex-direction: row; /* Tabs on side */
             }
             .sidebar-tabs {
                 flex-direction: column; /* Vertical tabs */
-                border-bottom: none;
                 border-right: 2px solid #eee;
-                padding-bottom: 0;
-                margin-bottom: 0;
+                border-bottom: none; /* Remove bottom border */
                 margin-right: 20px; /* Space between sidebar and content */
+                padding-right: 10px;
                 width: 150px; /* Fixed width for sidebar */
-                flex-shrink: 0;
+                margin-bottom: 0; /* Remove bottom margin */
             }
             .tab-button {
-                border-bottom: none;
+                border-bottom: none; /* Remove bottom border for tabs */
                 border-right: 3px solid transparent; /* For vertical */
                 text-align: left;
                 padding: 15px 10px;
+                margin-bottom: 5px;
             }
             .tab-button.active {
                 border-right-color: var(--primary-color); /* For vertical */
@@ -780,36 +800,34 @@
             }
         }
 
-        /* Desktops and Laptops */
+        /* Desktops and Laptops (min-width: 1025px) */
         @media (min-width: 1025px) {
             .container {
-                width: 90%;
+                width: 80%; /* Wider for desktops */
                 max-width: 1200px; /* Max width for large screens */
                 height: 85vh; /* Fixed height for desktops */
-                padding: 20px;
+                min-height: 600px;
             }
             #customer-page {
+                height: 100%;
+            }
+            .customer-page-layout {
                 flex-direction: row; /* Tabs on side */
             }
             .sidebar-tabs {
                 flex-direction: column; /* Vertical tabs */
-                border-bottom: none;
                 border-right: 2px solid #eee;
-                padding-bottom: 0;
-                margin-bottom: 0;
                 margin-right: 30px; /* More space */
+                padding-right: 15px;
                 width: 180px; /* Wider sidebar */
-                flex-shrink: 0;
             }
             .tab-button {
-                border-bottom: none;
                 border-right: 3px solid transparent;
                 text-align: left;
                 padding: 15px 15px;
             }
             .tab-button.active {
                 border-right-color: var(--primary-color);
-                border-bottom-color: transparent;
             }
             .main-content {
                 padding-left: 0;
@@ -821,26 +839,6 @@
                 grid-template-columns: 1fr 1fr; /* Two columns for admin on desktops */
             }
         }
-
-        /* Specific ratio for smartphones, if desired (e.g., 9:16 aspect ratio roughly) */
-        /* This is harder to enforce strictly for dynamic content, so max-height/width is more practical */
-        @media (max-aspect-ratio: 9/16) and (max-width: 480px) {
-            .container {
-                width: 98%;
-                height: 98vh; /* Use almost full height */
-                padding: 10px;
-            }
-            #customer-page {
-                height: calc(100% - 20px); /* Account for container padding */
-            }
-            .order-summary {
-                margin-bottom: 10px;
-            }
-            .checkout-button-container {
-                padding: 5px 0;
-            }
-        }
-
     </style>
 </head>
 <body>
@@ -1247,17 +1245,15 @@
                         drinksMenuDiv.style.display = 'none';
                         renderMenuItems('food');
                     } else {
-                        foodMenuDiv.style.display = 'flex'; // Use flex for drinks menu too
-                        drinksMenuDiv.style.display = 'none'; // Hide food menu
+                        foodMenuDiv.style.display = 'none'; // Hide food menu
+                        drinksMenuDiv.style.display = 'flex'; // Show drinks menu
                         renderMenuItems('drinks');
                     }
                 });
             });
 
             function updateCartDisplay() {
-                // Clear the content of cartItemsDiv as we only show total now
-                cartItemsDiv.innerHTML = '<p>ລາຍການຖືກເພີ່ມແລ້ວ</p>'; // Indicate items are in cart
-                
+                // Only display a message and total, no individual items listed here
                 let total = 0;
                 let hasItems = false;
 
@@ -1271,10 +1267,12 @@
                     }
                 }
 
-                if (!hasItems) {
+                if (hasItems) {
+                    cartItemsDiv.innerHTML = '<p>ລາຍການຖືກເພີ່ມແລ້ວ</p>';
+                } else {
                     cartItemsDiv.innerHTML = '<p>ຍັງບໍ່ມີລາຍການໃນກະຕ່າ.</p>';
                 }
-
+                
                 totalPriceSpan.textContent = total.toLocaleString('lo-LA') + ' ກີບ';
             }
 
