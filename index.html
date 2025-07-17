@@ -6,12 +6,12 @@
     <title>Ruby Food</title>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* CSS styles will go here */
         :root {
             --primary-color: #4CAF50; /* Green */
             --secondary-color: #2196F3; /* Blue */
+            --tertiary-color: #FF9800; /* Orange for highlights/accents */
             --gradient-start: #FFFFFF; /* White */
             --gradient-middle: #CCCCCC; /* Light Gray */
             --gradient-end: #000000; /* Black */
@@ -66,24 +66,32 @@
             box-sizing: border-box;
         }
 
-        /* Make sure order summary sticks to bottom or is visible */
+        /* Order Summary Position (Moved to top for customer page) */
         .order-summary {
             background-color: #f9f9f9;
             border-radius: var(--border-radius);
             padding: 15px;
-            margin-top: 20px;
+            margin-bottom: 20px; /* Space below summary */
             border: 1px solid #eee;
             text-align: left;
             width: 100%;
             box-sizing: border-box;
             box-shadow: 0 2px 10px var(--shadow-light);
-            /* Add some margin-bottom if needed to ensure button is not hidden */
-            margin-bottom: 20px;
+            order: -1; /* Make it appear first in flex container */
+            position: sticky; /* Make it stick to top on scroll */
+            top: 0; /* Stick to the very top */
+            z-index: 10; /* Ensure it's above other content when scrolling */
         }
 
         .checkout-button-container {
             width: 100%;
-            padding: 10px 0; /* Padding for the container of the button */
+            padding: 10px 0;
+            position: sticky; /* Stick to bottom */
+            bottom: 0; /* Stick to the very bottom */
+            background-color: #fff; /* Cover content when scrolling */
+            z-index: 10;
+            border-top: 1px solid #eee; /* Visual separation */
+            box-shadow: 0 -2px 10px var(--shadow-light); /* Shadow above */
         }
 
         /* Splash Screen */
@@ -128,7 +136,7 @@
             flex-direction: column;
             align-items: center;
             padding: 20px;
-            width: 100%; /* Ensure these pages take full width of container */
+            width: 100%;
         }
 
         .app-icon {
@@ -144,16 +152,28 @@
             color: white;
             box-shadow: 0 8px 16px var(--shadow-medium);
             animation: bounce 1s infinite alternate;
-            overflow: hidden; /* Ensure image doesn't overflow */
+            overflow: hidden;
+            position: relative; /* For text overlay */
         }
         
         .app-icon img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* Cover the area, cropping if necessary */
-            border-radius: 20%; /* Match parent border-radius */
+            object-fit: cover;
+            border-radius: 20%;
         }
 
+        .app-icon-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white; /* Or any contrasting color */
+            font-size: 2.5em; /* Adjust size as needed */
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            z-index: 2; /* Ensure text is above image */
+        }
 
         @keyframes bounce {
             0% { transform: translateY(0); }
@@ -253,8 +273,7 @@
             justify-content: center;
             gap: 20px;
             width: 100%;
-            /* No max-height here, let the #customer-page scroll */
-            padding-bottom: 20px; /* Add padding for bottom items */
+            padding-bottom: 20px;
         }
 
         .menu-item-card {
@@ -272,7 +291,7 @@
             animation: fadeIn 0.5s forwards;
             display: flex;
             flex-direction: column;
-            justify-content: space-between; /* Push controls to bottom */
+            justify-content: space-between;
         }
 
         .menu-item-card:hover {
@@ -323,12 +342,8 @@
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            margin-top: auto; /* Push to bottom of card */
+            margin-top: auto;
             padding-top: 10px;
-        }
-
-        .quantity-control {
-            display: none; /* Hide quantity control as per new requirement */
         }
 
         .add-to-cart-button {
@@ -340,7 +355,7 @@
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease;
             font-size: 0.9em;
-            margin-left: auto; /* Push button to the right */
+            margin-left: auto;
         }
 
         .add-to-cart-button:hover {
@@ -403,36 +418,65 @@
             margin-top: 20px;
         }
 
-        /* Admin Dashboard */
+        /* Admin Dashboard NEW STYLES */
         #admin-dashboard {
             text-align: left;
             width: 100%;
             max-width: 900px;
             box-sizing: border-box;
-            max-height: 80vh; /* Allow scrolling for dashboard if content is long */
+            max-height: 80vh;
             overflow-y: auto;
-            padding-right: 15px; /* Account for scrollbar */
+            padding-right: 15px;
         }
 
         #admin-dashboard h2 {
             color: var(--primary-color);
             margin-bottom: 20px;
+            text-align: center;
         }
 
-        .admin-section {
+        .admin-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .admin-grid {
+                grid-template-columns: 1fr 1fr; /* Two columns for larger screens */
+            }
+        }
+
+        .admin-card {
             background-color: #f9f9f9;
             border-radius: var(--border-radius);
             padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px var(--shadow-light);
+            box-shadow: 0 5px 15px var(--shadow-light);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .admin-section h3 {
+        .admin-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px var(--shadow-medium);
+        }
+
+        .admin-card h3 {
             margin-top: 0;
             color: var(--secondary-color);
             border-bottom: 1px solid #eee;
             padding-bottom: 10px;
             margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .admin-card h3 .count {
+            background-color: var(--tertiary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
         }
 
         .order-list {
@@ -449,6 +493,7 @@
             box-shadow: 0 1px 5px var(--shadow-light);
             display: flex;
             flex-direction: column;
+            position: relative;
         }
 
         .order-item-admin strong {
@@ -460,11 +505,18 @@
             justify-content: space-between;
             flex-wrap: wrap;
             margin-bottom: 10px;
+            font-size: 0.95em;
         }
 
         .order-item-admin .order-items-list {
             margin-top: 10px;
             padding-left: 20px;
+            border-top: 1px dashed #eee;
+            padding-top: 10px;
+        }
+
+        .order-item-admin .order-items-list li {
+            margin-bottom: 5px;
         }
 
         .order-item-admin .order-actions {
@@ -480,6 +532,7 @@
             border-radius: 5px;
             cursor: pointer;
             transition: background-color 0.3s ease;
+            font-size: 0.9em;
         }
 
         .order-item-admin .success-button {
@@ -499,38 +552,19 @@
         .order-item-admin .clear-button:hover {
             background-color: #da190b;
         }
-
-        /* Dashboard and Accounting */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-
-        @media (min-width: 768px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-
-        .chart-container {
-            width: 100%;
-            height: 300px;
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: 0 2px 10px var(--shadow-light);
-            padding: 15px;
+        
+        .admin-total-summary {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #ddd;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+            justify-content: space-between;
+            color: var(--text-color-dark);
         }
 
-        .chart-container canvas {
-            max-width: 100%;
-            max-height: 100%;
-        }
-
+        /* Accounting Form */
         .accounting-form {
             display: flex;
             flex-direction: column;
@@ -540,6 +574,39 @@
 
         .accounting-form button {
             width: 100%;
+        }
+
+        #cost-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 15px;
+        }
+        #cost-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed #eee;
+            font-size: 0.95em;
+        }
+        #cost-list li:last-child {
+            border-bottom: none;
+        }
+        #cost-list li span:first-child {
+            font-weight: bold;
+            color: #555;
+        }
+        .remove-cost-btn {
+            background: none;
+            border: none;
+            color: #f44336;
+            cursor: pointer;
+            font-size: 0.9em;
+            margin-left: 10px;
+            transition: color 0.2s ease;
+        }
+        .remove-cost-btn:hover {
+            color: #da190b;
         }
 
         /* Popups */
@@ -572,9 +639,9 @@
             text-align: center;
             transform: scale(0.8);
             transition: transform 0.3s ease;
-            max-width: 450px; /* Increased max-width for order confirmation */
+            max-width: 450px;
             width: 90%;
-            max-height: 80vh; /* Allow popup content to scroll */
+            max-height: 80vh;
             overflow-y: auto;
         }
 
@@ -597,7 +664,7 @@
             margin-top: 15px;
             border-top: 1px solid #eee;
             padding-top: 10px;
-            max-height: 200px; /* Limit height for scrollable items */
+            max-height: 200px;
             overflow-y: auto;
         }
 
@@ -660,12 +727,18 @@
             .menu-item-card {
                 width: calc(50% - 20px); /* 2 items per row */
             }
+            .admin-grid {
+                grid-template-columns: 1fr; /* Single column on smaller screens */
+            }
         }
 
         @media (max-width: 480px) {
             .app-icon {
                 width: 200px;
                 height: 200px;
+            }
+            .app-icon-text {
+                font-size: 2em;
             }
             .menu-item-card {
                 width: 90%; /* 1 item per row */
@@ -692,8 +765,9 @@
     <div class="container" id="main-container">
         <div id="home-page">
             <div class="app-icon">
-                <img src="dreamina-2025-07-07-6231-white-background.jpg" alt="Ruby Food Icon">
-                </div>
+                <img src="dreamina-2025-07-07-6231-white background.jpg" alt="Ruby Food Icon">
+                <span class="app-icon-text">Hi</span>
+            </div>
             <h1>Ruby Food</h1>
             <button class="button" id="start-ordering-button">ເລີ່ມສັ່ງອາຫານ</button>
             <button class="button" id="admin-mode-button">ໂໝດແອັດມິ້ນ</button>
@@ -714,17 +788,6 @@
         </div>
 
         <div id="customer-page">
-            <div class="tabs">
-                <button class="tab-button active" data-tab="food">ອາຫານ</button>
-                <button class="tab-button" data-tab="drinks">ເຄື່ອງດື່ມ</button>
-            </div>
-
-            <div id="food-menu" class="menu-content">
-                </div>
-
-            <div id="drinks-menu" class="menu-content" style="display: none;">
-                </div>
-
             <div class="order-summary">
                 <h3>ລາຍການສັ່ງຊື້</h3>
                 <div id="cart-items">
@@ -735,6 +798,18 @@
                     <span id="total-price">0 ກີບ</span>
                 </div>
             </div>
+
+            <div class="tabs">
+                <button class="tab-button active" data-tab="food">ອາຫານ</button>
+                <button class="tab-button" data-tab="drinks">ເຄື່ອງດື່ມ</button>
+            </div>
+
+            <div id="food-menu" class="menu-content">
+                </div>
+
+            <div id="drinks-menu" class="menu-content" style="display: none;">
+                </div>
+            
             <div class="checkout-button-container">
                 <button class="button checkout-button" id="checkout-button">ສັ່ງເລີຍ</button>
                 <button class="button" id="back-to-home-from-customer" style="background-color: #f44336;">ກັບຄືນໜ້າຫຼັກ</button>
@@ -744,49 +819,66 @@
         <div id="admin-dashboard">
             <h2>ແດດບອດແອັດມິ້ນ</h2>
 
-            <div class="admin-section">
-                <h3>ການແຈ້ງເຕືອນການສັ່ງອາຫານ</h3>
-                <p>ຈຳນວນອໍເດີ້ທີ່ຍັງຄ້າງ: <span id="pending-orders-count">0</span></p>
-                <ul id="admin-order-list" class="order-list">
-                    <p>ຍັງບໍ່ມີອໍເດີ້.</p>
-                </ul>
-            </div>
-
-            <div class="dashboard-grid">
-                <div class="admin-section">
-                    <h3>ສະຫຼຸບລາຍຮັບ</h3>
-                    <div class="chart-container">
-                        <canvas id="revenueChart"></canvas>
-                    </div>
-                </div>
-
-                <div class="admin-section">
-                    <h3>ການວິເຄາະເມນູທີ່ຂາຍດີ</h3>
-                    <div class="chart-container">
-                        <canvas id="topSellingChart"></canvas>
-                    </div>
-                </div>
-            </div>
-
-            <div class="admin-section">
-                <h3>ລະບົບບັນຊີ (ຕົ້ນທຶນ)</h3>
-                <div class="accounting-form">
-                    <div class="input-group">
-                        <label for="cost-description">ລາຍລະອຽດຕົ້ນທຶນ:</label>
-                        <input type="text" id="cost-description" placeholder="ເຊັ່ນ: ຄ່າວັດຖຸດິບ, ຄ່າແຮງງານ">
-                    </div>
-                    <div class="input-group">
-                        <label for="cost-amount">ຈຳນວນຕົ້ນທຶນ (ກີບ):</label>
-                        <input type="number" id="cost-amount" min="0" value="0" placeholder="ຈຳນວນ">
-                    </div>
-                    <button class="button" id="add-cost-button">ເພີ່ມຕົ້ນທຶນ</button>
-                </div>
-                <h4>ລາຍການຕົ້ນທຶນ</h4>
-                <ul id="cost-list">
+            <div class="admin-grid">
+                <div class="admin-card">
+                    <h3>
+                        <span>ອໍເດີ້ທີ່ຍັງຄ້າງ</span>
+                        <span class="count" id="pending-orders-count">0</span>
+                    </h3>
+                    <ul id="admin-order-list" class="order-list">
+                        <p>ຍັງບໍ່ມີອໍເດີ້.</p>
                     </ul>
+                </div>
+
+                <div class="admin-card">
+                    <h3>
+                        <span>ອໍເດີ້ທີ່ສຳເລັດ</span>
+                        <span class="count" id="completed-orders-count">0</span>
+                    </h3>
+                    <ul id="admin-completed-order-list" class="order-list">
+                        <p>ຍັງບໍ່ມີອໍເດີ້ທີ່ສຳເລັດ.</p>
+                    </ul>
+                    <div class="admin-total-summary">
+                        <span>ລາຍຮັບລວມ:</span>
+                        <span id="total-revenue">0 ກີບ</span>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <h3>ການຄຸ້ມຄອງຕົ້ນທຶນ</h3>
+                    <div class="accounting-form">
+                        <div class="input-group">
+                            <label for="cost-description">ລາຍລະອຽດຕົ້ນທຶນ:</label>
+                            <input type="text" id="cost-description" placeholder="ເຊັ່ນ: ຄ່າວັດຖຸດິບ, ຄ່າແຮງງານ">
+                        </div>
+                        <div class="input-group">
+                            <label for="cost-amount">ຈຳນວນຕົ້ນທຶນ (ກີບ):</label>
+                            <input type="number" id="cost-amount" min="0" value="0" placeholder="ຈຳນວນ">
+                        </div>
+                        <button class="button" id="add-cost-button">ເພີ່ມຕົ້ນທຶນ</button>
+                    </div>
+                    <h4>ລາຍການຕົ້ນທຶນ</h4>
+                    <ul id="cost-list">
+                        </ul>
+                    <div class="admin-total-summary">
+                        <span>ຕົ້ນທຶນລວມ:</span>
+                        <span id="total-cost">0 ກີບ</span>
+                    </div>
+                </div>
+
+                <div class="admin-card">
+                    <h3>ສະຫຼຸບກຳໄລ-ຂາດທຶນ</h3>
+                    <div class="admin-total-summary" style="font-size: 1.3em;">
+                        <span>ກຳໄລສຸດທິ:</span>
+                        <span id="net-profit" style="color: var(--primary-color);">0 ກີບ</span>
+                    </div>
+                    <p style="text-align: center; font-size: 0.9em; color: #888; margin-top: 20px;">
+                        (ກຳໄລສຸດທິ = ລາຍຮັບລວມ - ຕົ້ນທຶນລວມ)
+                    </p>
+                </div>
             </div>
 
-            <button class="button" id="back-to-home-from-admin-dashboard" style="background-color: #f44336;">ກັບຄືນໜ້າຫຼັກ</button>
+            <button class="button" id="back-to-home-from-admin-dashboard" style="background-color: #f44336; margin-top: 20px;">ກັບຄືນໜ້າຫຼັກ</button>
         </div>
     </div>
 
@@ -845,14 +937,14 @@
             const tableNumberInput = document.getElementById('table-number-input');
             const confirmTableNumberButton = document.getElementById('confirm-table-number');
 
-            const orderConfirmPopup = document.getElementById('order-confirm-popup'); // New confirmation popup
+            const orderConfirmPopup = document.getElementById('order-confirm-popup');
             const confirmPopupTableNumber = document.getElementById('confirm-popup-table-number');
             const confirmPopupItems = document.getElementById('confirm-popup-items');
             const confirmPopupTotalPrice = document.getElementById('confirm-popup-total-price');
             const placeOrderButton = document.getElementById('place-order-button');
             const cancelOrderButton = document.getElementById('cancel-order-button');
 
-            const orderConfirmationPopup = document.getElementById('order-confirmation-popup'); // Final success popup
+            const orderConfirmationPopup = document.getElementById('order-confirmation-popup');
             const confirmedTableNumberSpan = document.getElementById('confirmed-table-number');
             const confirmedTotalPriceSpan = document.getElementById('confirmed-total-price');
             const closeConfirmationPopupButton = document.getElementById('close-confirmation-popup');
@@ -867,7 +959,13 @@
             const adminUsernameInput = document.getElementById('admin-username');
             const adminPasswordInput = document.getElementById('admin-password');
             const adminOrderList = document.getElementById('admin-order-list');
+            const adminCompletedOrderList = document.getElementById('admin-completed-order-list'); // New element
             const pendingOrdersCountSpan = document.getElementById('pending-orders-count');
+            const completedOrdersCountSpan = document.getElementById('completed-orders-count'); // New element
+            const totalRevenueSpan = document.getElementById('total-revenue'); // New element
+            const totalCostSpan = document.getElementById('total-cost'); // New element
+            const netProfitSpan = document.getElementById('net-profit'); // New element
+
             const addCostButton = document.getElementById('add-cost-button');
             const costDescriptionInput = document.getElementById('cost-description');
             const costAmountInput = document.getElementById('cost-amount');
@@ -877,7 +975,6 @@
             let cart = {}; // { menuId: { item: {}, quantity: N } }
             let orders = []; // For admin dashboard
             let costs = []; // For accounting
-            let revenueChart, topSellingChart;
 
             // Sample Menu Data (Prices in LAK)
             const menuItems = {
@@ -917,22 +1014,20 @@
                 pages.forEach(page => {
                     if (page.id === pageId) {
                         page.style.display = 'flex';
-                        // Add animation class if transitioning from a different page
                         if (!page.classList.contains('slide-in-right') && page.style.display === 'none') {
                            page.classList.add('slide-in-right');
                         }
                         page.classList.remove('slide-out-left');
                     } else {
-                        // Apply exit animation before hiding
                         if (page.style.display === 'flex') {
                             page.classList.add('slide-out-left');
                             setTimeout(() => {
                                 page.style.display = 'none';
                                 page.classList.remove('slide-out-left');
-                                page.classList.remove('slide-in-right'); // Clean up entry animation class
-                            }, 500); // Match animation duration
+                                page.classList.remove('slide-in-right');
+                            }, 500);
                         } else {
-                            page.style.display = 'none'; // Ensure it's hidden if not in view
+                            page.style.display = 'none';
                         }
                     }
                 });
@@ -941,9 +1036,7 @@
                     updateCartDisplay();
                 }
                 if (pageId === 'admin-dashboard') {
-                    renderAdminOrders();
-                    updateCharts();
-                    renderCosts();
+                    renderAdminDashboardContent(); // New function for all admin updates
                 }
             }
 
@@ -978,12 +1071,11 @@
             // --- Table Number Popup ---
             confirmTableNumberButton.addEventListener('click', () => {
                 let tableNum = tableNumberInput.value.trim();
-                // Ensure table number is two digits if it's a single digit
                 if (tableNum.length === 1 && parseInt(tableNum) < 10) {
                     tableNum = '0' + tableNum;
                 }
 
-                if (tableNum && tableNum.length <= 2 && parseInt(tableNum) > 0) { // Max 2 digits
+                if (tableNum && tableNum.length <= 2 && parseInt(tableNum) > 0) {
                     currentTableNumber = tableNum;
                     tableNumberPopup.classList.remove('active');
                     showPage('customer-page');
@@ -996,7 +1088,7 @@
             // --- Menu Rendering and Interactions ---
             function renderMenuItems(type) {
                 const targetDiv = type === 'food' ? foodMenuDiv : drinksMenuDiv;
-                targetDiv.innerHTML = ''; // Clear previous items
+                targetDiv.innerHTML = '';
 
                 menuItems[type].forEach(item => {
                     const isFavorite = favorites.some(fav => fav.id === item.id);
@@ -1016,7 +1108,6 @@
                     `;
                     targetDiv.appendChild(card);
 
-                    // Add fade-in animation to each card
                     setTimeout(() => card.style.opacity = '1', 50);
                 });
                 attachMenuItemListeners();
@@ -1053,8 +1144,6 @@
                                 cart[id] = { item: item, quantity: 1 };
                             }
                             updateCartDisplay();
-                            // Optional: Show a quick feedback like "Added!"
-                            // console.log(`${item.name} added to cart. Current quantity: ${cart[id].quantity}`);
                         }
                     });
                 });
@@ -1105,12 +1194,11 @@
                 if (!hasItems) {
                     cartItemsDiv.innerHTML = '<p>ຍັງບໍ່ມີລາຍການໃນກະຕ່າ.</p>';
                 } else {
-                    // Attach remove item listeners
                     document.querySelectorAll('.remove-item-btn').forEach(button => {
                         button.addEventListener('click', (e) => {
                             const idToRemove = e.currentTarget.dataset.id;
                             if (cart[idToRemove]) {
-                                delete cart[idToRemove]; // Remove the item completely
+                                delete cart[idToRemove];
                                 updateCartDisplay();
                             }
                         });
@@ -1135,7 +1223,6 @@
 
                 const orderTotal = orderedItems.reduce((sum, item) => sum + (item.item.price * item.quantity), 0);
 
-                // Populate confirmation popup
                 confirmPopupTableNumber.textContent = currentTableNumber;
                 confirmPopupItems.innerHTML = '';
                 orderedItems.forEach(item => {
@@ -1148,7 +1235,7 @@
                 });
                 confirmPopupTotalPrice.textContent = orderTotal.toLocaleString('lo-LA') + ' ກີບ';
 
-                orderConfirmPopup.classList.add('active'); // Show confirmation popup
+                orderConfirmPopup.classList.add('active');
             });
 
             placeOrderButton.addEventListener('click', () => {
@@ -1156,7 +1243,7 @@
                 const orderTotal = orderedItems.reduce((sum, item) => sum + (item.item.price * item.quantity), 0);
 
                 const newOrder = {
-                    orderId: Date.now(), // Unique ID for the order
+                    orderId: Date.now(),
                     tableNumber: currentTableNumber,
                     items: orderedItems.map(i => ({
                         name: i.item.name,
@@ -1165,23 +1252,22 @@
                     })),
                     total: orderTotal,
                     timestamp: new Date().toLocaleString('lo-LA'),
-                    status: 'ລໍຖ້າ' // Pending
+                    status: 'ລໍຖ້າ'
                 };
                 orders.push(newOrder);
                 localStorage.setItem('rubyFoodOrders', JSON.stringify(orders));
 
-                orderConfirmPopup.classList.remove('active'); // Hide confirmation popup
+                orderConfirmPopup.classList.remove('active');
                 confirmedTableNumberSpan.textContent = currentTableNumber;
                 confirmedTotalPriceSpan.textContent = orderTotal.toLocaleString('lo-LA') + ' ກີບ';
-                orderConfirmationPopup.classList.add('active'); // Show final success popup
+                orderConfirmationPopup.classList.add('active');
 
-                // Clear cart after successful order
                 cart = {};
                 updateCartDisplay();
             });
 
             cancelOrderButton.addEventListener('click', () => {
-                orderConfirmPopup.classList.remove('active'); // Hide confirmation popup
+                orderConfirmPopup.classList.remove('active');
             });
 
             closeConfirmationPopupButton.addEventListener('click', () => {
@@ -1200,7 +1286,14 @@
                 }
             });
 
-            // --- Admin Dashboard ---
+            // --- Admin Dashboard RENDER ---
+            function renderAdminDashboardContent() {
+                renderAdminOrders();
+                renderCompletedOrders();
+                renderCosts();
+                updateAdminSummaries();
+            }
+
             function renderAdminOrders() {
                 adminOrderList.innerHTML = '';
                 const pendingOrders = orders.filter(order => order.status === 'ລໍຖ້າ');
@@ -1219,7 +1312,6 @@
                         <div class="order-details">
                             <span><strong>ໂຕະ:</strong> ${order.tableNumber}</span>
                             <span><strong>ເວລາ:</strong> ${order.timestamp}</span>
-                            <span><strong>ສະຖານະ:</strong> ${order.status}</span>
                         </div>
                         <p><strong>ລາຍການ:</strong></p>
                         <ul class="order-items-list">
@@ -1237,16 +1329,43 @@
                 attachAdminOrderListeners();
             }
 
+            function renderCompletedOrders() {
+                adminCompletedOrderList.innerHTML = '';
+                const completedOrders = orders.filter(order => order.status === 'ສຳເລັດ');
+                completedOrdersCountSpan.textContent = completedOrders.length;
+
+                if (completedOrders.length === 0) {
+                    adminCompletedOrderList.innerHTML = '<p>ຍັງບໍ່ມີອໍເດີ້ທີ່ສຳເລັດ.</p>';
+                    return;
+                }
+
+                completedOrders.forEach(order => {
+                    const listItem = document.createElement('li');
+                    listItem.className = 'order-item-admin';
+                    listItem.innerHTML = `
+                        <div class="order-details">
+                            <span><strong>ໂຕະ:</strong> ${order.tableNumber}</span>
+                            <span><strong>ເວລາ:</strong> ${order.timestamp}</span>
+                        </div>
+                        <p><strong>ລາຍການ:</strong></p>
+                        <ul class="order-items-list">
+                            ${order.items.map(item => `<li>${item.name} x ${item.quantity} (${item.pricePerUnit.toLocaleString('lo-LA')} ກີບ/ໜ່ວຍ)</li>`).join('')}
+                        </ul>
+                        <p><strong>ລວມ:</strong> ${order.total.toLocaleString('lo-LA')} ກີບ</p>
+                        `;
+                    adminCompletedOrderList.appendChild(listItem);
+                });
+            }
+
             function attachAdminOrderListeners() {
                 document.querySelectorAll('.success-button').forEach(button => {
                     button.addEventListener('click', (e) => {
                         const orderId = parseInt(e.currentTarget.dataset.id);
                         const orderIndex = orders.findIndex(order => order.orderId === orderId);
                         if (orderIndex !== -1) {
-                            orders[orderIndex].status = 'ສຳເລັດ'; // Completed
+                            orders[orderIndex].status = 'ສຳເລັດ';
                             localStorage.setItem('rubyFoodOrders', JSON.stringify(orders));
-                            renderAdminOrders();
-                            updateCharts(); // Update charts after an order is completed
+                            renderAdminDashboardContent(); // Re-render all admin sections
                         }
                     });
                 });
@@ -1257,118 +1376,10 @@
                         if (confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບອໍເດີ້ນີ້?')) {
                             orders = orders.filter(order => order.orderId !== orderId);
                             localStorage.setItem('rubyFoodOrders', JSON.stringify(orders));
-                            renderAdminOrders();
-                            updateCharts();
+                            renderAdminDashboardContent(); // Re-render all admin sections
                         }
                     });
                 });
-            }
-
-            // --- Dashboard Charts (Chart.js) ---
-            function updateCharts() {
-                const completedOrders = orders.filter(order => order.status === 'ສຳເລັດ');
-                const dailyRevenue = {};
-                const menuSales = {};
-                let totalRevenue = 0;
-                let totalCost = costs.reduce((sum, cost) => sum + cost.amount, 0);
-
-                completedOrders.forEach(order => {
-                    // Use a consistent date format for daily revenue (YYYY-MM-DD)
-                    const orderDate = new Date(order.timestamp).toISOString().split('T')[0];
-                    dailyRevenue[orderDate] = (dailyRevenue[orderDate] || 0) + order.total;
-                    totalRevenue += order.total;
-
-                    order.items.forEach(item => {
-                        menuSales[item.name] = (menuSales[item.name] || 0) + item.quantity;
-                    });
-                });
-
-                // Revenue Chart
-                const revenueLabels = Object.keys(dailyRevenue).sort();
-                const revenueData = revenueLabels.map(date => dailyRevenue[date]);
-
-                if (revenueChart) revenueChart.destroy(); // Destroy previous chart instance
-
-                const ctxRevenue = document.getElementById('revenueChart').getContext('2d');
-                revenueChart = new Chart(ctxRevenue, {
-                    type: 'line',
-                    data: {
-                        labels: revenueLabels,
-                        datasets: [{
-                            label: 'ລາຍຮັບ (ກີບ)',
-                            data: revenueData,
-                            borderColor: 'rgb(75, 192, 192)',
-                            tension: 0.1,
-                            fill: false
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: function(value) {
-                                        return value.toLocaleString('lo-LA') + ' ກີບ';
-                                    }
-                                }
-                            }
-                        },
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: 'ລາຍຮັບປະຈຳວັນ'
-                            }
-                        }
-                    }
-                });
-
-                // Top Selling Menu Chart
-                const sortedMenuSales = Object.entries(menuSales).sort(([, a], [, b]) => b - a);
-                const topSellingLabels = sortedMenuSales.map(([name]) => name).slice(0, 5); // Top 5
-                const topSellingData = sortedMenuSales.map(([, quantity]) => quantity).slice(0, 5);
-
-                if (topSellingChart) topSellingChart.destroy(); // Destroy previous chart instance
-
-                const ctxTopSelling = document.getElementById('topSellingChart').getContext('2d');
-                topSellingChart = new Chart(ctxTopSelling, {
-                    type: 'bar',
-                    data: {
-                        labels: topSellingLabels,
-                        datasets: [{
-                            label: 'ຈຳນວນທີ່ຂາຍໄດ້',
-                            data: topSellingData,
-                            backgroundColor: 'rgba(54, 162, 235, 0.6)',
-                            borderColor: 'rgba(54, 162, 235, 1)',
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true
-                            }
-                        },
-                        plugins: {
-                            title: {
-                                display: true,
-                                text: 'ເມນູທີ່ຂາຍດີທີ່ສຸດ'
-                            },
-                            legend: {
-                                display: false
-                            }
-                        }
-                    }
-                });
-                
-                // Add profit/loss calculation to dashboard (you might need to create a dedicated display area)
-                const netProfit = totalRevenue - totalCost;
-                // console.log(`Total Revenue: ${totalRevenue}, Total Cost: ${totalCost}, Net Profit: ${netProfit}`);
-                // You can display this somewhere on the admin dashboard, e.g., in a new div.
-                // Example: document.getElementById('net-profit-display').textContent = `ກຳໄລສຸດທິ: ${netProfit.toLocaleString('lo-LA')} ກີບ`;
             }
 
             // --- Accounting System (Costs) ---
@@ -1385,8 +1396,7 @@
                     };
                     costs.push(newCost);
                     localStorage.setItem('rubyFoodCosts', JSON.stringify(costs));
-                    renderCosts();
-                    updateCharts(); // Update charts to reflect profit/loss
+                    renderAdminDashboardContent(); // Re-render all admin sections
                     costDescriptionInput.value = '';
                     costAmountInput.value = '0';
                 } else {
@@ -1405,31 +1415,41 @@
                     listItem.innerHTML = `
                         <span>${cost.description}: ${cost.amount.toLocaleString('lo-LA')} ກີບ</span>
                         <span style="font-size: 0.8em; color: #888;"> (${cost.timestamp}) 
-                            <button class="remove-cost-btn" data-id="${cost.id}" style="background: none; border: none; color: #f44336; cursor: pointer; margin-left: 5px;">
+                            <button class="remove-cost-btn" data-id="${cost.id}">
                                 <i class="fas fa-times-circle"></i>
                             </button>
                         </span>
                     `;
                     costListUl.appendChild(listItem);
                 });
-                // Attach remove cost listeners
                 document.querySelectorAll('.remove-cost-btn').forEach(button => {
                     button.addEventListener('click', (e) => {
                         const costIdToRemove = parseInt(e.currentTarget.dataset.id);
                         if (confirm('ທ່ານແນ່ໃຈບໍ່ວ່າຕ້ອງການລຶບຕົ້ນທຶນນີ້?')) {
                             costs = costs.filter(cost => cost.id !== costIdToRemove);
                             localStorage.setItem('rubyFoodCosts', JSON.stringify(costs));
-                            renderCosts();
-                            updateCharts();
+                            renderAdminDashboardContent(); // Re-render all admin sections
                         }
                     });
                 });
             }
 
+            function updateAdminSummaries() {
+                const totalRevenue = orders
+                    .filter(order => order.status === 'ສຳເລັດ')
+                    .reduce((sum, order) => sum + order.total, 0);
+                totalRevenueSpan.textContent = totalRevenue.toLocaleString('lo-LA') + ' ກີບ';
+
+                const totalCost = costs.reduce((sum, cost) => sum + cost.amount, 0);
+                totalCostSpan.textContent = totalCost.toLocaleString('lo-LA') + ' ກີບ';
+
+                const netProfit = totalRevenue - totalCost;
+                netProfitSpan.textContent = netProfit.toLocaleString('lo-LA') + ' ກີບ';
+                netProfitSpan.style.color = netProfit >= 0 ? 'var(--primary-color)' : '#f44336'; // Green for profit, Red for loss
+            }
+
             // --- Initial Data Load & Render ---
-            renderAdminOrders();
-            updateCharts();
-            renderCosts();
+            renderAdminDashboardContent(); // Initial render for admin data
         });
     </script>
 </body>
