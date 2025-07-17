@@ -642,6 +642,62 @@
             color: var(--primary-color);
         }
 
+        /* NEW: Order Review Popup specific styles */
+        #order-review-popup .popup-content {
+            max-width: 550px; /* Wider for item list */
+            text-align: left;
+        }
+        #order-review-items {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+        }
+        #order-review-items li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px dashed #eee;
+        }
+        #order-review-items li:last-child {
+            border-bottom: none;
+        }
+        #order-review-items .item-name {
+            font-weight: bold;
+            flex-grow: 1;
+        }
+        #order-review-items .item-qty {
+            margin: 0 10px;
+            color: #555;
+        }
+        #order-review-items .item-subtotal {
+            font-weight: bold;
+            color: var(--text-color-dark);
+        }
+        .order-review-total {
+            display: flex;
+            justify-content: space-between;
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+        .order-review-buttons {
+            display: flex;
+            justify-content: space-around;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .order-review-buttons button {
+            flex: 1;
+            margin: 0; /* Override default button margin */
+        }
+
+
         /* Animations */
         @keyframes fadeInScale {
             0% { opacity: 0; transform: scale(0.95); }
@@ -752,6 +808,9 @@
             }
             .checkout-button-container {
                 padding: 5px 0;
+            }
+            #order-review-popup .popup-content {
+                max-width: 95%;
             }
         }
 
@@ -981,16 +1040,20 @@
         </div>
     </div>
 
-    <div id="order-confirm-popup" class="popup-overlay">
+    <div id="order-review-popup" class="popup-overlay">
         <div class="popup-content">
-            <h3>ຢືນຢັນລາຍການສັ່ງຊື້</h3>
-            <p>ໝາຍເລກໂຕະ: <strong id="confirm-popup-table-number"></strong></p>
-            <div class="order-confirmation-summary">
+            <h3>ກວດສອບລາຍການສັ່ງຊື້</h3>
+            <p>ໝາຍເລກໂຕະ: <strong id="review-popup-table-number"></strong></p>
+            <ul id="order-review-items">
+                </ul>
+            <div class="order-review-total">
                 <span>ລວມທັງໝົດ:</span>
-                <span id="confirm-popup-total-price">0 ກີບ</span>
+                <span id="review-popup-total-price">0 ກີບ</span>
             </div>
-            <button class="button" id="place-order-button">ສັ່ງເລີຍ</button>
-            <button class="button" id="cancel-order-button" style="background-color: #f44336;">ຍົກເລີກ</button>
+            <div class="order-review-buttons">
+                <button class="button" id="confirm-order-button">ຢືນຢັນ</button>
+                <button class="button" id="cancel-order-review-button" style="background-color: #f44336;">ຍົກເລີກ</button>
+            </div>
         </div>
     </div>
 
@@ -1023,11 +1086,20 @@
             const tableNumberInput = document.getElementById('table-number-input');
             const confirmTableNumberButton = document.getElementById('confirm-table-number');
 
-            const orderConfirmPopup = document.getElementById('order-confirm-popup');
-            const confirmPopupTableNumber = document.getElementById('confirm-popup-table-number');
-            const confirmPopupTotalPrice = document.getElementById('confirm-popup-total-price');
-            const placeOrderButton = document.getElementById('place-order-button');
-            const cancelOrderButton = document.getElementById('cancel-order-button');
+            // NEW: Order Review Popup elements
+            const orderReviewPopup = document.getElementById('order-review-popup');
+            const reviewPopupTableNumber = document.getElementById('review-popup-table-number');
+            const orderReviewItemsUl = document.getElementById('order-review-items');
+            const reviewPopupTotalPrice = document.getElementById('review-popup-total-price');
+            const confirmOrderButton = document.getElementById('confirm-order-button'); // This is the new "ຢືນຢັນ" button
+            const cancelOrderReviewButton = document.getElementById('cancel-order-review-button');
+
+            // Removed order-confirm-popup elements as they are replaced by order-review-popup
+            // const orderConfirmPopup = document.getElementById('order-confirm-popup');
+            // const confirmPopupTableNumber = document.getElementById('confirm-popup-table-number');
+            // const confirmPopupTotalPrice = document.getElementById('confirm-popup-total-price');
+            // const placeOrderButton = document.getElementById('place-order-button');
+            // const cancelOrderButton = document.getElementById('cancel-order-button');
 
             const orderConfirmationPopup = document.getElementById('order-confirmation-popup');
             const confirmedTableNumberSpan = document.getElementById('confirmed-table-number');
@@ -1289,16 +1361,30 @@
                     return;
                 }
 
-                const orderTotal = orderedItems.reduce((sum, item) => sum + (item.item.price * item.quantity), 0);
+                let orderTotal = 0;
+                orderReviewItemsUl.innerHTML = ''; // Clear previous items
 
-                confirmPopupTableNumber.textContent = currentTableNumber;
-                // Only show total price in confirmation popup
-                confirmPopupTotalPrice.textContent = orderTotal.toLocaleString('lo-LA') + ' ກີບ';
+                orderedItems.forEach(cartItem => {
+                    const item = cartItem.item;
+                    const quantity = cartItem.quantity;
+                    const subtotal = item.price * quantity;
+                    orderTotal += subtotal;
 
-                orderConfirmPopup.classList.add('active');
+                    const listItem = document.createElement('li');
+                    listItem.innerHTML = `
+                        <span class="item-name">${item.name}</span>
+                        <span class="item-qty">x${quantity}</span>
+                        <span class="item-subtotal">${subtotal.toLocaleString('lo-LA')} ກີບ</span>
+                    `;
+                    orderReviewItemsUl.appendChild(listItem);
+                });
+
+                reviewPopupTableNumber.textContent = currentTableNumber;
+                reviewPopupTotalPrice.textContent = orderTotal.toLocaleString('lo-LA') + ' ກີບ';
+                orderReviewPopup.classList.add('active'); // Show the new review popup
             });
 
-            placeOrderButton.addEventListener('click', () => {
+            confirmOrderButton.addEventListener('click', () => {
                 const orderedItems = Object.values(cart).filter(item => item.quantity > 0);
                 const orderTotal = orderedItems.reduce((sum, item) => sum + (item.item.price * item.quantity), 0);
 
@@ -1318,17 +1404,17 @@
                 orders.push(newOrder);
                 localStorage.setItem('rubyFoodOrders', JSON.stringify(orders));
 
-                orderConfirmPopup.classList.remove('active');
+                orderReviewPopup.classList.remove('active'); // Hide review popup
                 confirmedTableNumberSpan.textContent = currentTableNumber;
                 confirmedTotalPriceSpan.textContent = orderTotal.toLocaleString('lo-LA') + ' ກີບ';
-                orderConfirmationPopup.classList.add('active');
+                orderConfirmationPopup.classList.add('active'); // Show final confirmation popup
 
                 cart = {}; // Clear cart after placing order
                 updateCartDisplay(); // Update display to show empty cart
             });
 
-            cancelOrderButton.addEventListener('click', () => {
-                orderConfirmPopup.classList.remove('active');
+            cancelOrderReviewButton.addEventListener('click', () => {
+                orderReviewPopup.classList.remove('active'); // Hide review popup
             });
 
             closeConfirmationPopupButton.addEventListener('click', () => {
