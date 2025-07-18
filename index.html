@@ -1,1096 +1,1312 @@
 <!DOCTYPE html>
-<html lang="th">
+<html lang="lo">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ระบบสั่งอาหาร</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Noto Sans Lao -->
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@100..900&display=swap" rel="stylesheet">
+    <title>ແອັບສັ່ງອາຫານລາວ</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* กำหนดฟอนต์หลัก */
-        body {
-            font-family: 'Noto Sans Lao', sans-serif;
-            overflow: hidden; /* ป้องกันการเลื่อนหน้าหลัก */
+        * {
             margin: 0;
             padding: 0;
+            box-sizing: border-box;
         }
 
-        .font-noto-sans-lao {
+        body {
+            font-family: 'Noto Sans Lao', sans-serif;
+            background: linear-gradient(135deg, #ff6b9d, #4ecdc4, #a8e6cf, #ffd93d, #6c5ce7);
+            background-size: 400% 400%;
+            animation: gradientShift 10s ease infinite;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .container {
+            max-width: 450px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 30px rgba(0,0,0,0.1);
+        }
+
+        /* Splash Screen */
+        .splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff6b9d, #4ecdc4, #a8e6cf, #ffd93d, #6c5ce7);
+            background-size: 400% 400%;
+            animation: gradientShift 3s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 1;
+            transition: opacity 0.5s ease;
+        }
+
+        .splash-icon {
+            font-size: 120px;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-30px); }
+            60% { transform: translateY(-15px); }
+        }
+
+        /* Home Screen */
+        .home-screen {
+            text-align: center;
+            padding: 60px 20px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .home-icon {
+            font-size: 300px;
+            margin-bottom: 40px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .home-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .home-subtitle {
+            font-size: 18px;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #ff6b9d, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
             font-family: 'Noto Sans Lao', sans-serif;
         }
 
-        /* Custom Animations */
-        @keyframes fade-out {
-            0% { opacity: 1; }
-            80% { opacity: 1; }
-            100% { opacity: 0; visibility: hidden; }
-        }
-        .animate-fade-out {
-            animation: fade-out 2s forwards;
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.3);
         }
 
-        @keyframes fade-in-up {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .animate-fade-in-up {
-            animation: fade-in-up 0.5s ease-out forwards;
+        .btn:active {
+            transform: translateY(0);
         }
 
-        @keyframes bounce-effect {
-            0%, 100% {
-                transform: translateY(0);
-            }
-            25% {
-                transform: translateY(-5px);
-            }
-            50% {
-                transform: translateY(0);
-            }
-            75% {
-                transform: translateY(-2px);
-            }
-        }
-        .animate-bounce-effect:hover {
-            animation: bounce-effect 0.8s ease-in-out infinite;
+        /* Menu Screen */
+        .menu-screen {
+            display: none;
+            padding: 20px;
+            padding-bottom: 100px;
         }
 
-        @keyframes bounce-in {
-            0% {
-                transform: scale(0.5);
-                opacity: 0;
-            }
-            70% {
-                transform: scale(1.05);
-                opacity: 1;
-            }
-            100% {
-                transform: scale(1);
-            }
-        }
-        .animate-bounce-in {
-            animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+        .menu-header {
+            text-align: center;
+            margin-bottom: 20px;
+            position: sticky;
+            top: 0;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 20px 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
         }
 
-        /* Responsive adjustments for smaller screens */
-        @media (max-width: 640px) {
-            .text-5xl { font-size: 3rem; /* ~48px */ }
-            .text-4xl { font-size: 2.25rem; /* ~36px */ }
-            .text-3xl { font-size: 1.875rem; /* ~30px */ }
-            .text-2xl { font-size: 1.5rem; /* ~24px */ }
-            .text-xl { font-size: 1.25rem; /* ~20px */ }
-            .text-lg { font-size: 1.125rem; /* ~18px */ }
-            .p-4 { padding: 1rem; }
-            .m-4 { margin: 1rem; }
+        .menu-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .menu-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #a8e6cf, #ffd93d);
+            color: #2c3e50;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-family: 'Noto Sans Lao', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #ff6b9d, #6c5ce7);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .menu-items {
+            display: grid;
+            gap: 15px;
+        }
+
+        .menu-item {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border-color: #ff6b9d;
+        }
+
+        .menu-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .menu-item-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .menu-item-price {
+            font-size: 16px;
+            font-weight: 700;
+            color: #e74c3c;
+        }
+
+        .quantity-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .quantity-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            background: linear-gradient(135deg, #ff6b9d, #4ecdc4);
+            color: white;
+            font-size: 20px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .quantity-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .quantity-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .quantity-display {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        /* Floating Cart Button */
+        .floating-cart {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #ff6b9d, #6c5ce7);
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: all 0.3s ease;
+        }
+
+        .floating-cart:hover {
+            transform: scale(1.1);
+        }
+
+        .floating-cart.show {
+            display: flex;
+        }
+
+        .cart-icon {
+            font-size: 24px;
+            color: white;
+            position: relative;
+        }
+
+        .cart-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        /* Cart Modal */
+        .cart-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .cart-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .cart-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #7f8c8d;
+        }
+
+        .cart-items {
+            margin-bottom: 20px;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-price {
+            color: #e74c3c;
+            font-weight: 600;
+        }
+
+        .cart-item-quantity {
+            color: #7f8c8d;
+            margin-left: 10px;
+        }
+
+        .cart-total {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(135deg, #a8e6cf, #ffd93d);
+            border-radius: 15px;
+        }
+
+        .table-input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-family: 'Noto Sans Lao', sans-serif;
+        }
+
+        .table-input:focus {
+            outline: none;
+            border-color: #ff6b9d;
+        }
+
+        /* Admin Screen */
+        .admin-screen {
+            display: none;
+            padding: 20px;
+        }
+
+        .admin-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .admin-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .admin-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .admin-tab {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #a8e6cf, #ffd93d);
+            color: #2c3e50;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-family: 'Noto Sans Lao', sans-serif;
+            font-size: 14px;
+        }
+
+        .admin-tab.active {
+            background: linear-gradient(135deg, #ff6b9d, #6c5ce7);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .admin-content {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .order-item {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-left: 4px solid #ff6b9d;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .order-table {
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .order-time {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .order-total {
+            font-weight: 700;
+            color: #e74c3c;
+            font-size: 18px;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .action-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            font-family: 'Noto Sans Lao', sans-serif;
+        }
+
+        .accept-btn {
+            background: linear-gradient(135deg, #2ecc71, #27ae60);
+            color: white;
+        }
+
+        .reject-btn {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #ff6b9d, #4ecdc4);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #ff6b9d, #4ecdc4);
+            border: none;
+            border-radius: 50%;
+            color: white;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 100;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .popup {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 3000;
+        }
+
+        .popup-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            max-width: 300px;
+            width: 90%;
+        }
+
+        .popup-text {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+
+        .popup-btn {
+            background: linear-gradient(135deg, #ff6b9d, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            font-family: 'Noto Sans Lao', sans-serif;
+        }
+
+        .cart-menu-btn {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ff6b9d, #4ecdc4);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 20px;
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+
+        .cart-menu-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .cart-menu-btn.show {
+            display: flex;
+        }
+
+        .expense-form {
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            font-family: 'Noto Sans Lao', sans-serif;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #ff6b9d;
+        }
+
+        .date-range {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .date-input {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Noto Sans Lao', sans-serif;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                max-width: 100%;
+            }
+            
+            .home-icon {
+                font-size: 200px;
+            }
+            
+            .menu-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .admin-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
 <body>
-    <div id="root"></div>
+    <!-- Splash Screen -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-icon">😊</div>
+    </div>
 
-    <!-- React CDN -->
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <!-- Babel for JSX transformation (for development, use build process for production) -->
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <div class="container">
+        <!-- Back Button -->
+        <button class="back-btn hidden" id="backBtn">←</button>
+        
+        <!-- Cart Menu Button -->
+        <button class="cart-menu-btn" id="cartMenuBtn">
+            <span class="cart-icon">🛒</span>
+            <span class="cart-badge" id="cartMenuBadge">0</span>
+        </button>
 
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        <!-- Home Screen -->
+        <div class="home-screen" id="homeScreen">
+            <div class="home-icon">😊</div>
+            <h1 class="home-title">ຍິນດີຕ້ອນຮັບ</h1>
+            <p class="home-subtitle">ສັ່ງອາຫານແບບງ່າຍໆ</p>
+            <button class="btn" onclick="startOrdering()">ເລີ່ມສັ່ງອາຫານ</button>
+            <button class="btn" onclick="showAdminLogin()">ໂໝດແອດມິນ</button>
+        </div>
 
-        // Global variables for Firebase configuration (replace with your actual Firebase config)
-        // หากคุณนำไปใช้จริงนอก Canvas ให้แทนที่ค่าเหล่านี้ด้วยข้อมูลโปรเจกต์ Firebase ของคุณ
-        // คุณสามารถหาค่าเหล่านี้ได้จาก Firebase Console -> Project settings -> General -> Your apps
-        const appId = 'YOUR_APP_ID_HERE'; // เช่น 'your-app-id'
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY_HERE",
-            authDomain: "YOUR_AUTH_DOMAIN_HERE",
-            projectId: "YOUR_PROJECT_ID_HERE",
-            storageBucket: "YOUR_STORAGE_BUCKET_HERE",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID_HERE",
-            appId: "YOUR_FIREBASE_APP_ID_HERE"
+        <!-- Menu Screen -->
+        <div class="menu-screen" id="menuScreen">
+            <div class="menu-header">
+                <h2 class="menu-title">ເມນູອາຫານ</h2>
+                <div class="menu-tabs">
+                    <button class="tab-btn active" onclick="showTab('food')">
+                        🍽️ ອາຫານ
+                    </button>
+                    <button class="tab-btn" onclick="showTab('drinks')">
+                        🥤 ເຄື່ອງດື່ມ
+                    </button>
+                </div>
+            </div>
+            
+            <div class="menu-items" id="menuItems">
+                <!-- Menu items will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Admin Screen -->
+        <div class="admin-screen" id="adminScreen">
+            <div class="admin-header">
+                <h2 class="admin-title">ແພນລແອດມິນ</h2>
+                <div class="admin-tabs">
+                    <button class="admin-tab active" onclick="showAdminTab('orders')">ອໍເດີເຂົ້າ</button>
+                    <button class="admin-tab" onclick="showAdminTab('summary')">ສະຫຼຸບລາຍຮັບ</button>
+                    <button class="admin-tab" onclick="showAdminTab('analysis')">ວິເຄາະ</button>
+                    <button class="admin-tab" onclick="showAdminTab('accounting')">ລະບົບບັນຊີ</button>
+                </div>
+            </div>
+            
+            <div class="admin-content" id="adminContent">
+                <!-- Admin content will be populated by JavaScript -->
+            </div>
+        </div>
+
+        <!-- Floating Cart Button -->
+        <div class="floating-cart" id="floatingCart" onclick="showCart()">
+            <span class="cart-icon">
+                🛒
+                <span class="cart-badge" id="cartBadge">0</span>
+            </span>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div class="cart-modal" id="cartModal">
+        <div class="cart-content">
+            <div class="cart-header">
+                <h3 class="cart-title">ຕະກົດສິນຄ້າ</h3>
+                <button class="close-btn" onclick="hideCart()">×</button>
+            </div>
+            <div class="cart-items" id="cartItems">
+                <!-- Cart items will be populated by JavaScript -->
+            </div>
+            <div class="cart-total" id="cartTotal">
+                ລວມ: 0 ກີບ
+            </div>
+            <input type="text" class="table-input" id="tableInput" placeholder="ລະບຸໂຕະ (ຕົວຢ່າງ: 01, 1, 001)">
+            <button class="btn" onclick="confirmOrder()" style="width: 100%;">ຢືນຢັນການສັ່ງ</button>
+        </div>
+    </div>
+
+    <!-- Popup -->
+    <div class="popup" id="popup">
+        <div class="popup-content">
+            <p class="popup-text" id="popupText"></p>
+            <button class="popup-btn" onclick="hidePopup()">ຕົກລົງ</button>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let currentScreen = 'home';
+        let currentTab = 'food';
+        let cart = {};
+        let orders = [];
+        let expenses = [];
+        let adminTab = 'orders';
+        let tableOrders = new Set();
+
+        // Menu data
+        const menuData = {
+            food: [
+                { id: 1, name: 'ຕຳໝີ່ຂາວ', price: 30000 },
+                { id: 2, name: 'ຕຳໝີ່ໄວໆ', price: 30000 },
+                { id: 3, name: 'ຕຳຕ່ອນ', price: 50000 },
+                { id: 4, name: 'ຕຳເຂົ້າປຸ້ນ / ຕຳໝາກຮຸ່ງ', price: 25000 },
+                { id: 5, name: 'ຕົ້ມເລືອດ', price: 30000 },
+                { id: 6, name: 'ລາບງົວ', price: 50000 },
+                { id: 7, name: 'ເຂົ້າໜຽວ', price: 15000 }
+            ],
+            drinks: [
+                { id: 8, name: 'ນ້ຳດື່ມນ້ອຍ', price: 8000 },
+                { id: 9, name: 'ນ້ຳດື່ມໃຫຍ່', price: 10000 },
+                { id: 10, name: 'ແປບຊີ່', price: 15000 }
+            ]
         };
-        const initialAuthToken = null; // หากมี Custom Auth Token ให้ใส่ที่นี่ (ปกติจะใช้ null สำหรับ Anonymous/Email-Password)
 
-        // Create a context for Firebase and User data
-        const AppContext = React.createContext(null);
+        // Initialize app
+        window.onload = function() {
+            setTimeout(() => {
+                document.getElementById('splashScreen').style.opacity = '0';
+                setTimeout(() => {
+                    document.getElementById('splashScreen').style.display = 'none';
+                }, 500);
+            }, 2000);
+        };
 
-        // Custom Modal Component (replaces alert/confirm)
-        const Modal = ({ show, title, message, onConfirm, onCancel, confirmText = 'ตกลง', cancelText = 'ยกเลิก' }) => {
-            if (!show) return null;
+        function normalizeTableNumber(tableNum) {
+            return parseInt(tableNum.replace(/^0+/, '') || '0');
+        }
 
-            return (
-                <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 p-4">
-                    <div className="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full transform transition-all duration-300 scale-100 opacity-100 animate-bounce-in">
-                        <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">{title}</h3>
-                        <p className="text-gray-700 mb-6 text-center">{message}</p>
-                        <div className="flex justify-around space-x-4">
-                            {onCancel && (
-                                <button
-                                    onClick={onCancel}
-                                    className="flex-1 bg-gray-300 text-gray-800 py-3 px-6 rounded-lg font-semibold hover:bg-gray-400 transition duration-300 ease-in-out shadow-md"
-                                >
-                                    {cancelText}
-                                </button>
-                            )}
-                            {onConfirm && (
-                                <button
-                                    onClick={onConfirm}
-                                    className="flex-1 bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-pink-600 hover:to-purple-700 transition duration-300 ease-in-out shadow-md"
-                                >
-                                    {confirmText}
-                                </button>
-                            )}
-                        </div>
+        function startOrdering() {
+            currentScreen = 'menu';
+            document.getElementById('homeScreen').style.display = 'none';
+            document.getElementById('menuScreen').style.display = 'block';
+            document.getElementById('backBtn').classList.remove('hidden');
+            document.getElementById('cartMenuBtn').classList.add('show');
+            renderMenuItems();
+        }
+
+        function showAdminLogin() {
+            const username = prompt('ຊື່ຜູ້ໃຊ້:');
+            const password = prompt('ລະຫັດຜ່ານ:');
+            
+            if (username === 'panda' && password === '123') {
+                currentScreen = 'admin';
+                document.getElementById('homeScreen').style.display = 'none';
+                document.getElementById('adminScreen').style.display = 'block';
+                document.getElementById('backBtn').classList.remove('hidden');
+                document.getElementById('cartMenuBtn').classList.remove('show');
+                renderAdminContent();
+                startOrderRefresh();
+            } else {
+                showPopup('ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ');
+            }
+        }
+
+        function showTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderMenuItems();
+        }
+
+        function renderMenuItems() {
+            const menuItems = document.getElementById('menuItems');
+            menuItems.innerHTML = '';
+            
+            menuData[currentTab].forEach(item => {
+                const quantity = cart[item.id] || 0;
+                const itemDiv = document.createElement('div');
+                itemDiv.className = 'menu-item';
+                itemDiv.innerHTML = `
+                    <div class="menu-item-header">
+                        <span class="menu-item-name">${item.name}</span>
+                        <span class="menu-item-price">${item.price.toLocaleString()} ກີບ</span>
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn" onclick="updateQuantity(${item.id}, -1)" ${quantity === 0 ? 'disabled' : ''}>-</button>
+                        <span class="quantity-display">${quantity}</span>
+                        <button class="quantity-btn" onclick="updateQuantity(${item.id}, 1)">+</button>
+                    </div>
+                `;
+                menuItems.appendChild(itemDiv);
+            });
+        }
+
+        function updateQuantity(itemId, change) {
+            const currentQuantity = cart[itemId] || 0;
+            const newQuantity = Math.max(0, currentQuantity + change);
+            
+            if (newQuantity === 0) {
+                delete cart[itemId];
+            } else {
+                cart[itemId] = newQuantity;
+            }
+            
+            updateCartDisplay();
+            renderMenuItems();
+        }
+
+        function updateCartDisplay() {
+            const totalItems = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
+            const floatingCart = document.getElementById('floatingCart');
+            const cartBadge = document.getElementById('cartBadge');
+            const cartMenuBadge = document.getElementById('cartMenuBadge');
+            
+            if (totalItems > 0) {
+                floatingCart.classList.add('show');
+                cartBadge.textContent = totalItems;
+                cartMenuBadge.textContent = totalItems;
+            } else {
+                floatingCart.classList.remove('show');
+                cartBadge.textContent = '0';
+                cartMenuBadge.textContent = '0';
+            }
+        }
+
+        function showCart() {
+            const cartModal = document.getElementById('cartModal');
+            const cartItems = document.getElementById('cartItems');
+            const cartTotal = document.getElementById('cartTotal');
+            
+            cartItems.innerHTML = '';
+            let total = 0;
+            
+            Object.keys(cart).forEach(itemId => {
+                const quantity = cart[itemId];
+                const item = [...menuData.food, ...menuData.drinks].find(i => i.id == itemId);
+                const itemTotal = item.price * quantity;
+                total += itemTotal;
+                
+                const cartItem = document.createElement('div');
+                cartItem.className = 'cart-item';
+                cartItem.innerHTML = `
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${item.name}</div>
+                        <div class="cart-item-price">${item.price.toLocaleString()} ກີບ <span class="cart-item-quantity">x${quantity}</span></div>
+                    </div>
+                    <div style="text-align: right;">
+                        <div style="font-weight: 600; color: #e74c3c;">${itemTotal.toLocaleString()} ກີບ</div>
+                        <button onclick="removeFromCart(${itemId})" style="background: #e74c3c; color: white; border: none; border-radius: 5px; padding: 5px 10px; margin-top: 5px; cursor: pointer;">ລົບ</button>
+                    </div>
+                `;
+                cartItems.appendChild(cartItem);
+            });
+            
+            cartTotal.textContent = `ລວມ: ${total.toLocaleString()} ກີບ`;
+            cartModal.style.display = 'flex';
+        }
+
+        function removeFromCart(itemId) {
+            delete cart[itemId];
+            updateCartDisplay();
+            showCart();
+        }
+
+        function hideCart() {
+            document.getElementById('cartModal').style.display = 'none';
+        }
+
+        function confirmOrder() {
+            const tableInput = document.getElementById('tableInput');
+            const tableNumber = tableInput.value.trim();
+            
+            if (!tableNumber) {
+                showPopup('ກະລຸນາລະບຸເລກໂຕະ');
+                return;
+            }
+            
+            if (Object.keys(cart).length === 0) {
+                showPopup('ກະລຸນາເລືອກອາຫານກ່ອນ');
+                return;
+            }
+            
+            const normalizedTable = normalizeTableNumber(tableNumber);
+            
+            if (tableOrders.has(normalizedTable)) {
+                showPopup('ລໍຖ້າອາຫານຂອງທ່ານກຳລັງຈະມາ');
+                return;
+            }
+            
+            const order = {
+                id: Date.now(),
+                table: normalizedTable,
+                items: { ...cart },
+                total: Object.keys(cart).reduce((sum, itemId) => {
+                    const item = [...menuData.food, ...menuData.drinks].find(i => i.id == itemId);
+                    return sum + (item.price * cart[itemId]);
+                }, 0),
+                timestamp: new Date(),
+                status: 'pending'
+            };
+            
+            orders.push(order);
+            tableOrders.add(normalizedTable);
+            
+            cart = {};
+            updateCartDisplay();
+            hideCart();
+            tableInput.value = '';
+            
+            showPopup('ສັ່ງອາຫານສຳເລັດແລ້ວ! ກະລຸນາລໍຖ້າ...');
+        }
+
+        function backToHome() {
+            currentScreen = 'home';
+            document.getElementById('homeScreen').style.display = 'block';
+            document.getElementById('menuScreen').style.display = 'none';
+            document.getElementById('adminScreen').style.display = 'none';
+            document.getElementById('backBtn').classList.add('hidden');
+            document.getElementById('cartMenuBtn').classList.remove('show');
+            stopOrderRefresh();
+        }
+
+        function showAdminTab(tab) {
+            adminTab = tab;
+            document.querySelectorAll('.admin-tab').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            renderAdminContent();
+        }
+
+        function renderAdminContent() {
+            const adminContent = document.getElementById('adminContent');
+            
+            switch(adminTab) {
+                case 'orders':
+                    renderOrders();
+                    break;
+                case 'summary':
+                    renderSummary();
+                    break;
+                case 'analysis':
+                    renderAnalysis();
+                    break;
+                case 'accounting':
+                    renderAccounting();
+                    break;
+            }
+        }
+
+        function renderOrders() {
+            const adminContent = document.getElementById('adminContent');
+            const pendingOrders = orders.filter(order => order.status === 'pending');
+            
+            if (pendingOrders.length === 0) {
+                adminContent.innerHTML = '<p style="text-align: center; color: #7f8c8d;">ບໍ່ມີອໍເດີໃໝ່</p>';
+                return;
+            }
+            
+            adminContent.innerHTML = pendingOrders.map(order => `
+                <div class="order-item">
+                    <div class="order-header">
+                        <span class="order-table">ໂຕະ ${order.table}</span>
+                        <span class="order-time">${order.timestamp.toLocaleTimeString('lo-LA')}</span>
+                    </div>
+                    <div style="margin-bottom: 10px;">
+                        ${Object.keys(order.items).map(itemId => {
+                            const item = [...menuData.food, ...menuData.drinks].find(i => i.id == itemId);
+                            return `<div>${item.name} x${order.items[itemId]}</div>`;
+                        }).join('')}
+                    </div>
+                    <div class="order-total">${order.total.toLocaleString()} ກີບ</div>
+                    <div class="order-actions">
+                        <button class="action-btn accept-btn" onclick="acceptOrder(${order.id})">ຮັບ</button>
+                        <button class="action-btn reject-btn" onclick="rejectOrder(${order.id})">Clear</button>
                     </div>
                 </div>
-            );
-        };
+            `).join('');
+        }
 
-        // Splash Screen Component
-        const SplashScreen = ({ onComplete }) => {
-            React.useEffect(() => {
-                const timer = setTimeout(() => {
-                    onComplete(true);
-                }, 2000); // แสดง Splash Screen 2 วินาที
-                return () => clearTimeout(timer);
-            }, [onComplete]);
+        function acceptOrder(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                order.status = 'accepted';
+                renderAdminContent();
+            }
+        }
 
-            return (
-                <div className="fixed inset-0 bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 flex items-center justify-center z-50 animate-fade-out">
-                    <div className="text-white text-4xl font-bold animate-pulse">
-                        <img src="https://placehold.co/300x300/ffffff/000000?text=%F0%9F%98%84" alt="Smiling Icon" className="w-64 h-64 mx-auto mb-8 rounded-full shadow-lg animate-bounce-in" />
-                        <p className="text-center text-3xl font-bold text-white drop-shadow-lg">ยินดีต้อนรับ</p>
+        function rejectOrder(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                order.status = 'rejected';
+                tableOrders.delete(order.table);
+                renderAdminContent();
+            }
+        }
+
+        function renderSummary() {
+            const adminContent = document.getElementById('adminContent');
+            const acceptedOrders = orders.filter(order => order.status === 'accepted');
+            const totalRevenue = acceptedOrders.reduce((sum, order) => sum + order.total, 0);
+            const averageOrder = acceptedOrders.length > 0 ? totalRevenue / acceptedOrders.length : 0;
+            
+            adminContent.innerHTML = `
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">${totalRevenue.toLocaleString()}</div>
+                        <div class="stat-label">ລາຍຮັບລວມ (ກີບ)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${acceptedOrders.length}</div>
+                        <div class="stat-label">ຈຳນວນອໍເດີ</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${Math.round(averageOrder).toLocaleString()}</div>
+                        <div class="stat-label">ຄ່າເຉລີ່ຍຕໍ່ອໍເດີ (ກີບ)</div>
                     </div>
                 </div>
-            );
-        };
-
-        // Home Page Component
-        const HomePage = ({ setView }) => {
-            return (
-                <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 text-white font-noto-sans-lao">
-                    <div className="text-center mb-12">
-                        <img src="https://placehold.co/300x300/ffffff/000000?text=%F0%9F%98%84" alt="Smiling Icon" className="w-64 h-64 mx-auto mb-8 rounded-full shadow-lg animate-bounce-in" />
-                        <h1 className="text-5xl font-extrabold drop-shadow-lg animate-fade-in-up">ร้านอาหาร</h1>
-                    </div>
-                    <div className="w-full max-w-xs space-y-6">
-                        <button
-                            onClick={() => setView('customer')}
-                            className="w-full bg-white text-purple-600 py-4 rounded-xl text-2xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 ease-in-out animate-bounce-effect"
-                        >
-                            เริ่มสั่งอาหาร
-                        </button>
-                        <button
-                            onClick={() => setView('admin-login')}
-                            className="w-full bg-purple-700 text-white py-4 rounded-xl text-2xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 ease-in-out animate-bounce-effect"
-                        >
-                            โหมดแอดมิน
-                        </button>
-                    </div>
+                <div class="date-range">
+                    <input type="date" class="date-input" id="startDate">
+                    <input type="date" class="date-input" id="endDate">
+                    <button class="btn" onclick="filterByDate()">ກັ່ນຕອງ</button>
                 </div>
-            );
-        };
+            `;
+        }
 
-        // Customer Order Page Component
-        const CustomerOrderPage = ({ setView }) => {
-            const { db, auth, userId } = React.useContext(AppContext);
-            const [activeTab, setActiveTab] = React.useState('food');
-            const [cartItems, setCartItems] = React.useState([]);
-            const [showCartModal, setShowCartModal] = React.useState(false);
-            const [tableNumber, setTableNumber] = React.useState('');
-            const [showConfirmOrderModal, setShowConfirmOrderModal] = React.useState(false);
-            const [showPendingOrderModal, setShowPendingOrderModal] = React.useState(false);
-            const [pendingOrders, setPendingOrders] = React.useState([]);
-            const [showMyOrdersModal, setShowMyOrdersModal] = React.useState(false);
-            const [modalConfig, setModalConfig] = React.useState({ show: false, title: '', message: '', onConfirm: null, onCancel: null });
-
-            const menu = {
-                food: [
-                    { id: 'f1', name: 'ຕຳໝີ່ຂາວ', price: 30000, type: 'food' },
-                    { id: 'f2', name: 'ຕຳໝີ່ໄວໆ', price: 30000, type: 'food' },
-                    { id: 'f3', name: 'ຕຳຕ່ອນ', price: 50000, type: 'food' },
-                    { id: 'f4', name: 'ຕຳເຂົ້າປຸ້ນ / ຕຳໝາກຮຸ່ງ', price: 25000, type: 'food' },
-                    { id: 'f5', name: 'ຕົ້ມເລືອດ', price: 30000, type: 'food' },
-                    { id: 'f6', name: 'ລາບງົວ', price: 50000, type: 'food' },
-                    { id: 'f7', name: 'ເຂົ້າໜຽວ', price: 15000, type: 'food' },
-                ],
-                drinks: [
-                    { id: 'd1', name: 'ນ້ຳດື່ມນ້ອຍ', price: 8000, type: 'drink' },
-                    { id: 'd2', name: 'ນ້ຳດື່ມໃຫຍ່', price: 10000, type: 'drink' },
-                    { id: 'd3', name: 'ແປບຊີ່', price: 15000, type: 'drink' },
-                ],
-            };
-
-            // Normalize table number: remove leading zeros and convert to string
-            const normalizeTableNumber = (num) => {
-                if (!num) return '';
-                return String(parseInt(num, 10));
-            };
-
-            React.useEffect(() => {
-                if (!db || !userId) return;
-
-                // Listen for pending orders for the current user
-                const q = query(collection(db, `artifacts/${appId}/public/data/orders`), where('userId', '==', userId), where('status', '==', 'pending'));
-                const unsubscribe = onSnapshot(q, (snapshot) => {
-                    const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    setPendingOrders(orders);
-                }, (error) => {
-                    console.error("Error fetching pending orders:", error);
-                });
-
-                return () => unsubscribe();
-            }, [db, userId]);
-
-            const handleAddToCart = (item) => {
-                setCartItems((prevItems) => {
-                    const existingItem = prevItems.find((i) => i.id === item.id);
-                    if (existingItem) {
-                        return prevItems.map((i) =>
-                            i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-                        );
-                    } else {
-                        return [...prevItems, { ...item, quantity: 1 }];
-                    }
-                });
-            };
-
-            const handleRemoveFromCart = (item) => {
-                setCartItems((prevItems) => {
-                    const existingItem = prevItems.find((i) => i.id === item.id);
-                    if (existingItem && existingItem.quantity > 1) {
-                        return prevItems.map((i) =>
-                            i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i
-                        );
-                    } else {
-                        return prevItems.filter((i) => i.id !== item.id);
-                    }
-                });
-            };
-
-            const getTotalItemsInCart = () => {
-                return cartItems.reduce((total, item) => total + item.quantity, 0);
-            };
-
-            const getTotalCartPrice = () => {
-                return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-            };
-
-            const handlePlaceOrderClick = () => {
-                if (cartItems.length === 0) {
-                    setModalConfig({
-                        show: true,
-                        title: 'ตะกร้าสินค้าว่างเปล่า',
-                        message: 'กรุณาเลือกรายการอาหารก่อนสั่ง',
-                        onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                        confirmText: 'ตกลง'
-                    });
-                    return;
-                }
-                setShowConfirmOrderModal(true);
-            };
-
-            const confirmOrder = async () => {
-                setShowConfirmOrderModal(false);
-                const normalizedTable = normalizeTableNumber(tableNumber);
-
-                if (!normalizedTable) {
-                    setModalConfig({
-                        show: true,
-                        title: 'แจ้งเตือน',
-                        message: 'กรุณาระบุเลขโต๊ะก่อนสั่งอาหาร',
-                        onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                        confirmText: 'ตกลง'
-                    });
-                    return;
-                }
-
-                try {
-                    // Check for existing pending orders for this table
-                    const q = query(collection(db, `artifacts/${appId}/public/data/orders`), where('tableNumber', '==', normalizedTable), where('status', '==', 'pending'));
-                    const querySnapshot = await getDocs(q);
-
-                    if (!querySnapshot.empty) {
-                        // If there's an existing pending order for this table, show the message
-                        setModalConfig({
-                            show: true,
-                            title: 'แจ้งเตือน',
-                            message: 'ລໍຖ້າອາຫານຂອງທ່ານກຳລັງຈະມາ',
-                            onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                            confirmText: 'ตกลง'
-                        });
-                        return;
-                    }
-
-                    // If no pending order, proceed to add new order
-                    await addDoc(collection(db, `artifacts/${appId}/public/data/orders`), {
-                        tableNumber: normalizedTable,
-                        items: cartItems.map(item => ({ id: item.id, name: item.name, quantity: item.quantity, price: item.price })),
-                        totalPrice: getTotalCartPrice(),
-                        timestamp: serverTimestamp(),
-                        status: 'pending',
-                        userId: userId, // Store userId to allow user to cancel their own pending order
-                    });
-                    setCartItems([]);
-                    setTableNumber('');
-                    setModalConfig({
-                        show: true,
-                        title: 'สั่งอาหารสำเร็จ',
-                        message: 'คำสั่งซื้อของคุณถูกส่งแล้ว กรุณารอการยืนยันจากแอดมิน',
-                        onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                        confirmText: 'ตกลง'
-                    });
-                } catch (e) {
-                    console.error("Error adding document: ", e);
-                    setModalConfig({
-                        show: true,
-                        title: 'เกิดข้อผิดพลาด',
-                        message: 'ไม่สามารถส่งคำสั่งซื้อได้ กรุณาลองใหม่อีกครั้ง',
-                        onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                        confirmText: 'ตกลง'
-                    });
-                }
-            };
-
-            const handleCancelPendingOrder = async (orderId) => {
-                setModalConfig({
-                    show: true,
-                    title: 'ยืนยันการยกเลิก',
-                    message: 'คุณต้องการยกเลิกคำสั่งซื้อนี้ใช่หรือไม่?',
-                    onConfirm: async () => {
-                        try {
-                            await updateDoc(doc(db, `artifacts/${appId}/public/data/orders`, orderId), {
-                                status: 'cancelled'
-                            });
-                            setModalConfig({ ...modalConfig, show: false }); // Close confirmation modal
-                            setModalConfig({
-                                show: true,
-                                title: 'ยกเลิกสำเร็จ',
-                                message: 'คำสั่งซื้อถูกยกเลิกแล้ว',
-                                onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                                confirmText: 'ตกลง'
-                            });
-                        } catch (e) {
-                            console.error("Error cancelling order: ", e);
-                            setModalConfig({
-                                show: true,
-                                title: 'เกิดข้อผิดพลาด',
-                                message: 'ไม่สามารถยกเลิกคำสั่งซื้อได้',
-                                onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                                confirmText: 'ตกลง'
-                            });
-                        }
-                    },
-                    onCancel: () => setModalConfig({ ...modalConfig, show: false }),
-                    confirmText: 'ยืนยัน',
-                    cancelText: 'ยกเลิก'
-                });
-            };
-
-            return (
-                <div className="min-h-screen flex flex-col bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 text-white font-noto-sans-lao relative">
-                    {/* Header */}
-                    <div className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg p-4 flex justify-between items-center shadow-md sticky top-0 z-10 rounded-b-xl">
-                        <button
-                            onClick={() => setView('home')}
-                            className="text-white text-xl p-2 rounded-full hover:bg-white hover:bg-opacity-30 transition-all duration-300"
-                            aria-label="Back to Home"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                        </button>
-                        <h2 className="text-3xl font-extrabold text-white drop-shadow-lg">สั่งอาหาร</h2>
-                        <button
-                            onClick={() => setShowMyOrdersModal(true)}
-                            className="relative text-white text-xl p-2 rounded-full hover:bg-white hover:bg-opacity-30 transition-all duration-300"
-                            aria-label="My Orders"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M19 20H5c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2zm-7-2c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4-8h8V6H8v4z"/>
-                            </svg>
-                            {pendingOrders.length > 0 && (
-                                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
-                                    {pendingOrders.length}
-                                </span>
-                            )}
-                        </button>
-                    </div>
-
-                    {/* Table Number Input */}
-                    <div className="p-4 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg m-4 rounded-xl shadow-lg flex items-center space-x-3">
-                        <label htmlFor="tableNumber" className="text-white text-lg font-semibold">ລະບຸໂຕະ:</label>
-                        <input
-                            type="number"
-                            id="tableNumber"
-                            value={tableNumber}
-                            onChange={(e) => setTableNumber(e.target.value)}
-                            placeholder="ใส่เลขโต๊ะ"
-                            className="flex-grow p-3 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
-                        />
-                    </div>
-
-                    {/* Menu Tabs */}
-                    <div className="flex justify-center p-4 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg m-4 rounded-xl shadow-lg">
-                        <button
-                            onClick={() => setActiveTab('food')}
-                            className={`flex-1 py-3 text-xl font-bold rounded-l-lg transition-all duration-300 ${
-                                activeTab === 'food' ? 'bg-purple-600 text-white shadow-inner' : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
-                            }`}
-                        >
-                            อาหาร
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('drinks')}
-                            className={`flex-1 py-3 text-xl font-bold rounded-r-lg transition-all duration-300 ${
-                                activeTab === 'drinks' ? 'bg-purple-600 text-white shadow-inner' : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
-                            }`}
-                        >
-                            เครื่องดื่ม
-                        </button>
-                    </div>
-
-                    {/* Menu Items */}
-                    <div className="flex-grow p-4 overflow-y-auto">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-24"> {/* Added pb-24 for floating button */}
-                            {(activeTab === 'food' ? menu.food : menu.drinks).map((item) => (
-                                <div
-                                    key={item.id}
-                                    className="bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg rounded-xl p-5 shadow-xl flex flex-col items-center text-center transform hover:scale-105 transition duration-300 ease-in-out animate-fade-in-up"
-                                >
-                                    {activeTab === 'food' ? (
-                                        <img src="https://placehold.co/100x100/ffffff/000000?text=%F0%9F%8D%9B" alt="Food Icon" className="w-24 h-24 mb-4 rounded-full shadow-md" />
-                                    ) : (
-                                        <img src="https://placehold.co/100x100/ffffff/000000?text=%F0%9F%8D%B7" alt="Drink Icon" className="w-24 h-24 mb-4 rounded-full shadow-md" />
-                                    )}
-                                    <h3 className="text-2xl font-bold mb-2 text-white drop-shadow-md">{item.name}</h3>
-                                    <p className="text-xl text-gray-100 mb-4 font-semibold">{item.price.toLocaleString()} ກີບ</p>
-                                    <div className="flex items-center space-x-3 mt-auto">
-                                        <button
-                                            onClick={() => handleRemoveFromCart(item)}
-                                            className="bg-red-500 text-white w-10 h-10 rounded-full flex items-center justify-center text-2xl font-bold shadow-md hover:bg-red-600 transition duration-300"
-                                        >
-                                            -
-                                        </button>
-                                        <span className="text-2xl font-bold text-white">
-                                            {cartItems.find((i) => i.id === item.id)?.quantity || 0}
-                                        </span>
-                                        <button
-                                            onClick={() => handleAddToCart(item)}
-                                            className="bg-green-500 text-white w-10 h-10 rounded-full flex items-center justify-center text-2xl font-bold shadow-md hover:bg-green-600 transition duration-300"
-                                        >
-                                            +
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Floating Cart Button */}
-                    {getTotalItemsInCart() > 0 && (
-                        <button
-                            onClick={() => setShowCartModal(true)}
-                            className="fixed bottom-6 right-6 bg-gradient-to-r from-pink-500 to-purple-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-3xl font-bold shadow-2xl hover:scale-110 transition duration-300 ease-in-out z-40 animate-bounce-effect"
-                            aria-label="View Cart"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zm-8.7-18H5.2c-.7 0-1.2.4-1.4.9L.4 11.2c-.3.6-.1 1.3.4 1.7.5.4 1.2.4 1.7-.1l2.4-4.8h11.3l-2.4 4.8c-.5.9-.1 2 1 2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-3.2c-.7 0-1.2.4-1.4.9L16.4 0H8.3zM18 10H6l-1.5-3H18v3z"/>
-                            </svg>
-                            <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full transform translate-x-1/2 -translate-y-1/2">
-                                {getTotalItemsInCart()}
-                            </span>
-                        </button>
-                    )}
-
-                    {/* Cart Modal */}
-                    <Modal
-                        show={showCartModal}
-                        title="ตะกร้าสินค้าของคุณ"
-                        message={
-                            <div className="text-left">
-                                {cartItems.length === 0 ? (
-                                    <p className="text-gray-700 text-center">ยังไม่มีสินค้าในตะกร้า</p>
-                                ) : (
-                                    <>
-                                        {cartItems.map((item) => (
-                                            <div key={item.id} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-b-0">
-                                                <span className="text-gray-800 text-lg">{item.name} x {item.quantity}</span>
-                                                <span className="text-gray-800 text-lg">{(item.price * item.quantity).toLocaleString()} ກີບ</span>
-                                            </div>
-                                        ))}
-                                        <div className="flex justify-between items-center py-2 mt-4 font-bold text-gray-900 text-xl">
-                                            <span>รวม:</span>
-                                            <span>{getTotalCartPrice().toLocaleString()} ກີບ</span>
-                                        </div>
-                                    </>
-                                )}
-                            </div>
-                        }
-                        onConfirm={cartItems.length > 0 ? handlePlaceOrderClick : null}
-                        onCancel={() => setShowCartModal(false)}
-                        confirmText="สั่งอาหาร"
-                        cancelText="ปิด"
-                    />
-
-                    {/* Confirm Order Modal */}
-                    <Modal
-                        show={showConfirmOrderModal}
-                        title="ยืนยันการสั่งอาหาร"
-                        message={
-                            <div className="text-left">
-                                <p className="text-gray-800 font-bold mb-2">โต๊ะที่: {normalizeTableNumber(tableNumber)}</p>
-                                {cartItems.map((item) => (
-                                    <div key={item.id} className="flex justify-between items-center py-1 text-gray-700">
-                                        <span>{item.name} x {item.quantity}</span>
-                                        <span>{(item.price * item.quantity).toLocaleString()} ກີບ</span>
-                                    </div>
-                                ))}
-                                <div className="flex justify-between items-center py-2 mt-4 font-bold text-gray-900 text-xl border-t-2 border-gray-300 pt-4">
-                                    <span>รวมทั้งหมด:</span>
-                                    <span>{getTotalCartPrice().toLocaleString()} ກີບ</span>
-                                </div>
-                            </div>
-                        }
-                        onConfirm={confirmOrder}
-                        onCancel={() => setShowConfirmOrderModal(false)}
-                        confirmText="ยืนยันการสั่ง"
-                        cancelText="แก้ไข"
-                    />
-
-                    {/* My Orders Modal (Top Right Cart Icon) */}
-                    <Modal
-                        show={showMyOrdersModal}
-                        title="คำสั่งซื้อของฉัน"
-                        message={
-                            <div className="text-left max-h-80 overflow-y-auto">
-                                {pendingOrders.length === 0 ? (
-                                    <p className="text-gray-700 text-center">ไม่มีคำสั่งซื้อที่รอดำเนินการ</p>
-                                ) : (
-                                    pendingOrders.map((order) => (
-                                        <div key={order.id} className="bg-gray-50 p-4 rounded-lg shadow-sm mb-4">
-                                            <p className="text-gray-800 font-bold mb-2">โต๊ะที่: {order.tableNumber}</p>
-                                            <p className="text-gray-600 text-sm mb-2">สถานะ: <span className="font-semibold text-orange-500">{order.status === 'pending' ? 'รอดำเนินการ' : order.status}</span></p>
-                                            <ul className="list-disc pl-5 text-gray-700 mb-3">
-                                                {order.items.map((item, idx) => (
-                                                    <li key={idx}>{item.name} x {item.quantity} ({(item.price * item.quantity).toLocaleString()} ກີບ)</li>
-                                                ))}
-                                            </ul>
-                                            <p className="text-gray-900 font-bold text-lg text-right">รวม: {order.totalPrice.toLocaleString()} ກີບ</p>
-                                            {order.status === 'pending' && (
-                                                <button
-                                                    onClick={() => handleCancelPendingOrder(order.id)}
-                                                    className="mt-3 w-full bg-red-500 text-white py-2 rounded-lg font-semibold hover:bg-red-600 transition duration-300"
-                                                >
-                                                    ยกเลิกคำสั่งซื้อ
-                                                </button>
-                                            )}
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        }
-                        onConfirm={null} // No confirm button for this modal
-                        onCancel={() => setShowMyOrdersModal(false)}
-                        cancelText="ปิด"
-                    />
-
-                    {/* Global Modal for general messages */}
-                    <Modal
-                        show={modalConfig.show}
-                        title={modalConfig.title}
-                        message={modalConfig.message}
-                        onConfirm={modalConfig.onConfirm}
-                        onCancel={modalConfig.onCancel}
-                        confirmText={modalConfig.confirmText}
-                        cancelText={modalConfig.cancelText}
-                    />
-                </div>
-            );
-        };
-
-        // Admin Login Page
-        const AdminLoginPage = ({ setView, setIsAdmin }) => {
-            const [username, setUsername] = React.useState('');
-            const [password, setPassword] = React.useState('');
-            const [error, setError] = React.useState('');
-
-            const handleLogin = () => {
-                if (username === 'panda' && password === '123') {
-                    setIsAdmin(true);
-                    setView('admin-dashboard');
-                } else {
-                    setError('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
-                }
-            };
-
-            return (
-                <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 text-white font-noto-sans-lao">
-                    <div className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg p-8 rounded-xl shadow-2xl w-full max-w-md animate-fade-in-up">
-                        <h2 className="text-4xl font-extrabold mb-8 text-center text-white drop-shadow-lg">แอดมินล็อกอิน</h2>
-                        <div className="mb-6">
-                            <label htmlFor="username" className="block text-white text-lg font-semibold mb-2">ชื่อผู้ใช้:</label>
-                            <input
-                                type="text"
-                                id="username"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                                className="w-full p-4 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
-                                placeholder="panda"
-                            />
-                        </div>
-                        <div className="mb-8">
-                            <label htmlFor="password" className="block text-white text-lg font-semibold mb-2">รหัสผ่าน:</label>
-                            <input
-                                type="password"
-                                id="password"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                                className="w-full p-4 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
-                                placeholder="123"
-                            />
-                        </div>
-                        {error && <p className="text-red-300 text-center mb-6 text-lg animate-bounce-effect">{error}</p>}
-                        <button
-                            onClick={handleLogin}
-                            className="w-full bg-purple-700 text-white py-4 rounded-xl text-2xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 ease-in-out animate-bounce-effect"
-                        >
-                            เข้าสู่ระบบ
-                        </button>
-                        <button
-                            onClick={() => setView('home')}
-                            className="mt-4 w-full bg-gray-600 text-white py-3 rounded-xl text-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 ease-in-out"
-                        >
-                            กลับหน้าหลัก
-                        </button>
-                    </div>
-                </div>
-            );
-        };
-
-        // Admin Dashboard Component
-        const AdminDashboard = ({ setView, setIsAdmin }) => {
-            const { db } = React.useContext(AppContext);
-            const [activeTab, setActiveTab] = React.useState('incoming-orders');
-            const [orders, setOrders] = React.useState([]);
-            const [expenses, setExpenses] = React.useState([]);
-            const [newExpenseDescription, setNewExpenseDescription] = React.useState('');
-            const [newExpenseAmount, setNewExpenseAmount] = React.useState('');
-            const [startDate, setStartDate] = React.useState('');
-            const [endDate, setEndDate] = React.useState('');
-            const [modalConfig, setModalConfig] = React.useState({ show: false, title: '', message: '', onConfirm: null, onCancel: null });
-
-            // Fetch orders in real-time
-            React.useEffect(() => {
-                if (!db) return;
-
-                const q = query(collection(db, `artifacts/${appId}/public/data/orders`));
-                const unsubscribe = onSnapshot(q, (snapshot) => {
-                    const fetchedOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    // Sort orders by timestamp descending
-                    fetchedOrders.sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
-                    setOrders(fetchedOrders);
-                }, (error) => {
-                    console.error("Error fetching orders:", error);
-                });
-
-                // Refresh every 30 seconds (though onSnapshot handles real-time, this ensures a fallback/re-fetch if needed)
-                const interval = setInterval(() => {
-                    // This interval will trigger onSnapshot again if there are no changes,
-                    // but onSnapshot is more efficient for real-time updates.
-                    // This is primarily for the "reload every 30 seconds" requirement.
-                    console.log("Refreshing orders data...");
-                }, 30000);
-
-                return () => {
-                    unsubscribe();
-                    clearInterval(interval);
-                };
-            }, [db]);
-
-            // Fetch expenses
-            React.useEffect(() => {
-                if (!db) return;
-
-                const q = query(collection(db, `artifacts/${appId}/public/data/expenses`));
-                const unsubscribe = onSnapshot(q, (snapshot) => {
-                    const fetchedExpenses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                    setExpenses(fetchedExpenses);
-                }, (error) => {
-                    console.error("Error fetching expenses:", error);
-                });
-
-                return () => unsubscribe();
-            }, [db]);
-
-            const handleUpdateOrderStatus = async (orderId, status) => {
-                try {
-                    await updateDoc(doc(db, `artifacts/${appId}/public/data/orders`, orderId), { status });
-                    setModalConfig({
-                        show: true,
-                        title: 'อัปเดตสถานะ',
-                        message: `สถานะคำสั่งซื้อ ${orderId} ถูกเปลี่ยนเป็น ${status === 'accepted' ? 'รับแล้ว' : 'เคลียร์แล้ว'}`,
-                        onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                        confirmText: 'ตกลง'
-                    });
-                } catch (e) {
-                    console.error("Error updating order status: ", e);
-                    setModalConfig({
-                        show: true,
-                        title: 'เกิดข้อผิดพลาด',
-                        message: 'ไม่สามารถอัปเดตสถานะได้',
-                        onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                        confirmText: 'ตกลง'
-                    });
-                }
-            };
-
-            const handleAddExpense = async () => {
-                if (!newExpenseDescription || !newExpenseAmount || isNaN(parseFloat(newExpenseAmount))) {
-                    setModalConfig({
-                        show: true,
-                        title: 'ข้อมูลไม่ครบถ้วน',
-                        message: 'กรุณากรอกรายละเอียดและจำนวนเงินค่าใช้จ่ายให้ถูกต้อง',
-                        onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                        confirmText: 'ตกลง'
-                    });
-                    return;
-                }
-
-                try {
-                    await addDoc(collection(db, `artifacts/${appId}/public/data/expenses`), {
-                        description: newExpenseDescription,
-                        amount: parseFloat(newExpenseAmount),
-                        timestamp: serverTimestamp(),
-                    });
-                    setNewExpenseDescription('');
-                    setNewExpenseAmount('');
-                    setModalConfig({
-                        show: true,
-                        title: 'เพิ่มค่าใช้จ่ายสำเร็จ',
-                        message: 'ค่าใช้จ่ายถูกบันทึกแล้ว',
-                        onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                        confirmText: 'ตกลง'
-                    });
-                } catch (e) {
-                    console.error("Error adding expense: ", e);
-                    setModalConfig({
-                        show: true,
-                        title: 'เกิดข้อผิดพลาด',
-                        message: 'ไม่สามารถเพิ่มค่าใช้จ่ายได้',
-                        onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                        confirmText: 'ตกลง'
-                    });
-                }
-            };
-
-            const getFilteredData = (data) => {
-                let filtered = data;
-                if (startDate) {
-                    const start = new Date(startDate);
-                    filtered = filtered.filter(item => item.timestamp && item.timestamp.toDate() >= start);
-                }
-                if (endDate) {
-                    const end = new Date(endDate);
-                    end.setHours(23, 59, 59, 999); // Set to end of day
-                    filtered = filtered.filter(item => item.timestamp && item.timestamp.toDate() <= end);
-                }
-                return filtered;
-            };
-
-            const filteredOrders = getFilteredData(orders.filter(order => order.status === 'accepted' || order.status === 'cleared'));
-            const filteredExpenses = getFilteredData(expenses);
-
-            // Revenue Summary Calculations
-            const totalRevenue = filteredOrders.reduce((sum, order) => sum + order.totalPrice, 0);
-            const totalOrdersCount = filteredOrders.length;
-            const averageOrderValue = totalOrdersCount > 0 ? totalRevenue / totalOrdersCount : 0;
-
-            // Analysis: Top Selling Items
+        function renderAnalysis() {
+            const adminContent = document.getElementById('adminContent');
+            const acceptedOrders = orders.filter(order => order.status === 'accepted');
             const itemSales = {};
-            filteredOrders.forEach(order => {
-                order.items.forEach(item => {
-                    itemSales[item.name] = (itemSales[item.name] || 0) + item.quantity;
+            
+            acceptedOrders.forEach(order => {
+                Object.keys(order.items).forEach(itemId => {
+                    const item = [...menuData.food, ...menuData.drinks].find(i => i.id == itemId);
+                    if (!itemSales[item.name]) {
+                        itemSales[item.name] = { quantity: 0, revenue: 0 };
+                    }
+                    itemSales[item.name].quantity += order.items[itemId];
+                    itemSales[item.name].revenue += item.price * order.items[itemId];
                 });
             });
-            const sortedItems = Object.entries(itemSales).sort(([, a], [, b]) => b - a);
-
-            // Accounting: Net Profit
-            const totalExpenses = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-            const netProfit = totalRevenue - totalExpenses;
-
-            return (
-                <div className="min-h-screen flex flex-col bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 text-white font-noto-sans-lao">
-                    {/* Header */}
-                    <div className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg p-4 flex justify-between items-center shadow-md sticky top-0 z-10 rounded-b-xl">
-                        <button
-                            onClick={() => { setIsAdmin(false); setView('home'); }}
-                            className="text-white text-xl p-2 rounded-full hover:bg-white hover:bg-opacity-30 transition-all duration-300"
-                            aria-label="Logout"
-                        >
-                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H5a3 0 01-3-3V7a3 3 0 013-3h5a3 3 0 013 3v1" />
-                            </svg>
-                        </button>
-                        <h2 className="text-3xl font-extrabold text-white drop-shadow-lg">แผงควบคุมแอดมิน</h2>
-                        <div className="w-6"></div> {/* Spacer */}
-                    </div>
-
-                    {/* Admin Tabs */}
-                    <div className="flex justify-center p-4 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg m-4 rounded-xl shadow-lg overflow-x-auto whitespace-nowrap">
-                        <button
-                            onClick={() => setActiveTab('incoming-orders')}
-                            className={`flex-1 py-3 px-4 text-lg font-bold rounded-l-lg transition-all duration-300 ${
-                                activeTab === 'incoming-orders' ? 'bg-purple-600 text-white shadow-inner' : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
-                            }`}
-                        >
-                            ອໍເດີເຂົ້າ
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('revenue-summary')}
-                            className={`flex-1 py-3 px-4 text-lg font-bold transition-all duration-300 ${
-                                activeTab === 'revenue-summary' ? 'bg-purple-600 text-white shadow-inner' : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
-                            }`}
-                        >
-                            ສະຫຼຸບລາຍຮັບ
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('analysis')}
-                            className={`flex-1 py-3 px-4 text-lg font-bold transition-all duration-300 ${
-                                activeTab === 'analysis' ? 'bg-purple-600 text-white shadow-inner' : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
-                            }`}
-                        >
-                            ວິເຄາະ
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('accounting')}
-                            className={`flex-1 py-3 px-4 text-lg font-bold rounded-r-lg transition-all duration-300 ${
-                                activeTab === 'accounting' ? 'bg-purple-600 text-white shadow-inner' : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
-                            }`}
-                        >
-                            ລະບົບບັນຊີ
-                        </button>
-                    </div>
-
-                    {/* Date Range Filter (for summary, analysis, accounting) */}
-                    {(activeTab === 'revenue-summary' || activeTab === 'analysis' || activeTab === 'accounting') && (
-                        <div className="p-4 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg m-4 rounded-xl shadow-lg flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-                            <label htmlFor="startDate" className="text-white text-lg font-semibold">จาก:</label>
-                            <input
-                                type="date"
-                                id="startDate"
-                                value={startDate}
-                                onChange={(e) => setStartDate(e.target.value)}
-                                className="p-3 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
-                            />
-                            <label htmlFor="endDate" className="text-white text-lg font-semibold">ถึง:</label>
-                            <input
-                                type="date"
-                                id="endDate"
-                                value={endDate}
-                                onChange={(e) => setEndDate(e.target.value)}
-                                className="p-3 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
-                            />
+            
+            const sortedItems = Object.entries(itemSales)
+                .sort((a, b) => b[1].quantity - a[1].quantity)
+                .slice(0, 10);
+            
+            adminContent.innerHTML = `
+                <h3 style="margin-bottom: 20px; text-align: center;">ອັນດັບເມນູຂາຍດີ</h3>
+                ${sortedItems.map((item, index) => `
+                    <div class="order-item">
+                        <div class="order-header">
+                            <span class="order-table">ອັນດັບ ${index + 1}. ${item[0]}</span>
+                            <span class="order-total">${item[1].quantity} ໃບ</span>
                         </div>
-                    )}
-
-                    {/* Tab Content */}
-                    <div className="flex-grow p-4 overflow-y-auto">
-                        {activeTab === 'incoming-orders' && (
-                            <div className="grid grid-cols-1 gap-6">
-                                {orders.filter(order => order.status === 'pending').length === 0 ? (
-                                    <p className="text-center text-xl text-white font-semibold mt-8">ไม่มีออเดอร์ใหม่</p>
-                                ) : (
-                                    orders.filter(order => order.status === 'pending').map((order) => (
-                                        <div key={order.id} className="bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg rounded-xl p-6 shadow-xl animate-fade-in-up">
-                                            <h3 className="text-2xl font-bold mb-3 text-white drop-shadow-md">โต๊ะที่: {order.tableNumber}</h3>
-                                            <p className="text-gray-100 text-sm mb-4">เวลา: {order.timestamp?.toDate().toLocaleString()}</p>
-                                            <ul className="space-y-2 mb-4">
-                                                {order.items.map((item, idx) => (
-                                                    <li key={idx} className="flex justify-between text-lg text-white">
-                                                        <span>{item.name} x {item.quantity}</span>
-                                                        <span>{(item.price * item.quantity).toLocaleString()} ກີບ</span>
-                                                    </li>
-                                                ))}
-                                            </ul>
-                                            <p className="text-3xl font-extrabold text-white text-right mb-6 drop-shadow-lg">รวม: {order.totalPrice.toLocaleString()} ກີບ</p>
-                                            <div className="flex space-x-4">
-                                                <button
-                                                    onClick={() => handleUpdateOrderStatus(order.id, 'accepted')}
-                                                    className="flex-1 bg-green-500 text-white py-3 rounded-lg font-bold text-xl shadow-md hover:bg-green-600 transition duration-300 transform hover:scale-105"
-                                                >
-                                                    รับ
-                                                </button>
-                                                <button
-                                                    onClick={() => handleUpdateOrderStatus(order.id, 'cleared')}
-                                                    className="flex-1 bg-blue-500 text-white py-3 rounded-lg font-bold text-xl shadow-md hover:bg-blue-600 transition duration-300 transform hover:scale-105"
-                                                >
-                                                    เคลียร์
-                                                </button>
-                                            </div>
-                                        </div>
-                                    ))
-                                )}
-                            </div>
-                        )}
-
-                        {activeTab === 'revenue-summary' && (
-                            <div className="bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg rounded-xl p-6 shadow-xl text-center animate-fade-in-up">
-                                <h3 className="text-3xl font-bold mb-6 text-white drop-shadow-md">ສະຫຼຸບລາຍຮັບ</h3>
-                                <div className="space-y-4">
-                                    <p className="text-xl text-white">ยอดรวม: <span className="font-extrabold text-3xl">{totalRevenue.toLocaleString()} ກີບ</span></p>
-                                    <p className="text-xl text-white">จำนวนออเดอร์: <span className="font-extrabold text-3xl">{totalOrdersCount}</span></p>
-                                    <p className="text-xl text-white">ค่าเฉลี่ยต่อออเดอร์: <span className="font-extrabold text-3xl">{averageOrderValue.toLocaleString(undefined, { maximumFractionDigits: 2 })} ກີບ</span></p>
-                                </div>
-                            </div>
-                        )}
-
-                        {activeTab === 'analysis' && (
-                            <div className="bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg rounded-xl p-6 shadow-xl animate-fade-in-up">
-                                <h3 className="text-3xl font-bold mb-6 text-white drop-shadow-md text-center">ວິເຄາະ: เมนูขายดีที่สุด</h3>
-                                {sortedItems.length === 0 ? (
-                                    <p className="text-center text-xl text-white font-semibold">ไม่มีข้อมูลการขาย</p>
-                                ) : (
-                                    <ol className="list-decimal list-inside space-y-3 text-white text-xl">
-                                        {sortedItems.map(([name, count], index) => (
-                                            <li key={index} className="flex justify-between items-center bg-white bg-opacity-10 p-3 rounded-lg shadow-sm">
-                                                <span className="font-semibold">{name}</span>
-                                                <span className="font-bold text-2xl">{count} รายการ</span>
-                                            </li>
-                                        ))}
-                                    </ol>
-                                )}
-                            </div>
-                        )}
-
-                        {activeTab === 'accounting' && (
-                            <div className="bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg rounded-xl p-6 shadow-xl animate-fade-in-up">
-                                <h3 className="text-3xl font-bold mb-6 text-white drop-shadow-md text-center">ລະບົບບັນຊີ</h3>
-
-                                <div className="mb-8">
-                                    <h4 className="text-2xl font-bold mb-4 text-white drop-shadow-md">เพิ่มค่าใช้จ่าย</h4>
-                                    <div className="space-y-4">
-                                        <input
-                                            type="text"
-                                            placeholder="รายละเอียดค่าใช้จ่าย"
-                                            value={newExpenseDescription}
-                                            onChange={(e) => setNewExpenseDescription(e.target.value)}
-                                            className="w-full p-3 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
-                                        />
-                                        <input
-                                            type="number"
-                                            placeholder="จำนวนเงิน (ກີບ)"
-                                            value={newExpenseAmount}
-                                            onChange={(e) => setNewExpenseAmount(e.target.value)}
-                                            className="w-full p-3 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
-                                        />
-                                        <button
-                                            onClick={handleAddExpense}
-                                            className="w-full bg-purple-700 text-white py-3 rounded-lg font-bold text-xl shadow-md hover:bg-purple-800 transition duration-300 transform hover:scale-105"
-                                        >
-                                            เพิ่มค่าใช้จ่าย
-                                        </button>
-                                    </div>
-                                </div>
-
-                                <div className="space-y-4 mt-8">
-                                    <h4 className="text-2xl font-bold mb-4 text-white drop-shadow-md">สรุปการเงิน</h4>
-                                    <p className="text-xl text-white">รายรับทั้งหมด: <span className="font-extrabold text-2xl">{totalRevenue.toLocaleString()} ກີບ</span></p>
-                                    <p className="text-xl text-white">ค่าใช้จ่ายทั้งหมด: <span className="font-extrabold text-2xl">{totalExpenses.toLocaleString()} ກີບ</span></p>
-                                    <p className="text-xl text-white">กำไรสุทธิ: <span className={`font-extrabold text-3xl ${netProfit >= 0 ? 'text-green-300' : 'text-red-300'}`}>{netProfit.toLocaleString()} ກີບ</span></p>
-                                </div>
-                            </div>
-                        )}
+                        <div style="color: #e74c3c; font-weight: 600;">
+                            ລາຍຮັບ: ${item[1].revenue.toLocaleString()} ກີບ
+                        </div>
                     </div>
+                `).join('')}
+            `;
+        }
 
-                    {/* Global Modal for general messages */}
-                    <Modal
-                        show={modalConfig.show}
-                        title={modalConfig.title}
-                        message={modalConfig.message}
-                        onConfirm={modalConfig.onConfirm}
-                        onCancel={modalConfig.onCancel}
-                        confirmText={modalConfig.confirmText}
-                        cancelText={modalConfig.cancelText}
-                    />
+        function renderAccounting() {
+            const adminContent = document.getElementById('adminContent');
+            const acceptedOrders = orders.filter(order => order.status === 'accepted');
+            const totalRevenue = acceptedOrders.reduce((sum, order) => sum + order.total, 0);
+            const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const netProfit = totalRevenue - totalExpenses;
+            
+            adminContent.innerHTML = `
+                <div class="expense-form">
+                    <h3 style="margin-bottom: 15px;">ເພີ່ມຄ່າໃຊ້ຈ່າຍ</h3>
+                    <div class="form-group">
+                        <label class="form-label">ລາຍການ:</label>
+                        <input type="text" class="form-input" id="expenseDescription" placeholder="ຕົວຢ່າງ: ຊື້ເຄື່ອງປຸງ">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">ຈຳນວນເງິນ (ກີບ):</label>
+                        <input type="number" class="form-input" id="expenseAmount" placeholder="0">
+                    </div>
+                    <button class="btn" onclick="addExpense()">ເພີ່ມຄ່າໃຊ້ຈ່າຍ</button>
                 </div>
-            );
-        };
+                
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number">${totalRevenue.toLocaleString()}</div>
+                        <div class="stat-label">ລາຍຮັບ</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${totalExpenses.toLocaleString()}</div>
+                        <div class="stat-label">ຄ່າໃຊ້ຈ່າຍ</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" style="color: ${netProfit >= 0 ? '#2ecc71' : '#e74c3c'}">${netProfit.toLocaleString()}</div>
+                        <div class="stat-label">ກຳໄລສຸດທິ</div>
+                    </div>
+                </div>
+                
+                <h3 style="margin: 20px 0 15px 0;">ລາຍການຄ່າໃຊ້ຈ່າຍ</h3>
+                ${expenses.map(expense => `
+                    <div class="order-item">
+                        <div class="order-header">
+                            <span class="order-table">${expense.description}</span>
+                            <span class="order-total">${expense.amount.toLocaleString()} ກີບ</span>
+                        </div>
+                        <div style="color: #7f8c8d; font-size: 14px;">
+                            ${expense.timestamp.toLocaleDateString('lo-LA')}
+                        </div>
+                    </div>
+                `).join('')}
+            `;
+        }
 
-        // Main App Component
-        const App = () => {
-            const [view, setView] = React.useState('splash'); // 'splash', 'home', 'customer', 'admin-login', 'admin-dashboard'
-            const [showSplash, setShowSplash] = React.useState(true);
-            const [isAdmin, setIsAdmin] = React.useState(false);
-            const [db, setDb] = React.useState(null);
-            const [auth, setAuth] = React.useState(null);
-            const [userId, setUserId] = React.useState(null);
+        function addExpense() {
+            const description = document.getElementById('expenseDescription').value.trim();
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            
+            if (!description || !amount || amount <= 0) {
+                showPopup('ກະລຸນາປ້ອນຂໍ້ມູນໃຫ້ຄົບຖ້ວນ');
+                return;
+            }
+            
+            expenses.push({
+                id: Date.now(),
+                description,
+                amount,
+                timestamp: new Date()
+            });
+            
+            document.getElementById('expenseDescription').value = '';
+            document.getElementById('expenseAmount').value = '';
+            
+            renderAdminContent();
+            showPopup('ເພີ່ມຄ່າໃຊ້ຈ່າຍສຳເລັດແລ້ວ');
+        }
 
-            React.useEffect(() => {
-                // Initialize Firebase
-                try {
-                    const app = initializeApp(firebaseConfig);
-                    const firestoreDb = getFirestore(app);
-                    const firebaseAuth = getAuth(app);
-                    setDb(firestoreDb);
-                    setAuth(firebaseAuth);
+        function filterByDate() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            
+            if (!startDate || !endDate) {
+                showPopup('ກະລຸນາເລືອກຊ່ວງເວລາ');
+                return;
+            }
+            
+            // This would filter orders by date range
+            // Implementation would depend on requirements
+            showPopup('ຟີເຈີກັ່ນຕອງຕາມວັນທີ່ຍັງບໍ່ໄດ້ເຮັດ');
+        }
 
-                    // Sign in anonymously or with custom token
-                    const signIn = async () => {
-                        if (initialAuthToken) {
-                            await signInWithCustomToken(firebaseAuth, initialAuthToken);
-                        } else {
-                            await signInAnonymously(firebaseAuth);
-                        }
-                    };
-                    signIn();
-
-                    // Listen for auth state changes to get userId
-                    const unsubscribeAuth = onAuthStateChanged(firebaseAuth, (user) => {
-                        if (user) {
-                            setUserId(user.uid);
-                        } else {
-                            // Generate a random UUID for unauthenticated users if no __initial_auth_token
-                            setUserId(crypto.randomUUID());
-                        }
-                    });
-
-                    return () => unsubscribeAuth();
-                } catch (error) {
-                    console.error("Failed to initialize Firebase:", error);
-                    // Handle error, maybe show an error message to the user
+        function startOrderRefresh() {
+            if (window.orderRefreshInterval) {
+                clearInterval(window.orderRefreshInterval);
+            }
+            window.orderRefreshInterval = setInterval(() => {
+                if (adminTab === 'orders') {
+                    renderOrders();
                 }
-            }, []);
+            }, 30000); // 30 seconds
+        }
 
-            return (
-                <AppContext.Provider value={{ db, auth, userId }}>
-                    {showSplash && <SplashScreen onComplete={setShowSplash} />}
-                    {!showSplash && (
-                        <>
-                            {view === 'home' && <HomePage setView={setView} />}
-                            {view === 'customer' && <CustomerOrderPage setView={setView} />}
-                            {view === 'admin-login' && <AdminLoginPage setView={setView} setIsAdmin={setIsAdmin} />}
-                            {view === 'admin-dashboard' && isAdmin && <AdminDashboard setView={setView} setIsAdmin={setIsAdmin} />}
-                        </>
-                    )}
-                </AppContext.Provider>
-            );
-        };
+        function stopOrderRefresh() {
+            if (window.orderRefreshInterval) {
+                clearInterval(window.orderRefreshInterval);
+            }
+        }
 
-        // Render the React App
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(React.createElement(App));
+        function showPopup(message) {
+            document.getElementById('popupText').textContent = message;
+            document.getElementById('popup').style.display = 'flex';
+        }
+
+        function hidePopup() {
+            document.getElementById('popup').style.display = 'none';
+        }
+
+        // Event listeners
+        document.getElementById('backBtn').addEventListener('click', backToHome);
+        document.getElementById('cartMenuBtn').addEventListener('click', showCart);
+
+        // Handle clicks outside cart modal
+        document.getElementById('cartModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideCart();
+            }
+        });
+
+        // Handle clicks outside popup
+        document.getElementById('popup').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hidePopup();
+            }
+        });
+
+        // Initialize menu on first load
+        setTimeout(() => {
+            renderMenuItems();
+        }, 100);
     </script>
 </body>
 </html>
