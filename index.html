@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ຂາຍແຕ່ຕຳ - Food Ordering App</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>ລະບົບສັ່ງອາຫານ - Restaurant Ordering System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -14,423 +14,240 @@
 
         body {
             font-family: 'Noto Sans Lao', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ff6b9d, #4ecdc4, #45b7d1, #96ceb4, #ffeaa7);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
             min-height: 100vh;
             overflow-x: hidden;
         }
 
-        .app-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            min-height: 100vh;
-            background: rgba(255, 255, 255, 0.95);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(10px);
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        /* Splash Screen */
+        .container {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 10px;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .page {
+            display: none;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+            margin-bottom: 20px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+            60% { transform: translateY(-5px); }
+        }
+
         .splash-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
+            background: linear-gradient(135deg, #ff6b9d, #4ecdc4);
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            z-index: 9999;
-            animation: splashFade 3s ease-in-out forwards;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeOut 3s ease-in-out forwards;
         }
 
-        .splash-logo {
-            width: 150px;
-            height: 150px;
-            background: #ffeb3b;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 60px;
+        @keyframes fadeOut {
+            0%, 70% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+
+        .splash-icon {
+            font-size: 120px;
+            margin-bottom: 20px;
             animation: bounce 2s infinite;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
-        .splash-text {
-            color: white;
-            font-size: 24px;
-            font-weight: 600;
-            margin-top: 20px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-
-        @keyframes splashFade {
-            0%, 80% { opacity: 1; }
-            100% { opacity: 0; pointer-events: none; }
-        }
-
-        @keyframes bounce {
-            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-            40% { transform: translateY(-30px); }
-            60% { transform: translateY(-15px); }
-        }
-
-        /* Home Screen */
-        .home-screen {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 40px 20px;
-            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
-            animation: fadeIn 1s ease-in-out;
-        }
-
-        .app-logo {
+        .logo {
             width: 300px;
             height: 300px;
-            background: linear-gradient(45deg, #ffeb3b, #ffc107);
+            background: linear-gradient(135deg, #ff6b9d, #ffd93d);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 120px;
-            margin-bottom: 30px;
-            animation: logoFloat 3s ease-in-out infinite;
+            margin: 0 auto 30px;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
-            border: 8px solid white;
+            animation: bounce 2s infinite;
         }
 
-        .app-title {
-            font-size: 48px;
-            font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 40px;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-            animation: slideUp 1s ease-out 0.5s both;
-        }
-
-        .start-btn, .admin-btn {
-            background: linear-gradient(45deg, #667eea, #764ba2);
+        .btn {
+            background: linear-gradient(135deg, #ff6b9d, #4ecdc4);
             color: white;
             border: none;
-            padding: 20px 40px;
-            font-size: 20px;
-            font-weight: 600;
-            border-radius: 50px;
-            cursor: pointer;
-            margin: 10px;
-            transition: all 0.3s ease;
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-            animation: slideUp 1s ease-out 0.7s both;
-        }
-
-        .start-btn:hover, .admin-btn:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
-        }
-
-        @keyframes logoFloat {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-            from { transform: translateY(50px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        /* Main App Layout */
-        .main-app {
-            display: none;
-            min-height: 100vh;
-            position: relative;
-        }
-
-        .app-header {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-        }
-
-        .app-header h1 {
-            font-size: 32px;
-            font-weight: 700;
-        }
-
-        .back-btn {
-            position: absolute;
-            left: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: none;
-            padding: 10px 20px;
+            padding: 15px 30px;
             border-radius: 25px;
+            font-size: 18px;
+            font-weight: 600;
             cursor: pointer;
-            font-size: 16px;
+            width: 100%;
+            margin: 10px 0;
             transition: all 0.3s ease;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
         }
 
-        .back-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-50%) scale(1.05);
+        .btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
         }
 
-        .content-container {
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+        }
+
+        .menu-tabs {
             display: flex;
-            min-height: calc(100vh - 80px);
-        }
-
-        .sidebar {
-            width: 250px;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            padding: 20px;
-            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            border-radius: 15px;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.3);
         }
 
         .tab-btn {
-            width: 100%;
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
+            flex: 1;
+            padding: 15px;
+            background: transparent;
             border: none;
-            padding: 15px 20px;
-            margin-bottom: 10px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
+            cursor: pointer;
             transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .tab-btn:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateX(5px);
+            color: #333;
         }
 
         .tab-btn.active {
-            background: rgba(255, 255, 255, 0.9);
-            color: #667eea;
-            transform: translateX(10px);
-        }
-
-        .main-content {
-            flex: 1;
-            padding: 30px;
-            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-            overflow-y: auto;
-        }
-
-        .menu-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            animation: fadeIn 0.8s ease-in-out;
+            background: linear-gradient(135deg, #ff6b9d, #4ecdc4);
+            color: white;
         }
 
         .menu-item {
-            background: white;
-            border-radius: 20px;
-            padding: 25px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            background: rgba(255, 255, 255, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
-            animation: slideUp 0.6s ease-out;
         }
 
         .menu-item:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
         }
 
-        .menu-item h3 {
-            font-size: 24px;
-            color: #2c3e50;
+        .menu-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 10px;
-            font-weight: 600;
         }
 
-        .menu-item .price {
-            font-size: 20px;
-            color: #e74c3c;
+        .menu-item-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .menu-item-price {
+            font-size: 16px;
             font-weight: 700;
-            margin-bottom: 15px;
+            color: #ff6b9d;
         }
 
         .quantity-controls {
             display: flex;
             align-items: center;
-            gap: 15px;
-            margin-top: 15px;
+            gap: 10px;
         }
 
-        .qty-btn {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border: none;
+        .quantity-btn {
             width: 40px;
             height: 40px;
+            border: none;
             border-radius: 50%;
-            cursor: pointer;
+            background: linear-gradient(135deg, #ff6b9d, #4ecdc4);
+            color: white;
             font-size: 20px;
             font-weight: bold;
+            cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .qty-btn:hover {
+        .quantity-btn:hover {
             transform: scale(1.1);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
-        .qty-display {
+        .quantity-display {
             font-size: 18px;
             font-weight: 600;
-            color: #2c3e50;
             min-width: 30px;
             text-align: center;
         }
 
-        /* Order Summary */
-        .order-summary {
-            position: fixed;
-            right: -400px;
-            top: 0;
-            width: 400px;
-            height: 100vh;
-            background: white;
-            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            transition: right 0.4s ease;
-            overflow-y: auto;
-            padding: 20px;
-        }
-
-        .order-summary.show {
-            right: 0;
-        }
-
-        .order-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-
-        .order-header h3 {
-            font-size: 24px;
-            color: #2c3e50;
-            font-weight: 700;
-        }
-
-        .close-order {
-            background: none;
-            border: none;
-            font-size: 24px;
-            cursor: pointer;
-            color: #e74c3c;
-            padding: 5px;
-            border-radius: 50%;
-            transition: all 0.3s ease;
-        }
-
-        .close-order:hover {
-            background: #f8f9fa;
-            transform: scale(1.1);
-        }
-
-        .order-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            margin-bottom: 10px;
-            background: #f8f9fa;
-            border-radius: 10px;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        .order-total {
-            font-size: 24px;
-            font-weight: 700;
-            color: #e74c3c;
-            text-align: center;
-            margin: 20px 0;
-            padding: 20px;
-            background: linear-gradient(45deg, #ff9a9e, #fecfef);
-            border-radius: 15px;
-            color: white;
-            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
-        }
-
-        .checkout-btn {
-            width: 100%;
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-            border: none;
-            padding: 20px;
-            font-size: 20px;
-            font-weight: 600;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 20px;
-        }
-
-        .checkout-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-        }
-
-        .checkout-btn:disabled {
-            background: #ccc;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        /* Floating Order Button */
-        .floating-order-btn {
+        .floating-cart {
             position: fixed;
             bottom: 20px;
             right: 20px;
             width: 60px;
             height: 60px;
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
-            color: white;
-            border: none;
+            background: linear-gradient(135deg, #ff6b9d, #4ecdc4);
             border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
             font-size: 24px;
             cursor: pointer;
-            z-index: 999;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            z-index: 100;
             transition: all 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            animation: pulse 2s infinite;
         }
 
-        .floating-order-btn:hover {
+        .floating-cart:hover {
             transform: scale(1.1);
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         }
 
-        .order-count {
+        .cart-badge {
             position: absolute;
             top: -5px;
             right: -5px;
-            background: #ffeb3b;
-            color: #2c3e50;
-            width: 25px;
-            height: 25px;
+            background: #ff4757;
+            color: white;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -439,177 +256,195 @@
             font-weight: bold;
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        /* Modal Styles */
-        .modal {
-            display: none;
+        .cart-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.5);
-            z-index: 2000;
-            animation: fadeIn 0.3s ease-in-out;
+            z-index: 200;
+            display: none;
         }
 
-        .modal-content {
-            position: absolute;
+        .cart-popup {
+            position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             background: white;
-            padding: 40px;
+            padding: 30px;
             border-radius: 20px;
-            max-width: 500px;
             width: 90%;
+            max-width: 400px;
+            max-height: 80vh;
+            overflow-y: auto;
+            z-index: 201;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .cart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .cart-item-info {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .cart-item-price {
+            color: #ff6b9d;
+            font-weight: 600;
+        }
+
+        .cart-total {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff6b9d;
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.1), rgba(78, 205, 196, 0.1));
+            border-radius: 15px;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            width: 90%;
+            max-width: 400px;
             text-align: center;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            animation: slideUp 0.3s ease-out;
         }
 
-        .modal h3 {
-            font-size: 24px;
-            color: #2c3e50;
+        .input-group {
             margin-bottom: 20px;
-            font-weight: 700;
         }
 
-        .modal input {
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .input-group input {
             width: 100%;
             padding: 15px;
-            font-size: 18px;
             border: 2px solid #ddd;
             border-radius: 10px;
-            margin-bottom: 20px;
-            text-align: center;
-            font-family: 'Noto Sans Lao', sans-serif;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
         }
 
-        .modal input:focus {
+        .input-group input:focus {
             outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+            border-color: #ff6b9d;
         }
 
-        .modal-buttons {
-            display: flex;
+        .admin-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 15px;
-            justify-content: center;
-        }
-
-        .modal-btn {
-            padding: 15px 30px;
-            font-size: 16px;
-            font-weight: 600;
-            border: none;
-            border-radius: 25px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .modal-btn.primary {
-            background: linear-gradient(45deg, #667eea, #764ba2);
-            color: white;
-        }
-
-        .modal-btn.secondary {
-            background: #f8f9fa;
-            color: #2c3e50;
-            border: 2px solid #ddd;
-        }
-
-        .modal-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-        }
-
-        /* Admin Styles */
-        .admin-panel {
-            display: none;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            padding: 20px;
-        }
-
-        .admin-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .admin-header h2 {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .admin-tabs {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        .admin-tab {
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-
-        .admin-tab:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: translateY(-2px);
-        }
-
-        .admin-tab.active {
-            background: rgba(255, 255, 255, 0.9);
-            color: #667eea;
-        }
-
-        .admin-content {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            padding: 30px;
             margin-bottom: 20px;
         }
 
-        .orders-grid {
-            display: grid;
-            gap: 20px;
-        }
-
-        .order-card {
-            background: rgba(255, 255, 255, 0.9);
-            color: #2c3e50;
+        .stat-card {
+            background: linear-gradient(135deg, rgba(255, 107, 157, 0.1), rgba(78, 205, 196, 0.1));
             padding: 20px;
             border-radius: 15px;
-            animation: slideIn 0.5s ease-out;
+            text-align: center;
         }
 
-        .order-card h4 {
-            font-size: 20px;
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #ff6b9d;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        .order-item {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 15px;
+            border-left: 5px solid #ff6b9d;
+        }
+
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             margin-bottom: 10px;
-            color: #667eea;
+        }
+
+        .table-number {
+            background: linear-gradient(135deg, #ff6b9d, #4ecdc4);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .order-time {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .order-items {
+            margin: 10px 0;
+        }
+
+        .order-total {
+            font-size: 18px;
+            font-weight: 700;
+            color: #ff6b9d;
+            text-align: right;
+            margin-top: 10px;
         }
 
         .order-actions {
@@ -618,747 +453,717 @@
             margin-top: 15px;
         }
 
-        .action-btn {
-            padding: 10px 20px;
+        .success-btn {
+            background: linear-gradient(135deg, #4ecdc4, #44a08d);
+            color: white;
             border: none;
+            padding: 10px 20px;
             border-radius: 20px;
             cursor: pointer;
             font-weight: 600;
+            flex: 1;
             transition: all 0.3s ease;
         }
 
-        .success-btn {
-            background: linear-gradient(45deg, #27ae60, #2ecc71);
-            color: white;
-        }
-
         .clear-btn {
-            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            background: linear-gradient(135deg, #ff6b9d, #ee5a52);
             color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            flex: 1;
+            transition: all 0.3s ease;
         }
 
-        .action-btn:hover {
+        .back-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .cart-menu-btn {
+            background: linear-gradient(135deg, #ff6b9d, #4ecdc4);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .cart-menu-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
-        /* Responsive Design */
+        .pending-indicator {
+            background: #ffa502;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
+        .confirmed-indicator {
+            background: #4ecdc4;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+
         @media (max-width: 768px) {
-            .app-logo {
-                width: 200px;
-                height: 200px;
-                font-size: 80px;
+            .container {
+                padding: 5px;
             }
-
-            .app-title {
-                font-size: 32px;
+            
+            .logo {
+                width: 250px;
+                height: 250px;
+                font-size: 100px;
             }
-
-            .content-container {
-                flex-direction: column;
-            }
-
-            .sidebar {
-                width: 100%;
-                padding: 15px;
-            }
-
-            .order-summary {
-                width: 100%;
-                right: -100%;
-            }
-
-            .menu-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .floating-order-btn {
+            
+            .floating-cart {
                 bottom: 15px;
                 right: 15px;
-                width: 50px;
-                height: 50px;
-                font-size: 20px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .app-logo {
-                width: 150px;
-                height: 150px;
-                font-size: 60px;
-            }
-
-            .app-title {
-                font-size: 24px;
-            }
-
-            .start-btn, .admin-btn {
-                padding: 15px 30px;
-                font-size: 16px;
-            }
-
-            .modal-content {
-                padding: 30px 20px;
-            }
-
-            .main-content {
-                padding: 20px 15px;
-            }
-
-            .menu-item {
-                padding: 20px;
+                width: 55px;
+                height: 55px;
             }
         }
     </style>
 </head>
 <body>
     <!-- Splash Screen -->
-    <div class="splash-screen" id="splashScreen">
-        <div class="splash-logo">😊</div>
-        <div class="splash-text">ຂາຍແຕ່ຕຳ</div>
+    <div class="splash-screen">
+        <div class="splash-icon">😊</div>
+        <h1 style="color: white; font-size: 28px; text-align: center;">ລະບົບສັ່ງອາຫານ</h1>
+        <p style="color: white; font-size: 16px; text-align: center; margin-top: 10px;">ກຳລັງໂຫລດ...</p>
     </div>
 
-    <div class="app-container">
-        <!-- Home Screen -->
-        <div class="home-screen" id="homeScreen">
-            <div class="app-logo">😊</div>
-            <h1 class="app-title">ຂາຍແຕ່ຕຳ</h1>
-            <button class="start-btn" onclick="startApp()">ເລີ່ມສັ່ງອາຫານ</button>
-            <button class="admin-btn" onclick="showAdminLogin()">ໂໝດແອັດມິ້ນ</button>
+    <div class="container">
+        <!-- Home Page -->
+        <div class="page active" id="homePage">
+            <div class="logo">😊</div>
+            <h1 style="text-align: center; margin-bottom: 30px; font-size: 24px; color: #333;">ຍິນດີຕ້ອນຮັບ</h1>
+            <button class="btn" onclick="goToTableInput()">ເລີ່ມສັ່ງອາຫານ</button>
+            <button class="btn secondary" onclick="goToAdminLogin()">ໂໝດແອັດມິນ</button>
         </div>
 
-        <!-- Main App -->
-        <div class="main-app" id="mainApp">
-            <div class="app-header">
-                <button class="back-btn" onclick="goHome()">← ກັບຫນ້າຫລັກ</button>
-                <h1>ຂາຍແຕ່ຕຳ</h1>
+        <!-- Table Input Page -->
+        <div class="page" id="tableInputPage">
+            <button class="back-btn" onclick="goToHome()">← ກັບຄືນ</button>
+            <h2 style="text-align: center; margin-bottom: 30px; color: #333;">ລະບຸໂຕະ</h2>
+            <div class="input-group">
+                <label for="tableNumber">ເລກໂຕະ:</label>
+                <input type="text" id="tableNumber" placeholder="ກະລຸນາລະບຸເລກໂຕະ">
             </div>
-            
-            <div class="content-container">
-                <div class="sidebar">
-                    <button class="tab-btn active" onclick="showTab('food')">🍽️ ອາຫານ</button>
-                    <button class="tab-btn" onclick="showTab('drinks')">🥤 ເຄື່ອງດື່ມ</button>
-                </div>
-                
-                <div class="main-content" id="mainContent">
-                    <div class="menu-grid" id="menuGrid">
-                        <!-- Menu items will be populated by JavaScript -->
-                    </div>
-                </div>
+            <button class="btn" onclick="setTable()">ຢືນຢັນ</button>
+        </div>
+
+        <!-- Menu Page -->
+        <div class="page" id="menuPage">
+            <div class="nav-header">
+                <button class="back-btn" onclick="goToHome()">← ກັບຄືນ</button>
+                <button class="cart-menu-btn" onclick="openCartMenu()">🛒 ຕະກຮ້າ</button>
+            </div>
+            <h2 style="text-align: center; margin-bottom: 20px; color: #333;">ເມນູອາຫານ</h2>
+            <div class="menu-tabs">
+                <button class="tab-btn active" onclick="showMenuTab('food')">🍽️ ອາຫານ</button>
+                <button class="tab-btn" onclick="showMenuTab('drinks')">🥤 ເຄື່ອງດື່ມ</button>
+            </div>
+            <div id="menuContent">
+                <!-- Menu items will be loaded here -->
             </div>
         </div>
 
-        <!-- Order Summary -->
-        <div class="order-summary" id="orderSummary">
-            <div class="order-header">
-                <h3>ລາຍການສັ່ງ</h3>
-                <button class="close-order" onclick="closeOrderSummary()">×</button>
-            </div>
-            <div id="orderItems"></div>
-            <div class="order-total" id="orderTotal">ລວມ: 0 ກີບ</div>
-            <button class="checkout-btn" onclick="checkout()">ສັ່ງອາຫານ</button>
-        </div>
-
-        <!-- Floating Order Button -->
-        <button class="floating-order-btn" onclick="showOrderSummary()" id="floatingOrderBtn" style="display: none;">
-            🛒
-            <span class="order-count" id="orderCount">0</span>
-        </button>
-
-        <!-- Admin Panel -->
-        <div class="admin-panel" id="adminPanel">
-            <div class="admin-header">
-                <h2>ແອັດມິ້ນ</h2>
-                <button class="back-btn" onclick="goHome()" style="position: absolute; top: 20px; left: 20px;">← ກັບຫນ້າຫລັກ</button>
-            </div>
-            
-            <div class="admin-tabs">
-                <button class="admin-tab active" onclick="showAdminTab('orders')">ອໍເດີເຂົ້າ</button>
-                <button class="admin-tab" onclick="showAdminTab('revenue')">ສະຫຼຸບລາຍຮັບ</button>
-                <button class="admin-tab" onclick="showAdminTab('analytics')">ວິເຄາະ</button>
-                <button class="admin-tab" onclick="showAdminTab('accounting')">ລາຍຈ່າຍ</button>
-            </div>
-            
-            <div class="admin-content" id="adminContent">
-                <!-- Admin content will be populated by JavaScript -->
+        <!-- Cart Page -->
+        <div class="page" id="cartPage">
+            <button class="back-btn" onclick="goToMenu()">← ກັບຄືນ</button>
+            <h2 style="text-align: center; margin-bottom: 20px; color: #333;">ຕະກຮ້າສິນຄ້າ</h2>
+            <div id="cartContent">
+                <!-- Cart items will be loaded here -->
             </div>
         </div>
-    </div>
 
-    <!-- Modals -->
-    <div class="modal" id="tableModal">
-        <div class="modal-content">
-            <h3>ລະບູເລກໂຕ໊ະ</h3>
-            <input type="number" id="tableNumber" placeholder="ໃສ່ເລກໂຕ໊ະ" min="1">
-            <div class="modal-buttons">
-                <button class="modal-btn secondary" onclick="closeModal()">ຍົກເລີກ</button>
-                <button class="modal-btn primary" onclick="confirmTable()">ຢືນຢັນ</button>
+        <!-- Admin Login -->
+        <div class="page" id="adminLoginPage">
+            <button class="back-btn" onclick="goToHome()">← ກັບຄືນ</button>
+            <h2 style="text-align: center; margin-bottom: 30px; color: #333;">ເຂົ້າສູ່ລະບົບແອັດມິນ</h2>
+            <div class="input-group">
+                <label for="adminUser">ຊື່ຜູ້ໃຊ້:</label>
+                <input type="text" id="adminUser" placeholder="panda">
             </div>
+            <div class="input-group">
+                <label for="adminPass">ລະຫັດຜ່ານ:</label>
+                <input type="password" id="adminPass" placeholder="123">
+            </div>
+            <button class="btn" onclick="adminLogin()">ເຂົ້າສູ່ລະບົບ</button>
         </div>
-    </div>
 
-    <div class="modal" id="confirmModal">
-        <div class="modal-content">
-            <h3>ຢືນຢັນການສັ່ງອາຫານ</h3>
-            <div id="confirmOrderDetails"></div>
-            <div class="modal-buttons">
-                <button class="modal-btn secondary" onclick="closeModal()">ຍົກເລີກ</button>
-                <button class="modal-btn primary" onclick="finalizeOrder()">ຢືນຢັນສັ່ງ</button>
+        <!-- Admin Dashboard -->
+        <div class="page" id="adminDashboard">
+            <button class="back-btn" onclick="goToHome()">← ອອກຈາກລະບົບ</button>
+            <h2 style="text-align: center; margin-bottom: 20px; color: #333;">ແອັດມິນ Dashboard</h2>
+            <div class="menu-tabs">
+                <button class="tab-btn active" onclick="showAdminTab('orders')">📋 ອໍເດີເຂົ້າ</button>
+                <button class="tab-btn" onclick="showAdminTab('sales')">💰 ສະຫຼຸບລາຍຮັບ</button>
+                <button class="tab-btn" onclick="showAdminTab('analytics')">📊 ວິເຄາະ</button>
+                <button class="tab-btn" onclick="showAdminTab('expenses')">💸 ບັນຊີ</button>
+            </div>
+            <div id="adminContent">
+                <!-- Admin content will be loaded here -->
             </div>
         </div>
     </div>
 
-    <div class="modal" id="adminLoginModal">
-        <div class="modal-content">
-            <h3>ເຂົ້າສູ່ລະບົບແອັດມິ້ນ</h3>
-            <input type="text" id="adminUser" placeholder="ຊື່ຜູ້ໃຊ້">
-            <input type="password" id="adminPass" placeholder="ລະຫັດຜ່ານ">
-            <div class="modal-buttons">
-                <button class="modal-btn secondary" onclick="closeModal()">ຍົກເລີກ</button>
-                <button class="modal-btn primary" onclick="adminLogin()">ເຂົ້າສູ່ລະບົບ</button>
+    <!-- Floating Cart -->
+    <div class="floating-cart" id="floatingCart" onclick="openFloatingCart()" style="display: none;">
+        🛒
+        <div class="cart-badge" id="cartBadge">0</div>
+    </div>
+
+    <!-- Cart Overlay -->
+    <div class="cart-overlay" id="cartOverlay" onclick="closeFloatingCart()">
+        <div class="cart-popup" onclick="event.stopPropagation()">
+            <div class="cart-header">
+                <h3>ຕະກຮ້າສິນຄ້າ</h3>
+                <button class="close-btn" onclick="closeFloatingCart()">×</button>
+            </div>
+            <div id="floatingCartContent">
+                <!-- Floating cart items will be loaded here -->
             </div>
         </div>
     </div>
 
     <script>
+        // Global variables
+        let currentTable = null;
+        let cart = [];
+        let orders = [];
+        let expenses = [];
+        let currentMenuTab = 'food';
+        let currentAdminTab = 'orders';
+
         // Menu data
         const menuData = {
             food: [
-                { id: 1, name: 'ຕຳໝີ່ຂາວ', price: 30000 },
-                { id: 2, name: 'ຕຳໝີ່ໄວໆ', price: 30000 },
-                { id: 3, name: 'ຕຳຕ່ອນ', price: 50000 },
-                { id: 4, name: 'ຕຳເຂົ້າປຸ້ນ / ຕຳໝາກຮຸ່ງ', price: 25000 },
-                { id: 5, name: 'ຕົ້ມເລືອດ', price: 30000 },
-                { id: 6, name: 'ລາບງົວ', price: 50000 },
-                { id: 7, name: 'ເຂົ້າໜຽວ', price: 15000 }
+                { name: 'ຕຳໝີ່ຂາວ', price: 30000 },
+                { name: 'ຕຳໝີ່ໄວໆ', price: 30000 },
+                { name: 'ຕຳຕ່ອນ', price: 50000 },
+                { name: 'ຕຳເຂົ້າປຸ້ນ / ຕຳໝາກຮຸ່ງ', price: 25000 },
+                { name: 'ຕົ້ມເລືອດ', price: 30000 },
+                { name: 'ລາບງົວ', price: 50000 },
+                { name: 'ເຂົ້າໜຽວ', price: 15000 }
             ],
             drinks: [
-                { id: 8, name: 'ນ້ຳດື່ມນ້ອຍ', price: 8000 },
-                { id: 9, name: 'ນ້ຳດື່ມໃຫຍ່', price: 10000 },
-                { id: 10, name: 'ແປບຊີ່', price: 15000 }
+                { name: 'ນ້ຳດື່ມນ້ອຍ', price: 8000 },
+                { name: 'ນ້ຳດື່ມໃຫຍ່', price: 10000 },
+                { name: 'ແປບຊີ່', price: 15000 }
             ]
         };
 
-        // Global variables
-        let currentTab = 'food';
-        let cart = {};
-        let orders = [];
-        let tableOrders = {};
-        let currentTableNumber = null;
-        let totalRevenue = 0;
-        let expenses = [];
-        let menuStats = {};
+        // Utility functions
+        function formatPrice(price) {
+            return price.toLocaleString('lo-LA') + ' ກີບ';
+        }
 
-        // Initialize app
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
-                document.getElementById('splashScreen').style.display = 'none';
-            }, 3000);
-            
-            loadMenuItems();
-            startAdminAutoRefresh();
-        });
+        function normalizeTableNumber(table) {
+            return parseInt(table).toString();
+        }
+
+        function showPage(pageId) {
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+            document.getElementById(pageId).classList.add('active');
+        }
+
+        function updateCartBadge() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            document.getElementById('cartBadge').textContent = totalItems;
+            const floatingCart = document.getElementById('floatingCart');
+            if (totalItems > 0) {
+                floatingCart.style.display = 'flex';
+            } else {
+                floatingCart.style.display = 'none';
+            }
+        }
 
         // Navigation functions
-        function startApp() {
-            document.getElementById('homeScreen').style.display = 'none';
-            document.getElementById('mainApp').style.display = 'block';
-            loadMenuItems();
+        function goToHome() {
+            showPage('homePage');
+            currentTable = null;
+            cart = [];
+            updateCartBadge();
         }
 
-        function goHome() {
-            document.getElementById('homeScreen').style.display = 'flex';
-            document.getElementById('mainApp').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'none';
-            closeOrderSummary();
+        function goToTableInput() {
+            showPage('tableInputPage');
+            document.getElementById('tableNumber').value = '';
         }
 
-        function showTab(tab) {
-            currentTab = tab;
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            loadMenuItems();
+        function goToMenu() {
+            showPage('menuPage');
+            loadMenuContent();
         }
 
-        function loadMenuItems() {
-            const menuGrid = document.getElementById('menuGrid');
-            menuGrid.innerHTML = '';
-            
-            const items = menuData[currentTab];
-            items.forEach(item => {
-                const menuItem = document.createElement('div');
-                menuItem.className = 'menu-item';
-                menuItem.innerHTML = `
-                    <h3>${item.name}</h3>
-                    <div class="price">${item.price.toLocaleString()} ກີບ</div>
-                    <div class="quantity-controls">
-                        <button class="qty-btn" onclick="changeQuantity(${item.id}, -1)">-</button>
-                        <span class="qty-display" id="qty-${item.id}">${cart[item.id] || 0}</span>
-                        <button class="qty-btn" onclick="changeQuantity(${item.id}, 1)">+</button>
-                    </div>
-                `;
-                menuGrid.appendChild(menuItem);
-            });
+        function goToCart() {
+            showPage('cartPage');
+            loadCartContent();
         }
 
-        function changeQuantity(itemId, change) {
-            if (!cart[itemId]) cart[itemId] = 0;
-            cart[itemId] += change;
-            
-            if (cart[itemId] < 0) cart[itemId] = 0;
-            if (cart[itemId] === 0) delete cart[itemId];
-            
-            document.getElementById(`qty-${itemId}`).textContent = cart[itemId] || 0;
-            updateFloatingButton();
-            updateOrderSummary();
-        }
-
-        function updateFloatingButton() {
-            const totalItems = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
-            const floatingBtn = document.getElementById('floatingOrderBtn');
-            const orderCount = document.getElementById('orderCount');
-            
-            if (totalItems > 0) {
-                floatingBtn.style.display = 'block';
-                orderCount.textContent = totalItems;
-            } else {
-                floatingBtn.style.display = 'none';
-            }
-        }
-
-        function showOrderSummary() {
-            document.getElementById('orderSummary').classList.add('show');
-            updateOrderSummary();
-        }
-
-        function closeOrderSummary() {
-            document.getElementById('orderSummary').classList.remove('show');
-        }
-
-        function updateOrderSummary() {
-            const orderItems = document.getElementById('orderItems');
-            const orderTotal = document.getElementById('orderTotal');
-            
-            orderItems.innerHTML = '';
-            let total = 0;
-            
-            Object.keys(cart).forEach(itemId => {
-                const item = findItemById(parseInt(itemId));
-                if (item && cart[itemId] > 0) {
-                    const itemTotal = item.price * cart[itemId];
-                    total += itemTotal;
-                    
-                    const orderItem = document.createElement('div');
-                    orderItem.className = 'order-item';
-                    orderItem.innerHTML = `
-                        <div>
-                            <strong>${item.name}</strong><br>
-                            ${item.price.toLocaleString()} ກີບ × ${cart[itemId]}
-                        </div>
-                        <div>${itemTotal.toLocaleString()} ກີບ</div>
-                    `;
-                    orderItems.appendChild(orderItem);
-                }
-            });
-            
-            orderTotal.textContent = `ລວມ: ${total.toLocaleString()} ກີບ`;
-        }
-
-        function findItemById(id) {
-            return [...menuData.food, ...menuData.drinks].find(item => item.id === id);
-        }
-
-        function checkout() {
-            if (Object.keys(cart).length === 0) {
-                alert('ກະລຸນາເລືອກອາຫານກ່ອນ');
-                return;
-            }
-            
-            document.getElementById('tableModal').style.display = 'block';
-        }
-
-        function closeModal() {
-            document.querySelectorAll('.modal').forEach(modal => {
-                modal.style.display = 'none';
-            });
-        }
-
-        function confirmTable() {
-            const tableNumber = document.getElementById('tableNumber').value;
-            if (!tableNumber || tableNumber < 1) {
-                alert('ກະລຸນາໃສ່ເລກໂຕ໊ະ');
-                return;
-            }
-            
-            // Check if table is already occupied
-            if (tableOrders[tableNumber] && tableOrders[tableNumber].status === 'ລໍຖ້າ') {
-                alert('ໂຕ໊ະນີ້ຍັງມີອໍເດີທີ່ລໍຖ້າຢູ່ ກະລຸນາລໍຖ້າໃຫ້ແອັດມິ້ນອະນຸມັດກ່ອນ');
-                return;
-            }
-            
-            currentTableNumber = tableNumber;
-            closeModal();
-            showConfirmOrder();
-        }
-
-        function showConfirmOrder() {
-            const confirmDetails = document.getElementById('confirmOrderDetails');
-            let html = `<h4>ໂຕ໊ະ: ${currentTableNumber}</h4><br>`;
-            
-            let total = 0;
-            Object.keys(cart).forEach(itemId => {
-                const item = findItemById(parseInt(itemId));
-                if (item && cart[itemId] > 0) {
-                    const itemTotal = item.price * cart[itemId];
-                    total += itemTotal;
-                    html += `<div style="text-align: left; margin-bottom: 10px;">
-                        ${item.name} × ${cart[itemId]} = ${itemTotal.toLocaleString()} ກີບ
-                    </div>`;
-                }
-            });
-            
-            html += `<br><strong>ລວມທັງໝົດ: ${total.toLocaleString()} ກີບ</strong>`;
-            confirmDetails.innerHTML = html;
-            
-            document.getElementById('confirmModal').style.display = 'block';
-        }
-
-        function finalizeOrder() {
-            const orderId = Date.now();
-            const orderTime = new Date().toLocaleString('lo-LA');
-            
-            let total = 0;
-            const orderItems = [];
-            
-            Object.keys(cart).forEach(itemId => {
-                const item = findItemById(parseInt(itemId));
-                if (item && cart[itemId] > 0) {
-                    const itemTotal = item.price * cart[itemId];
-                    total += itemTotal;
-                    orderItems.push({
-                        name: item.name,
-                        quantity: cart[itemId],
-                        price: item.price,
-                        total: itemTotal
-                    });
-                    
-                    // Update menu stats
-                    if (!menuStats[item.name]) {
-                        menuStats[item.name] = { quantity: 0, revenue: 0 };
-                    }
-                    menuStats[item.name].quantity += cart[itemId];
-                    menuStats[item.name].revenue += itemTotal;
-                }
-            });
-            
-            const order = {
-                id: orderId,
-                tableNumber: currentTableNumber,
-                items: orderItems,
-                total: total,
-                time: orderTime,
-                status: 'ລໍຖ້າ'
-            };
-            
-            orders.push(order);
-            tableOrders[currentTableNumber] = order;
-            totalRevenue += total;
-            
-            // Clear cart
-            cart = {};
-            loadMenuItems();
-            updateFloatingButton();
-            closeOrderSummary();
-            closeModal();
-            
-            alert(`ສັ່ງອາຫານສຳເລັດ!\nໂຕ໊ະ: ${currentTableNumber}\nລວມ: ${total.toLocaleString()} ກີບ`);
-        }
-
-        // Admin functions
-        function showAdminLogin() {
-            document.getElementById('adminLoginModal').style.display = 'block';
-        }
-
-        function adminLogin() {
-            const user = document.getElementById('adminUser').value;
-            const pass = document.getElementById('adminPass').value;
-            
-            if (user === 'panda' && pass === '123') {
-                closeModal();
-                document.getElementById('homeScreen').style.display = 'none';
-                document.getElementById('adminPanel').style.display = 'block';
-                showAdminTab('orders');
-            } else {
-                alert('ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ');
-            }
-            
+        function goToAdminLogin() {
+            showPage('adminLoginPage');
             document.getElementById('adminUser').value = '';
             document.getElementById('adminPass').value = '';
         }
 
-        function showAdminTab(tab) {
-            document.querySelectorAll('.admin-tab').forEach(btn => btn.classList.remove('active'));
-            event.target.classList.add('active');
-            
-            const adminContent = document.getElementById('adminContent');
-            
-            switch(tab) {
-                case 'orders':
-                    showOrdersTab();
-                    break;
-                case 'revenue':
-                    showRevenueTab();
-                    break;
-                case 'analytics':
-                    showAnalyticsTab();
-                    break;
-                case 'accounting':
-                    showAccountingTab();
-                    break;
-            }
+        function goToAdminDashboard() {
+            showPage('adminDashboard');
+            showAdminTab('orders');
         }
 
-        function showOrdersTab() {
-            const adminContent = document.getElementById('adminContent');
-            let html = `<h3>ອໍເດີທັງໝົດ: ${orders.length}</h3><div class="orders-grid">`;
-            
-            orders.filter(order => order.status === 'ລໍຖ້າ').forEach(order => {
-                html += `
-                    <div class="order-card">
-                        <h4>ໂຕ໊ະ: ${order.tableNumber}</h4>
-                        <p><strong>ເວລາ:</strong> ${order.time}</p>
-                        <p><strong>ສະຖານະ:</strong> ${order.status}</p>
-                        <div style="margin: 10px 0;">
-                            <strong>ລາຍການ:</strong><br>
-                            ${order.items.map(item => 
-                                `${item.name} × ${item.quantity} = ${item.total.toLocaleString()} ກີບ`
-                            ).join('<br>')}
-                        </div>
-                        <p><strong>ລວມ:</strong> ${order.total.toLocaleString()} ກີບ</p>
-                        <div class="order-actions">
-                            <button class="action-btn success-btn" onclick="markOrderSuccess(${order.id})">Success</button>
-                            <button class="action-btn clear-btn" onclick="clearOrder(${order.id})">Clear</button>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            adminContent.innerHTML = html;
-        }
-
-        function showRevenueTab() {
-            const adminContent = document.getElementById('adminContent');
-            const completedOrders = orders.filter(order => order.status === 'ສຳເລັດ');
-            const totalOrders = completedOrders.length;
-            const avgOrder = totalOrders > 0 ? totalRevenue / totalOrders : 0;
-            
-            let html = `
-                <h3>ສະຫຼຸບລາຍຮັບ</h3>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px;">
-                    <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 15px; text-align: center;">
-                        <h4>ລາຍຮັບລວມ</h4>
-                        <p style="font-size: 24px; font-weight: bold;">${totalRevenue.toLocaleString()} ກີບ</p>
-                    </div>
-                    <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 15px; text-align: center;">
-                        <h4>ອໍເດີທັງໝົດ</h4>
-                        <p style="font-size: 24px; font-weight: bold;">${totalOrders}</p>
-                    </div>
-                    <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 15px; text-align: center;">
-                        <h4>ເຄື່ອງອໍເດີ</h4>
-                        <p style="font-size: 24px; font-weight: bold;">${avgOrder.toLocaleString()} ກີບ</p>
-                    </div>
-                </div>
-                <h4>ລາຍການອໍເດີທີ່ສຳເລັດ:</h4>
-                <div style="max-height: 400px; overflow-y: auto;">
-            `;
-            
-            completedOrders.forEach(order => {
-                html += `
-                    <div style="background: rgba(255,255,255,0.2); padding: 15px; margin-bottom: 10px; border-radius: 10px;">
-                        <p><strong>ໂຕ໊ະ ${order.tableNumber}</strong> - ${order.time}</p>
-                        <p>ລວມ: ${order.total.toLocaleString()} ກີບ</p>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            adminContent.innerHTML = html;
-        }
-
-        function showAnalyticsTab() {
-            const adminContent = document.getElementById('adminContent');
-            let html = `
-                <h3>ວິເຄາະເມນູ</h3>
-                <div style="display: grid; gap: 15px;">
-            `;
-            
-            // Sort menu items by popularity
-            const sortedMenus = Object.entries(menuStats)
-                .sort(([,a], [,b]) => b.quantity - a.quantity);
-            
-            sortedMenus.forEach(([itemName, stats], index) => {
-                const rank = index + 1;
-                html += `
-                    <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <h4>#${rank} ${itemName}</h4>
-                            <p>ຂາຍໄດ້: ${stats.quantity} ຈາກ</p>
-                        </div>
-                        <div style="text-align: right;">
-                            <p style="font-size: 18px; font-weight: bold;">${stats.revenue.toLocaleString()} ກີບ</p>
-                            <p style="font-size: 14px; opacity: 0.8;">ລາຍຮັບ</p>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            if (sortedMenus.length === 0) {
-                html += '<p>ຍັງບໍ່ມີຂໍ້ມູນການຂາຍ</p>';
-            }
-            
-            html += '</div>';
-            adminContent.innerHTML = html;
-        }
-
-        function showAccountingTab() {
-            const adminContent = document.getElementById('adminContent');
-            const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
-            const profit = totalRevenue - totalExpenses;
-            
-            let html = `
-                <h3>ລະບົບບັນຊີ</h3>
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px;">
-                    <div style="background: rgba(46, 204, 113, 0.2); padding: 20px; border-radius: 15px; text-align: center;">
-                        <h4>ລາຍຮັບ</h4>
-                        <p style="font-size: 24px; font-weight: bold; color: #27ae60;">+${totalRevenue.toLocaleString()} ກີບ</p>
-                    </div>
-                    <div style="background: rgba(231, 76, 60, 0.2); padding: 20px; border-radius: 15px; text-align: center;">
-                        <h4>ລາຍຈ່າຍ</h4>
-                        <p style="font-size: 24px; font-weight: bold; color: #e74c3c;">-${totalExpenses.toLocaleString()} ກີບ</p>
-                    </div>
-                    <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 15px; text-align: center;">
-                        <h4>ກຳໄລສຸດທິ</h4>
-                        <p style="font-size: 24px; font-weight: bold; color: ${profit >= 0 ? '#27ae60' : '#e74c3c'};">
-                            ${profit >= 0 ? '+' : ''}${profit.toLocaleString()} ກີບ
-                        </p>
-                    </div>
-                </div>
-                
-                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; margin-bottom: 20px;">
-                    <h4>ເພີ່ມລາຍຈ່າຍ</h4>
-                    <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
-                        <input type="text" id="expenseDescription" placeholder="ລາຍລະອຽດ" style="flex: 1; min-width: 200px; padding: 10px; border-radius: 5px; border: none;">
-                        <input type="number" id="expenseAmount" placeholder="ຈຳນວນເງິນ" style="flex: 1; min-width: 150px; padding: 10px; border-radius: 5px; border: none;">
-                        <button onclick="addExpense()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">ເພີ່ມ</button>
-                    </div>
-                </div>
-                
-                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px;">
-                    <h4>ລາຍການຄ່າໃຊ້ຈ່າຍ</h4>
-                    <div id="expensesList" style="max-height: 300px; overflow-y: auto;">
-            `;
-            
-            expenses.forEach((expense, index) => {
-                html += `
-                    <div style="background: rgba(255,255,255,0.1); padding: 15px; margin-bottom: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <p><strong>${expense.description}</strong></p>
-                            <p style="font-size: 14px; opacity: 0.8;">${expense.date}</p>
-                        </div>
-                        <div style="text-align: right;">
-                            <p style="font-size: 18px; font-weight: bold; color: #e74c3c;">-${expense.amount.toLocaleString()} ກີບ</p>
-                            <button onclick="removeExpense(${index})" style="padding: 5px 10px; background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px;">ລົບ</button>
-                        </div>
-                    </div>
-                `;
-            });
-            
-            if (expenses.length === 0) {
-                html += '<p>ຍັງບໍ່ມີລາຍຈ່າຍ</p>';
-            }
-            
-            html += '</div></div>';
-            adminContent.innerHTML = html;
-        }
-
-        function addExpense() {
-            const description = document.getElementById('expenseDescription').value;
-            const amount = parseFloat(document.getElementById('expenseAmount').value);
-            
-            if (!description || !amount || amount <= 0) {
-                alert('ກະລຸນາໃສ່ຂໍ້ມູນໃຫ້ຄົບຖ້ວນ');
+        // Table functions
+        function setTable() {
+            const tableInput = document.getElementById('tableNumber').value.trim();
+            if (!tableInput) {
+                alert('ກະລຸນາລະບຸເລກໂຕະ');
                 return;
             }
+
+            const normalizedTable = normalizeTableNumber(tableInput);
             
-            const expense = {
-                description: description,
-                amount: amount,
-                date: new Date().toLocaleString('lo-LA')
-            };
-            
-            expenses.push(expense);
-            
-            document.getElementById('expenseDescription').value = '';
-            document.getElementById('expenseAmount').value = '';
-            
-            showAccountingTab();
+            // Check if table has pending orders
+            const hasPendingOrder = orders.some(order => 
+                order.table === normalizedTable && order.status === 'pending'
+            );
+
+            if (hasPendingOrder) {
+                alert('ລໍຖ້າອາຫານຂອງທ່ານກຳລັງຈະມາ');
+                return;
+            }
+
+            currentTable = normalizedTable;
+            goToMenu();
         }
 
-        function removeExpense(index) {
-            if (confirm('ຕ້ອງການລົບລາຍຈ່າຍນີ້ແທ້ຫຼືບໍ?')) {
-                expenses.splice(index, 1);
-                showAccountingTab();
+        // Menu functions
+        function showMenuTab(tab) {
+            currentMenuTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            loadMenuContent();
+        }
+
+        function loadMenuContent() {
+            const menuContent = document.getElementById('menuContent');
+            const items = menuData[currentMenuTab];
+            
+            menuContent.innerHTML = items.map(item => `
+                <div class="menu-item">
+                    <div class="menu-item-header">
+                        <span class="menu-item-name">${item.name}</span>
+                        <span class="menu-item-price">${formatPrice(item.price)}</span>
+                    </div>
+                    <div class="quantity-controls">
+                        <button class="quantity-btn" onclick="changeQuantity('${item.name}', -1)">-</button>
+                        <span class="quantity-display" id="qty-${item.name.replace(/\s/g, '')}">${getItemQuantity(item.name)}</span>
+                        <button class="quantity-btn" onclick="changeQuantity('${item.name}', 1)">+</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getItemQuantity(itemName) {
+            const item = cart.find(item => item.name === itemName);
+            return item ? item.quantity : 0;
+        }
+
+        function changeQuantity(itemName, change) {
+            const menuItem = [...menuData.food, ...menuData.drinks].find(item => item.name === itemName);
+            const cartItem = cart.find(item => item.name === itemName);
+
+            if (cartItem) {
+                cartItem.quantity += change;
+                if (cartItem.quantity <= 0) {
+                    cart = cart.filter(item => item.name !== itemName);
+                }
+            } else if (change > 0) {
+                cart.push({
+                    name: itemName,
+                    price: menuItem.price,
+                    quantity: change
+                });
             }
+
+            document.getElementById(`qty-${itemName.replace(/\s/g, '')}`).textContent = getItemQuantity(itemName);
+            updateCartBadge();
+        }
+
+        // Cart functions
+        function openCartMenu() {
+            goToCart();
+        }
+
+        function openFloatingCart() {
+            document.getElementById('cartOverlay').style.display = 'block';
+            loadFloatingCartContent();
+        }
+
+        function closeFloatingCart() {
+            document.getElementById('cartOverlay').style.display = 'none';
+        }
+
+        function loadCartContent() {
+            const cartContent = document.getElementById('cartContent');
+            
+            if (cart.length === 0) {
+                cartContent.innerHTML = '<p style="text-align: center; color: #666;">ຕະກຮ້າວ່າງເປົ່າ</p>';
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            cartContent.innerHTML = `
+                ${cart.map(item => `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">${formatPrice(item.price)} × ${item.quantity}</div>
+                        </div>
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" onclick="changeQuantity('${item.name}', -1); loadCartContent();">-</button>
+                            <span class="quantity-display">${item.quantity}</span>
+                            <button class="quantity-btn" onclick="changeQuantity('${item.name}', 1); loadCartContent();">+</button>
+                        </div>
+                    </div>
+                `).join('')}
+                <div class="cart-total">
+                    ລວມທັງໝົດ: ${formatPrice(total)}
+                </div>
+                <button class="btn" onclick="confirmOrder()">ຢືນຢັນການສັ່ງ</button>
+            `;
+        }
+
+        function loadFloatingCartContent() {
+            const floatingCartContent = document.getElementById('floatingCartContent');
+            
+            if (cart.length === 0) {
+                floatingCartContent.innerHTML = '<p style="text-align: center; color: #666;">ຕະກຮ້າວ່າງເປົ່າ</p>';
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            
+            floatingCartContent.innerHTML = `
+                ${cart.map(item => `
+                    <div class="cart-item">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">${formatPrice(item.price)} × ${item.quantity}</div>
+                        </div>
+                        <div class="quantity-controls">
+                            <button class="quantity-btn" onclick="changeQuantity('${item.name}', -1); loadFloatingCartContent();">-</button>
+                            <span class="quantity-display">${item.quantity}</span>
+                            <button class="quantity-btn" onclick="changeQuantity('${item.name}', 1); loadFloatingCartContent();">+</button>
+                        </div>
+                    </div>
+                `).join('')}
+                <div class="cart-total">
+                    ລວມທັງໝົດ: ${formatPrice(total)}
+                </div>
+                <button class="btn" onclick="confirmOrder(); closeFloatingCart();">ຢືນຢັນການສັ່ງ</button>
+            `;
+        }
+
+        function confirmOrder() {
+            if (cart.length === 0) {
+                alert('ກະລຸນາເລືອກເມນູກ່ອນ');
+                return;
+            }
+
+            const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+            const orderTime = new Date().toLocaleString('lo-LA');
+            
+            const newOrder = {
+                id: Date.now(),
+                table: currentTable,
+                items: [...cart],
+                total: total,
+                time: orderTime,
+                status: 'pending'
+            };
+
+            orders.push(newOrder);
+            
+            // Clear cart
+            cart = [];
+            updateCartBadge();
+            
+            alert('ສັ່ງອາຫານສຳເລັດແລ້ວ!\nໂຕະ: ' + currentTable + '\nລວມ: ' + formatPrice(total));
+            goToHome();
+        }
+
+        // Admin functions
+        function adminLogin() {
+            const username = document.getElementById('adminUser').value;
+            const password = document.getElementById('adminPass').value;
+            
+            if (username === 'panda' && password === '123') {
+                goToAdminDashboard();
+            } else {
+                alert('ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ');
+            }
+        }
+
+        function showAdminTab(tab) {
+            currentAdminTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            loadAdminContent();
+        }
+
+        function loadAdminContent() {
+            const adminContent = document.getElementById('adminContent');
+            
+            switch(currentAdminTab) {
+                case 'orders':
+                    loadOrdersContent(adminContent);
+                    break;
+                case 'sales':
+                    loadSalesContent(adminContent);
+                    break;
+                case 'analytics':
+                    loadAnalyticsContent(adminContent);
+                    break;
+                case 'expenses':
+                    loadExpensesContent(adminContent);
+                    break;
+            }
+        }
+
+        function loadOrdersContent(container) {
+            const pendingOrders = orders.filter(order => order.status === 'pending');
+            
+            if (pendingOrders.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #666;">ບໍ່ມີອໍເດີໃໝ່</p>';
+                return;
+            }
+
+            container.innerHTML = pendingOrders.map(order => `
+                <div class="order-item">
+                    <div class="order-header">
+                        <span class="table-number">ໂຕະ ${order.table}</span>
+                        <span class="order-time">${order.time}</span>
+                    </div>
+                    <div class="order-items">
+                        ${order.items.map(item => `
+                            <div>${item.name} × ${item.quantity} = ${formatPrice(item.price * item.quantity)}</div>
+                        `).join('')}
+                    </div>
+                    <div class="order-total">ລວມ: ${formatPrice(order.total)}</div>
+                    <div class="order-actions">
+                        <button class="success-btn" onclick="markOrderSuccess(${order.id})">ສຳເລັດ</button>
+                        <button class="clear-btn" onclick="clearOrder(${order.id})">ລຶບ</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function loadSalesContent(container) {
+            const completedOrders = orders.filter(order => order.status === 'completed');
+            const totalRevenue = completedOrders.reduce((sum, order) => sum + order.total, 0);
+            const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const netProfit = totalRevenue - totalExpenses;
+            const averageOrder = completedOrders.length > 0 ? totalRevenue / completedOrders.length : 0;
+
+            container.innerHTML = `
+                <div class="admin-stats">
+                    <div class="stat-card">
+                        <div class="stat-number">${formatPrice(totalRevenue)}</div>
+                        <div class="stat-label">ລາຍຮັບລວມ</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${completedOrders.length}</div>
+                        <div class="stat-label">ຈຳນວນອໍເດີ</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${formatPrice(averageOrder)}</div>
+                        <div class="stat-label">ຄ່າເຉລີ່ຍຕໍ່ອໍເດີ</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${formatPrice(totalExpenses)}</div>
+                        <div class="stat-label">ຄ່າໃຊ້ຈ່າຍ</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number">${formatPrice(netProfit)}</div>
+                        <div class="stat-label">ກຳໄລສຸດທິ</div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function loadAnalyticsContent(container) {
+            const completedOrders = orders.filter(order => order.status === 'completed');
+            const itemSales = {};
+            
+            completedOrders.forEach(order => {
+                order.items.forEach(item => {
+                    if (itemSales[item.name]) {
+                        itemSales[item.name] += item.quantity;
+                    } else {
+                        itemSales[item.name] = item.quantity;
+                    }
+                });
+            });
+
+            const sortedItems = Object.entries(itemSales).sort((a, b) => b[1] - a[1]);
+
+            container.innerHTML = `
+                <h3 style="margin-bottom: 20px;">ເມນູຂາຍດີທີ່ສຸດ</h3>
+                ${sortedItems.length > 0 ? sortedItems.map((item, index) => `
+                    <div class="menu-item">
+                        <div class="menu-item-header">
+                            <span class="menu-item-name">#${index + 1} ${item[0]}</span>
+                            <span class="menu-item-price">${item[1]} ຈານ</span>
+                        </div>
+                    </div>
+                `).join('') : '<p style="text-align: center; color: #666;">ຍັງບໍ່ມີຂໍ້ມູນການຂາຍ</p>'}
+            `;
+        }
+
+        function loadExpensesContent(container) {
+            const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            
+            container.innerHTML = `
+                <div class="input-group">
+                    <label for="expenseDesc">ລາຍການຄ່າໃຊ້ຈ່າຍ:</label>
+                    <input type="text" id="expenseDesc" placeholder="ເຊັ່ນ: ຊື້ວັດຖຸດິບ">
+                </div>
+                <div class="input-group">
+                    <label for="expenseAmount">ຈຳນວນເງິນ (ກີບ):</label>
+                    <input type="number" id="expenseAmount" placeholder="0">
+                </div>
+                <button class="btn" onclick="addExpense()">ເພີ່ມຄ່າໃຊ້ຈ່າຍ</button>
+                
+                <h3 style="margin: 30px 0 20px 0;">ລາຍການຄ່າໃຊ້ຈ່າຍ</h3>
+                <div class="stat-card" style="margin-bottom: 20px;">
+                    <div class="stat-number">${formatPrice(totalExpenses)}</div>
+                    <div class="stat-label">ລວມຄ່າໃຊ້ຈ່າຍ</div>
+                </div>
+                
+                ${expenses.length > 0 ? expenses.map((expense, index) => `
+                    <div class="menu-item">
+                        <div class="menu-item-header">
+                            <span class="menu-item-name">${expense.description}</span>
+                            <span class="menu-item-price">${formatPrice(expense.amount)}</span>
+                        </div>
+                        <div style="margin-top: 10px;">
+                            <button class="clear-btn" onclick="removeExpense(${index})">ລຶບ</button>
+                        </div>
+                    </div>
+                `).join('') : '<p style="text-align: center; color: #666;">ຍັງບໍ່ມີຄ່າໃຊ້ຈ່າຍ</p>'}
+            `;
         }
 
         function markOrderSuccess(orderId) {
             const order = orders.find(o => o.id === orderId);
             if (order) {
-                order.status = 'ສຳເລັດ';
-                showOrdersTab();
+                order.status = 'completed';
+                loadAdminContent();
             }
         }
 
         function clearOrder(orderId) {
-            if (confirm('ຕ້ອງການລົບອໍເດີນີ້ແທ້ຫຼືບໍ?')) {
-                const orderIndex = orders.findIndex(o => o.id === orderId);
-                if (orderIndex !== -1) {
-                    const order = orders[orderIndex];
-                    delete tableOrders[order.tableNumber];
-                    orders.splice(orderIndex, 1);
-                    showOrdersTab();
-                }
+            const orderIndex = orders.findIndex(o => o.id === orderId);
+            if (orderIndex !== -1) {
+                orders.splice(orderIndex, 1);
+                loadAdminContent();
             }
         }
 
-        function startAdminAutoRefresh() {
-            setInterval(() => {
-                if (document.getElementById('adminPanel').style.display === 'block') {
-                    // Auto refresh admin panel every 30 seconds
-                    const activeTab = document.querySelector('.admin-tab.active');
-                    if (activeTab) {
-                        activeTab.click();
-                    }
+        function addExpense() {
+            const description = document.getElementById('expenseDesc').value.trim();
+            const amount = parseInt(document.getElementById('expenseAmount').value);
+            
+            if (!description || !amount || amount <= 0) {
+                alert('ກະລຸນາກອກຂໍ້ມູນໃຫ້ຄົບຖ້ວນ');
+                return;
+            }
+
+            expenses.push({
+                description: description,
+                amount: amount,
+                date: new Date().toLocaleString('lo-LA')
+            });
+
+            document.getElementById('expenseDesc').value = '';
+            document.getElementById('expenseAmount').value = '';
+            loadAdminContent();
+        }
+
+        function removeExpense(index) {
+            expenses.splice(index, 1);
+            loadAdminContent();
+        }
+
+        // Auto-refresh orders every 30 seconds when on admin orders tab
+        setInterval(() => {
+            if (document.getElementById('adminDashboard').classList.contains('active') && currentAdminTab === 'orders') {
+                loadAdminContent();
+            }
+        }, 30000);
+
+        // Initialize the application
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.querySelector('.splash-screen').style.display = 'none';
+                showPage('homePage');
+            }, 3000);
+        });
+
+        // Show floating cart on scroll
+        window.addEventListener('scroll', () => {
+            const floatingCart = document.getElementById('floatingCart');
+            if (cart.length > 0) {
+                floatingCart.style.display = 'flex';
+            }
+        });
+
+        // Prevent form submission on Enter key
+        document.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                const activeElement = document.activeElement;
+                if (activeElement.id === 'tableNumber') {
+                    setTable();
+                } else if (activeElement.id === 'adminUser' || activeElement.id === 'adminPass') {
+                    adminLogin();
                 }
-            }, 30000);
-        }
-
-        // Auto-save data to prevent loss
-        function saveData() {
-            const data = {
-                orders: orders,
-                tableOrders: tableOrders,
-                totalRevenue: totalRevenue,
-                expenses: expenses,
-                menuStats: menuStats
-            };
-            // In a real app, you would save this to a database
-            // For now, we'll just keep it in memory
-        }
-
-        // Auto-save every 5 minutes
-        setInterval(saveData, 300000);
+            }
+        });
     </script>
 </body>
 </html>
