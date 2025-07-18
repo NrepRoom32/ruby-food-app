@@ -1,901 +1,1354 @@
 <!DOCTYPE html>
-<html lang="lo">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ແອັບສັ່ງອາຫານ</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao&display=swap" rel="stylesheet">
+    <title>ระบบสั่งอาหารและเครื่องดื่ม</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Noto Sans Lao -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body {
             font-family: 'Noto Sans Lao', sans-serif;
-            margin: 0;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            /* Lollipop Gradient Background */
+            background: linear-gradient(135deg, #FF69B4, #8A2BE2, #00BFFF);
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
             min-height: 100vh;
-            background: linear-gradient(135deg, #FF6B6B, #4ECDC4, #8A2BE2);
-            background-size: cover;
-            color: #333;
-        }
-
-        .app-container {
-            width: 100%;
-            max-width: 480px;
-            height: 100vh;
-            max-height: 900px;
-            background-color: rgba(255, 255, 255, 0.9);
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
-            border-radius: 15px;
-            overflow: hidden;
-            position: relative;
             display: flex;
             flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            overflow-x: hidden; /* Prevent horizontal scrolling */
         }
 
-        @media (min-width: 768px) {
-            .app-container {
-                max-width: 768px;
-                max-height: 1024px;
-            }
+        @keyframes gradientAnimation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        .screen {
-            width: 100%;
-            height: 100%;
-            position: absolute;
+        /* Splash Screen */
+        #splash-screen {
+            position: fixed;
             top: 0;
             left: 0;
-            transition: transform 0.5s ease-in-out;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #FF69B4, #8A2BE2, #00BFFF);
+            background-size: 400% 400%;
+            animation: gradientAnimation 15s ease infinite;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 1;
+            transition: opacity 1s ease-out;
+            flex-direction: column;
+        }
+
+        #splash-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .splash-text {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: white;
+            animation: bounceIn 1s ease-out;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.1); opacity: 0; }
+            60% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); }
+        }
+
+        /* General container styling */
+        .container {
+            background-color: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 95%;
+            max-width: 600px;
+            margin: 1rem auto;
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
-            padding: 20px;
-            box-sizing: border-box;
-            background-color: rgba(255, 255, 255, 0.9);
+            min-height: 80vh; /* Ensure container has a minimum height */
         }
 
-        .screen.hidden {
-            transform: translateX(100%);
-            display: none;
-        }
-
-        .screen.active {
-            transform: translateX(0);
-            display: flex;
-        }
-
-        .home-content {
-            text-align: center;
-        }
-
-        .smile-icon {
-            width: 300px;
-            height: 300px;
-            margin-bottom: 20px;
-        }
-
-        .main-button {
-            background-color: #FF6B6B;
-            color: white;
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.2em;
-            border-radius: 30px;
-            cursor: pointer;
-            margin: 10px 0;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-        }
-
-        .main-button:hover {
-            background-color: #e65a5a;
-            transform: scale(1.05);
-        }
-
-        .secondary-button {
-            background-color: #ccc;
+        /* Button styling */
+        .btn {
+            padding: 0.8rem 2rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            background: linear-gradient(45deg, #FFD700, #FFA500); /* Gold to Orange gradient */
             color: #333;
             border: none;
-            padding: 10px 20px;
-            font-size: 1em;
-            border-radius: 20px;
             cursor: pointer;
-            margin-top: 10px;
-            transition: background-color 0.3s ease;
         }
 
-        .secondary-button:hover {
-            background-color: #bbb;
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(45deg, #FFA500, #FFD700);
         }
 
-        .floating-cart-button {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #8A2BE2;
+        .btn-primary {
+            background: linear-gradient(45deg, #6A0DAD, #FF1493); /* Purple to Deep Pink */
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #FF1493, #6A0DAD);
+        }
+
+        /* Tab buttons */
+        .tab-btn {
+            flex: 1;
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            background-color: rgba(255, 255, 255, 0.3);
             color: white;
             border: none;
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            font-size: 1.5em;
-            display: flex;
-            justify-content: center;
-            align-items: center;
             cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-            z-index: 1000;
-            transition: transform 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
         }
 
-        .floating-cart-button:hover {
-            transform: scale(1.1);
-        }
-
-        .floating-cart-button.hidden {
-            display: none;
-        }
-
-        .cart-count {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: red;
-            color: white;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 0.8em;
-        }
-
-        .app-header {
-            width: 100%;
-            padding: 10px 20px;
-            box-sizing: border-box;
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            position: absolute;
-            top: 0;
-            z-index: 500;
-        }
-
-        .cart-icon-top {
-            font-size: 1.8em;
+        .tab-btn.active {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
             color: #333;
-            cursor: pointer;
-            position: relative;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
         }
 
-        .cart-icon-top .cart-count {
-            font-size: 0.7em;
-            top: -8px;
-            right: -8px;
+        .tab-btn:hover:not(.active) {
+            transform: translateY(-2px);
+            background-color: rgba(255, 255, 255, 0.5);
         }
 
-        .tab-buttons-container {
-            display: flex;
-            width: 100%;
-            justify-content: center;
-            margin-bottom: 20px;
-            position: absolute;
-            top: 20px;
-            z-index: 50;
-        }
-
-        .tab-button {
-            background-color: #4ECDC4;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            margin: 0 5px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 1.1em;
-            transition: background-color 0.3s ease;
-            display: flex;
-            align-items: center;
-        }
-
-        .tab-button.active {
-            background-color: #3BB1A7;
-        }
-
-        .tab-button:hover {
-            background-color: #3BB1A7;
-        }
-
-        .tab-icon {
-            width: 24px;
-            height: 24px;
-            margin-left: 8px;
-        }
-
-        .menu-section {
-            width: 100%;
-            max-height: calc(100% - 120px);
-            overflow-y: auto;
-            padding-top: 80px;
-            box-sizing: border-box;
-        }
-
+        /* Menu item styling */
         .menu-item {
+            background-color: rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
+            padding: 1rem;
+            margin-bottom: 1rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid #eee;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .menu-item:last-child {
-            border-bottom: none;
+        .menu-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
         }
 
-        .item-info h3 {
-            margin: 0;
-            font-size: 1.1em;
-        }
-
-        .item-info p {
-            margin: 5px 0 0;
-            color: #666;
-        }
-
-        .item-controls {
+        .quantity-control {
             display: flex;
             align-items: center;
+            gap: 0.5rem;
         }
 
-        .item-controls button {
-            background-color: #eee;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 5px 10px;
+        .quantity-btn {
+            background-color: rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.2rem;
             cursor: pointer;
+            transition: background-color 0.2s ease;
         }
 
-        .item-controls span {
-            margin: 0 10px;
+        .quantity-btn:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Floating Cart Button */
+        #floating-cart-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            color: #333;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.8rem;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            cursor: pointer;
+            transition: transform 0.3s ease, background 0.3s ease;
+            z-index: 50;
+        }
+
+        #floating-cart-btn:hover {
+            transform: scale(1.1);
+            background: linear-gradient(45deg, #FFA500, #FFD700);
+        }
+
+        #cart-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #FF0000;
+            color: white;
+            border-radius: 50%;
+            padding: 0.2em 0.5em;
+            font-size: 0.75rem;
             font-weight: bold;
         }
 
-        #cart-screen h2 {
-            margin-bottom: 20px;
+        /* Cart Overlay */
+        #cart-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
         }
 
-        #cart-items-display {
-            width: 100%;
-            flex-grow: 1;
+        #cart-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .cart-content {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 500px;
+            color: #333;
+            position: relative;
+            max-height: 90vh;
             overflow-y: auto;
-            border: 1px solid #eee;
-            padding: 10px;
-            margin-bottom: 20px;
         }
 
         .cart-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px dashed #eee;
+            padding: 0.75rem 0;
+            border-bottom: 1px dashed #ccc;
         }
 
         .cart-item:last-child {
             border-bottom: none;
         }
 
-        .table-input-section {
-            width: 100%;
-            margin-bottom: 20px;
-        }
-
-        .table-input-section label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-
-        .table-input-section input {
-            width: calc(100% - 20px);
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            font-size: 1em;
-        }
-
-        .cart-summary {
-            width: 100%;
-            text-align: right;
-            margin-top: 20px;
-            font-size: 1.2em;
-            font-weight: bold;
-        }
-
-        .cart-actions {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
-            margin-top: 20px;
-        }
-
-        .modal {
+        /* Modal / Pop-up */
+        .modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.7);
             display: flex;
             justify-content: center;
             align-items: center;
-            z-index: 2000;
+            z-index: 200;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
         }
 
-        .modal.hidden {
-            display: none;
+        #message-modal.active {
+            opacity: 1;
+            pointer-events: auto;
         }
 
         .modal-content {
             background-color: white;
-            padding: 30px;
-            border-radius: 10px;
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 400px;
             text-align: center;
-            max-width: 80%;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            color: #333;
+            animation: fadeInScale 0.3s ease-out;
         }
 
-        .modal-buttons {
-            margin-top: 20px;
-            display: flex;
-            justify-content: space-around;
+        @keyframes fadeInScale {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
         }
 
-        #admin-login-screen input,
-        #admin-dashboard-screen input {
-            width: calc(100% - 40px);
-            padding: 12px;
-            margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 1.1em;
-        }
-
-        .admin-sections {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .admin-section-btn {
-            flex: 1 1 calc(50% - 30px);
-            max-width: calc(50% - 30px);
-            padding: 20px;
-            background-color: #4ECDC4;
+        /* Admin specific styles */
+        .admin-section {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
             color: white;
-            border: none;
+        }
+
+        .order-card {
+            background-color: rgba(255, 255, 255, 0.1);
             border-radius: 10px;
-            font-size: 1.1em;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
         }
 
-        .admin-section-btn:hover {
-            background-color: #3BB1A7;
+        .order-card.pending { border-left: 5px solid #FFD700; }
+        .order-card.accepted { border-left: 5px solid #00FF00; }
+        .order-card.cleared { border-left: 5px solid #888; opacity: 0.7; }
+
+        .admin-table th, .admin-table td {
+            padding: 0.75rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+            text-align: left;
         }
 
-        .splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #FF6B6B, #4ECDC4, #8A2BE2);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 3000;
-            transition: opacity 1s ease-out;
-        }
-
-        .splash-screen.hidden {
-            opacity: 0;
-            pointer-events: none;
+        .admin-table th {
+            font-weight: bold;
+            color: #FFD700;
         }
     </style>
 </head>
 <body>
-    <div id="splash-screen" class="splash-screen">
-        </div>
 
-    <div id="app-container" class="app-container hidden">
-        <header class="app-header">
-            <nav class="top-nav">
-                <div class="cart-icon-top" id="cart-icon-top">
-                    <i class="fas fa-shopping-cart"></i>
-                    <span id="cart-count-top" class="cart-count">0</span>
-                </div>
-            </nav>
-        </header>
-
-        <div id="home-screen" class="screen active">
-            <div class="home-content">
-                <img src="images/smile_icon.png" alt="Smile Icon" class="smile-icon">
-                <button id="start-order-btn" class="main-button">ເລີ່ມສັ່ງອາຫານ</button>
-                <button id="admin-mode-btn" class="main-button admin-button">ໂໝດແອັດມິນ</button>
-            </div>
-        </div>
-
-        <div id="menu-screen" class="screen hidden">
-            <div class="tab-buttons-container">
-                <button class="tab-button active" id="food-tab">ອາຫານ</button>
-                <button class="tab-button" id="drink-tab">ເຄື່ອງດື່ມ <img src="images/glass_icon.png" alt="Glass Icon" class="tab-icon"></button>
-            </div>
-
-            <div id="food-items" class="menu-section active">
-                </div>
-
-            <div id="drink-items" class="menu-section hidden">
-                </div>
-        </div>
-
-        <div id="cart-screen" class="screen hidden">
-            <h2>ລາຍການສັ່ງຊື້ຂອງທ່ານ</h2>
-            <div id="cart-items-display">
-                </div>
-            <div class="table-input-section">
-                <label for="table-number">ລະບຸໂຕະ:</label>
-                <input type="text" id="table-number" placeholder="ຕົວຢ່າງ: 01">
-            </div>
-            <div class="cart-summary">
-                <p>ລາຄາລວມ: <span id="total-price">0</span> ກີບ</p>
-            </div>
-            <div class="cart-actions">
-                <button id="confirm-order-btn" class="main-button">ຢືນຢັນການສັ່ງຊື້</button>
-                <button id="back-to-menu-btn" class="secondary-button">ກັບຄືນ</button>
-            </div>
-        </div>
-
-        <div id="order-confirm-modal" class="modal hidden">
-            <div class="modal-content">
-                <h2>ຢືນຢັນການສັ່ງຊື້</h2>
-                <div id="order-summary-modal">
-                    </div>
-                <div class="modal-buttons">
-                    <button id="modal-confirm-btn" class="main-button">ສັ່ງເລີຍ</button>
-                    <button id="modal-cancel-btn" class="secondary-button">ຍົກເລີກ</button>
-                </div>
-            </div>
-        </div>
-
-        <div id="duplicate-order-popup" class="modal hidden">
-            <div class="modal-content">
-                <p>ລໍຖ້າອາຫານຂອງທ່ານກຳລັງຈະມາ</p>
-                <button id="popup-ok-btn" class="main-button">ຕົກລົງ</button>
-            </div>
-        </div>
-
-        <div id="admin-login-screen" class="screen hidden">
-            <h2>ເຂົ້າສູ່ລະບົບແອັດມິນ</h2>
-            <input type="text" id="admin-username" placeholder="ຊື່ຜູ້ໃຊ້">
-            <input type="password" id="admin-password" placeholder="ລະຫັດຜ່ານ">
-            <button id="admin-login-btn" class="main-button">ເຂົ້າສູ່ລະບົບ</button>
-            <button id="back-to-home-from-admin-login" class="secondary-button">ກັບຄືນ</button>
-        </div>
-
-        <div id="admin-dashboard-screen" class="screen hidden">
-            <h2>ໜ້າຫຼັກແອັດມິນ</h2>
-            <div class="admin-sections">
-                <button class="admin-section-btn" id="view-orders-btn">ອໍເດີເຂົ້າ</button>
-                <button class="admin-section-btn" id="summary-revenue-btn">ສະຫຼຸບລາຍຮັບ</button>
-                <button class="admin-section-btn" id="analyze-menu-btn">ວິເຄາະ</button>
-                <button class="admin-section-btn" id="accounting-btn">ລະບົບບັນຊີ</button>
-                <button class="admin-section-btn" id="history-view-btn">ເບິ່ງຂໍ້ມູນຍ້ອນຫຼັງ</button>
-            </div>
-            <button id="admin-logout-btn" class="secondary-button">ອອກຈາກລະບົບ</button>
-        </div>
-
-        <div id="admin-view-orders-screen" class="screen hidden">
-            <h2>ອໍເດີເຂົ້າ (Real-time)</h2>
-            <div id="realtime-orders">
-                </div>
-            <button id="back-to-admin-dashboard" class="secondary-button">ກັບຄືນ</button>
-        </div>
-
-        <button id="floating-cart-btn" class="floating-cart-button hidden">
-            <i class="fas fa-shopping-cart"></i>
-            <span id="floating-cart-count" class="cart-count">0</span>
-        </button>
+    <!-- Splash Screen -->
+    <div id="splash-screen">
+        <img src="https://placehold.co/300x300/FF69B4/FFFFFF?text=😊" alt="ยิ้ม" class="w-[300px] h-[300px] rounded-full mb-8 animate-bounce">
+        <div class="splash-text">ຍິນດີຕ້ອນຮັບ</div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const splashScreen = document.getElementById('splash-screen');
-            const appContainer = document.getElementById('app-container');
+    <!-- Main Application Container -->
+    <div id="app-container" class="container hidden">
 
-            const homeScreen = document.getElementById('home-screen');
-            const startOrderBtn = document.getElementById('start-order-btn');
-            const adminModeBtn = document.getElementById('admin-mode-btn');
+        <!-- Home Page -->
+        <div id="home-page" class="flex flex-col items-center justify-center h-full w-full text-center">
+            <img src="https://placehold.co/300x300/FF69B4/FFFFFF?text=😊" alt="ยิ้ม" class="w-[300px] h-[300px] rounded-full mb-8 animate-bounce">
+            <h1 class="text-4xl font-bold mb-8 text-shadow-lg">ສັ່ງອາຫານ & ເຄື່ອງດື່ມ</h1>
+            <button id="start-order-btn" class="btn btn-primary mb-4 w-full max-w-xs">ເລີ່ມສັ່ງອາຫານ</button>
+            <button id="admin-mode-btn" class="btn w-full max-w-xs">ໂໝດແອັດມິນ</button>
+        </div>
 
-            const menuScreen = document.getElementById('menu-screen');
-            const foodTab = document.getElementById('food-tab');
-            const drinkTab = document.getElementById('drink-tab');
-            const foodItemsContainer = document.getElementById('food-items');
-            const drinkItemsContainer = document.getElementById('drink-items');
+        <!-- Customer Mode (Menu & Cart) -->
+        <div id="customer-mode" class="hidden w-full h-full flex flex-col">
+            <div class="flex justify-between items-center mb-4 w-full">
+                <h2 class="text-3xl font-bold">ເມນູ</h2>
+                <div class="flex gap-2">
+                    <button id="home-from-customer-btn" class="btn bg-gray-300 text-gray-800 text-sm p-2 rounded-full">
+                        <i class="fas fa-home"></i>
+                    </button>
+                    <button id="view-cart-top-btn" class="btn bg-yellow-400 text-gray-800 flex items-center gap-2">
+                        <i class="fas fa-shopping-cart"></i>
+                        <span id="cart-count-top">0</span>
+                    </button>
+                </div>
+            </div>
 
-            const cartScreen = document.getElementById('cart-screen');
-            const cartItemsDisplay = document.getElementById('cart-items-display');
-            const tableNumberInput = document.getElementById('table-number');
-            const totalPriceSpan = document.getElementById('total-price');
-            const confirmOrderBtn = document.getElementById('confirm-order-btn');
-            const backToMenuBtn = document.getElementById('back-to-menu-btn');
-            const cartIconTop = document.getElementById('cart-icon-top');
-            const cartCountTop = document.getElementById('cart-count-top');
+            <!-- Tab Buttons -->
+            <div class="flex gap-4 mb-6 justify-center">
+                <button id="food-tab-btn" class="tab-btn active">ອາຫານ</button>
+                <button id="drink-tab-btn" class="tab-btn"><i class="fas fa-glass-whiskey"></i> ເຄື່ອງດື່ມ</button>
+            </div>
 
-            const orderConfirmModal = document.getElementById('order-confirm-modal');
-            const orderSummaryModal = document.getElementById('order-summary-modal');
-            const modalConfirmBtn = document.getElementById('modal-confirm-btn');
-            const modalCancelBtn = document.getElementById('modal-cancel-btn');
+            <!-- Menu List -->
+            <div id="menu-list" class="flex-grow w-full overflow-y-auto pr-2">
+                <!-- Menu items will be rendered here by JavaScript -->
+            </div>
 
-            const duplicateOrderPopup = document.getElementById('duplicate-order-popup');
-            const popupOkBtn = document.getElementById('popup-ok-btn');
+            <!-- Floating Cart Button -->
+            <button id="floating-cart-btn" class="hidden">
+                <i class="fas fa-shopping-cart"></i>
+                <span id="cart-count">0</span>
+            </button>
+        </div>
 
-            const adminLoginScreen = document.getElementById('admin-login-screen');
-            const adminUsernameInput = document.getElementById('admin-username');
-            const adminPasswordInput = document.getElementById('admin-password');
-            const adminLoginBtn = document.getElementById('admin-login-btn');
-            const backToHomeFromAdminLogin = document.getElementById('back-to-home-from-admin-login');
+        <!-- Cart Overlay (Modal) -->
+        <div id="cart-overlay" class="modal-overlay">
+            <div class="cart-content">
+                <h3 class="text-2xl font-bold mb-4">ລາຍການໃນກະຕ່າ</h3>
+                <div id="cart-items-list" class="mb-4 max-h-60 overflow-y-auto">
+                    <!-- Cart items will be rendered here -->
+                </div>
+                <div class="flex justify-between items-center font-bold text-lg border-t pt-4 border-gray-300">
+                    <span>ລວມທັງໝົດ:</span>
+                    <span id="cart-total">0 ກີບ</span>
+                </div>
 
-            const adminDashboardScreen = document.getElementById('admin-dashboard-screen');
-            const viewOrdersBtn = document.getElementById('view-orders-btn');
-            const summaryRevenueBtn = document.getElementById('summary-revenue-btn');
-            const analyzeMenuBtn = document.getElementById('analyze-menu-btn');
-            const accountingBtn = document.getElementById('accounting-btn');
-            const historyViewBtn = document.getElementById('history-view-btn');
-            const adminLogoutBtn = document.getElementById('admin-logout-btn');
+                <div id="table-input-section" class="mt-4">
+                    <label for="table-number" class="block text-gray-700 text-sm font-bold mb-2">ລະບຸໂຕະ:</label>
+                    <input type="text" id="table-number" placeholder="ຕົວຢ່າງ: 01, 1, A1"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">
+                </div>
 
-            const adminViewOrdersScreen = document.getElementById('admin-view-orders-screen');
-            const realtimeOrdersDisplay = document.getElementById('realtime-orders');
-            const backToAdminDashboardBtn = document.getElementById('back-to-admin-dashboard');
+                <div id="order-confirmation-section" class="hidden text-left mt-4 p-4 bg-blue-100 rounded-lg border border-blue-200">
+                    <h4 class="text-xl font-bold mb-2 text-blue-800">ກວດສອບຄຳສັ່ງຊື້ຂອງທ່ານ</h4>
+                    <div id="confirmation-items-list" class="mb-4 text-gray-800"></div>
+                    <div class="font-bold text-lg text-blue-800">
+                        <span>ລວມທັງໝົດ:</span>
+                        <span id="confirmation-total">0 ກີບ</span>
+                    </div>
+                    <div class="font-bold text-lg text-blue-800 mt-2">
+                        <span>ໂຕະ:</span>
+                        <span id="confirmation-table-number"></span>
+                    </div>
+                </div>
 
-            const floatingCartBtn = document.getElementById('floating-cart-btn');
-            const floatingCartCount = document.getElementById('floating-cart-count');
+                <div class="flex justify-end gap-4 mt-6">
+                    <button id="close-cart-btn" class="btn bg-gray-300 text-gray-800">ປິດ</button>
+                    <button id="confirm-order-btn" class="btn btn-primary">ຢືນຢັນການສັ່ງ</button>
+                    <button id="place-order-btn" class="btn btn-primary hidden">ສັ່ງເລີຍ</button>
+                    <button id="cancel-customer-order-btn" class="btn bg-red-500 text-white hidden">ຍົກເລີກອໍເດີ</button>
+                </div>
+            </div>
+        </div>
 
-            const foodMenu = [
-                { id: 'f1', name: 'ຕຳໝີ່ຂາວ', price: 30000 },
-                { id: 'f2', name: 'ຕຳໝີ່ໄວໆ', price: 30000 },
-                { id: 'f3', name: 'ຕຳຕ່ອນ', price: 50000 },
-                { id: 'f4', name: 'ຕຳເຂົ້າປຸ້ນ / ຕຳໝາກຮຸ່ງ', price: 25000 },
-                { id: 'f5', name: 'ຕົ້ມເລືອດ', price: 30000 },
-                { id: 'f6', name: 'ລາບງົວ', price: 50000 },
-                { id: 'f7', name: 'ເຂົ້າໜຽວ', price: 15000 }
-            ];
+        <!-- Admin Login Page -->
+        <div id="admin-login-page" class="hidden flex flex-col items-center justify-center h-full w-full text-center">
+            <h2 class="text-3xl font-bold mb-6">ເຂົ້າສູ່ລະບົບແອັດມິນ</h2>
+            <input type="text" id="admin-username" placeholder="ຊື່ຜູ້ໃຊ້"
+                   class="shadow appearance-none border rounded w-full max-w-xs py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-4">
+            <input type="password" id="admin-password" placeholder="ລະຫັດຜ່ານ"
+                   class="shadow appearance-none border rounded w-full max-w-xs py-2 px-3 text-gray-700 mb-6">
+            <button id="admin-login-btn" class="btn btn-primary w-full max-w-xs mb-4">ເຂົ້າສູ່ລະບົບ</button>
+            <button id="back-to-home-from-admin-login" class="btn bg-gray-300 text-gray-800 w-full max-w-xs">ໜ້າຫຼັກ</button>
+        </div>
 
-            const drinkMenu = [
-                { id: 'd1', name: 'ນ້ຳດື່ມນ້ອຍ', price: 8000 },
-                { id: 'd2', name: 'ນ້ຳດື່ມໃຫຍ່', price: 10000 },
-                { id: 'd3', name: 'ແປບຊີ່', price: 15000 }
-            ];
+        <!-- Admin Dashboard -->
+        <div id="admin-dashboard" class="hidden w-full h-full flex flex-col">
+            <div class="flex justify-between items-center mb-4 w-full">
+                <h2 class="text-3xl font-bold">ແອັດມິນ ແດດບອດ</h2>
+                <div class="flex gap-2">
+                    <button id="home-from-admin-btn" class="btn bg-gray-300 text-gray-800 text-sm p-2 rounded-full">
+                        <i class="fas fa-home"></i>
+                    </button>
+                    <button id="admin-logout-btn" class="btn bg-red-500 text-white">ອອກຈາກລະບົບ</button>
+                </div>
+            </div>
 
-            let cart = [];
-            let currentTableNumber = '';
-            let adminLoggedIn = false;
-            let orderPollingInterval;
+            <!-- Admin Tabs -->
+            <div class="flex gap-2 mb-6 justify-center flex-wrap">
+                <button id="incoming-orders-tab" class="tab-btn active">ອໍເດີເຂົ້າ</button>
+                <button id="revenue-summary-tab" class="tab-btn">ສະຫຼຸບລາຍຮັບ</button>
+                <button id="analysis-tab" class="tab-btn">ວິເຄາະ</button>
+                <button id="accounting-tab" class="tab-btn">ລະບົບບັນຊີ</button>
+                <button id="history-tab" class="tab-btn">ເບິ່ງຍ້ອນຫຼັງ</button>
+            </div>
 
-            const ADMIN_USER = 'panda';
-            const ADMIN_PASS = '123';
+            <!-- Incoming Orders Section -->
+            <div id="incoming-orders-section" class="admin-section w-full flex-grow overflow-y-auto">
+                <h3 class="text-2xl font-bold mb-4">ອໍເດີເຂົ້າ</h3>
+                <div id="pending-orders-list">
+                    <!-- Pending orders will be rendered here -->
+                </div>
+            </div>
 
-            let pendingOrders = {}; // Simulated backend for pending orders
+            <!-- Revenue Summary Section -->
+            <div id="revenue-summary-section" class="admin-section w-full hidden">
+                <h3 class="text-2xl font-bold mb-4">ສະຫຼຸບລາຍຮັບ</h3>
+                <p class="text-lg mb-2">ຍອດລວມທັງໝົດ: <span id="total-revenue" class="font-bold text-yellow-300">0 ກີບ</span></p>
+                <p class="text-lg mb-2">ຈຳນວນອໍເດີ: <span id="total-orders" class="font-bold text-yellow-300">0</span></p>
+                <p class="text-lg mb-2">ຄ່າສະເລ່ຍຕໍ່ອໍເດີ: <span id="average-order" class="font-bold text-yellow-300">0 ກີບ</span></p>
+            </div>
 
-            function showScreen(screenToShow) {
-                document.querySelectorAll('.screen').forEach(screen => {
-                    screen.classList.add('hidden');
-                    screen.classList.remove('active');
-                });
-                screenToShow.classList.remove('hidden');
-                screenToShow.classList.add('active');
+            <!-- Analysis Section -->
+            <div id="analysis-section" class="admin-section w-full hidden">
+                <h3 class="text-2xl font-bold mb-4">ວິເຄາະເມນູຂາຍດີ</h3>
+                <div id="best-selling-list">
+                    <!-- Best selling items will be rendered here -->
+                </div>
+            </div>
+
+            <!-- Accounting Section -->
+            <div id="accounting-section" class="admin-section w-full hidden">
+                <h3 class="text-2xl font-bold mb-4">ລະບົບບັນຊີ</h3>
+                <div class="mb-4">
+                    <label for="expense-description" class="block text-white text-sm font-bold mb-2">ລາຍລະອຽດຄ່າໃຊ້ຈ່າຍ:</label>
+                    <input type="text" id="expense-description" placeholder="ຄ່າເຊົ່າ, ຄ່າໄຟ..."
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2">
+                    <label for="expense-amount" class="block text-white text-sm font-bold mb-2">ຈຳນວນ (ກີບ):</label>
+                    <input type="number" id="expense-amount" placeholder="50000"
+                           class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline mb-2">
+                    <button id="add-expense-btn" class="btn btn-primary w-full">ເພີ່ມຄ່າໃຊ້ຈ່າຍ</button>
+                </div>
+                <h4 class="text-xl font-bold mb-2">ລາຍການຄ່າໃຊ້ຈ່າຍ</h4>
+                <div id="expense-list" class="max-h-40 overflow-y-auto mb-4">
+                    <!-- Expenses will be listed here -->
+                </div>
+                <p class="text-lg font-bold">ກຳໄລສຸດທິ: <span id="net-profit" class="text-yellow-300">0 ກີບ</span></p>
+            </div>
+
+            <!-- History Section -->
+            <div id="history-section" class="admin-section w-full hidden">
+                <h3 class="text-2xl font-bold mb-4">ເບິ່ງຍ້ອນຫຼັງ</h3>
+                <div class="mb-4 flex gap-2 items-end">
+                    <div>
+                        <label for="history-start-date" class="block text-white text-sm font-bold mb-1">ວັນທີເລີ່ມຕົ້ນ:</label>
+                        <input type="date" id="history-start-date"
+                               class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <div>
+                        <label for="history-end-date" class="block text-white text-sm font-bold mb-1">ວັນທີສິ້ນສຸດ:</label>
+                        <input type="date" id="history-end-date"
+                               class="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline">
+                    </div>
+                    <button id="filter-history-btn" class="btn btn-primary">ຄົ້ນຫາ</button>
+                </div>
+                <h4 class="text-xl font-bold mb-2">ລາຍການອໍເດີທີ່ຜ່ານມາ</h4>
+                <div id="history-orders-list" class="max-h-60 overflow-y-auto">
+                    <!-- Historical orders will be rendered here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Message Modal -->
+    <div id="message-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="message-title" class="text-2xl font-bold mb-4 text-gray-800"></h3>
+            <p id="message-text" class="text-gray-700 mb-6"></p>
+            <button id="close-message-modal-btn" class="btn btn-primary">ຕົກລົງ</button>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables provided by the Canvas environment
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const auth = getAuth(app);
+
+        let userId = null; // Will be set after authentication
+
+        // --- UI Element References ---
+        const splashScreen = document.getElementById('splash-screen');
+        const appContainer = document.getElementById('app-container');
+        const homePage = document.getElementById('home-page');
+        const startOrderBtn = document.getElementById('start-order-btn');
+        const adminModeBtn = document.getElementById('admin-mode-btn');
+
+        const customerMode = document.getElementById('customer-mode');
+        const foodTabBtn = document.getElementById('food-tab-btn');
+        const drinkTabBtn = document.getElementById('drink-tab-btn');
+        const menuList = document.getElementById('menu-list');
+        const floatingCartBtn = document.getElementById('floating-cart-btn');
+        const cartCountSpan = document.getElementById('cart-count');
+        const viewCartTopBtn = document.getElementById('view-cart-top-btn');
+        const cartCountTopSpan = document.getElementById('cart-count-top');
+        const homeFromCustomerBtn = document.getElementById('home-from-customer-btn'); // New Home button for customer mode
+
+        const cartOverlay = document.getElementById('cart-overlay');
+        const cartItemsList = document.getElementById('cart-items-list');
+        const cartTotalSpan = document.getElementById('cart-total');
+        const closeCartBtn = document.getElementById('close-cart-btn');
+        const confirmOrderBtn = document.getElementById('confirm-order-btn');
+        const placeOrderBtn = document.getElementById('place-order-btn');
+        const cancelCustomerOrderBtn = document.getElementById('cancel-customer-order-btn');
+        const tableNumberInput = document.getElementById('table-number');
+        const tableInputSection = document.getElementById('table-input-section');
+        const orderConfirmationSection = document.getElementById('order-confirmation-section');
+        const confirmationItemsList = document.getElementById('confirmation-items-list');
+        const confirmationTotalSpan = document.getElementById('confirmation-total');
+        const confirmationTableNumberSpan = document.getElementById('confirmation-table-number');
+
+        const adminLoginPage = document.getElementById('admin-login-page');
+        const adminUsernameInput = document.getElementById('admin-username');
+        const adminPasswordInput = document.getElementById('admin-password');
+        const adminLoginBtn = document.getElementById('admin-login-btn');
+        const backToHomeFromAdminLoginBtn = document.getElementById('back-to-home-from-admin-login'); // Renamed to be more generic
+
+        const adminDashboard = document.getElementById('admin-dashboard');
+        const adminLogoutBtn = document.getElementById('admin-logout-btn');
+        const incomingOrdersTab = document.getElementById('incoming-orders-tab');
+        const revenueSummaryTab = document.getElementById('revenue-summary-tab');
+        const analysisTab = document.getElementById('analysis-tab');
+        const accountingTab = document.getElementById('accounting-tab');
+        const historyTab = document.getElementById('history-tab');
+        const homeFromAdminBtn = document.getElementById('home-from-admin-btn'); // New Home button for admin dashboard
+
+        const incomingOrdersSection = document.getElementById('incoming-orders-section');
+        const pendingOrdersList = document.getElementById('pending-orders-list');
+        const revenueSummarySection = document.getElementById('revenue-summary-section');
+        const totalRevenueSpan = document.getElementById('total-revenue');
+        const totalOrdersSpan = document.getElementById('total-orders');
+        const averageOrderSpan = document.getElementById('average-order');
+        const analysisSection = document.getElementById('analysis-section');
+        const bestSellingList = document.getElementById('best-selling-list');
+        const accountingSection = document.getElementById('accounting-section');
+        const expenseDescriptionInput = document.getElementById('expense-description');
+        const expenseAmountInput = document.getElementById('expense-amount');
+        const addExpenseBtn = document.getElementById('add-expense-btn');
+        const expenseList = document.getElementById('expense-list');
+        const netProfitSpan = document.getElementById('net-profit');
+        const historySection = document.getElementById('history-section');
+        const historyStartDateInput = document.getElementById('history-start-date');
+        const historyEndDateInput = document.getElementById('history-end-date');
+        const filterHistoryBtn = document.getElementById('filter-history-btn');
+        const historyOrdersList = document.getElementById('history-orders-list');
+
+        const messageModal = document.getElementById('message-modal');
+        const messageTitle = document.getElementById('message-title');
+        const messageText = document.getElementById('message-text');
+        const closeMessageModalBtn = document.getElementById('close-message-modal-btn');
+
+        // --- Global State Variables ---
+        let currentView = 'home'; // 'home', 'customer', 'admin-login', 'admin-dashboard'
+        let cart = [];
+        let menuItems = [];
+        let isAdminLoggedIn = false;
+        let currentCustomerOrderId = null; // To track the current customer's pending order
+        let currentCustomerTableNumber = null; // To track the current customer's table number
+
+        // --- Menu Data (Hardcoded for now, can be managed by admin later) ---
+        const foodMenu = [
+            { id: 'food1', name: 'ຕຳໝີ່ຂາວ', price: 30000, type: 'food' },
+            { id: 'food2', name: 'ຕຳໝີ່ໄວໆ', price: 30000, type: 'food' },
+            { id: 'food3', name: 'ຕຳຕ່ອນ', price: 50000, type: 'food' },
+            { id: 'food4', name: 'ຕຳເຂົ້າປຸ້ນ / ຕຳໝາກຮຸ່ງ', price: 25000, type: 'food' },
+            { id: 'food5', name: 'ຕົ້ມເລືອດ', price: 30000, type: 'food' },
+            { id: 'food6', name: 'ລາບງົວ', price: 50000, type: 'food' },
+            { id: 'food7', name: 'ເຂົ້າໜຽວ', price: 15000, type: 'food' },
+        ];
+
+        const drinkMenu = [
+            { id: 'drink1', name: 'ນ້ຳດື່ມນ້ອຍ', price: 8000, type: 'drink' },
+            { id: 'drink2', name: 'ນ້ຳດື່ມໃຫຍ່', price: 10000, type: 'drink' },
+            { id: 'drink3', name: 'ແປບຊີ່', price: 15000, type: 'drink' },
+        ];
+
+        menuItems = [...foodMenu, ...drinkMenu]; // Combine all menu items
+
+        // --- Utility Functions ---
+
+        /**
+         * Displays a custom modal message to the user.
+         * @param {string} title - The title of the message.
+         * @param {string} message - The message content.
+         */
+        function showMessageModal(title, message) {
+            messageTitle.textContent = title;
+            messageText.textContent = message;
+            messageModal.classList.add('active');
+        }
+
+        /**
+         * Hides the custom modal message.
+         */
+        function hideMessageModal() {
+            messageModal.classList.remove('active');
+        }
+
+        /**
+         * Normalizes a table number (e.g., "01", "1", "001" all become "1").
+         * @param {string} tableNum - The raw table number input.
+         * @returns {string} The normalized table number.
+         */
+        function normalizeTableNumber(tableNum) {
+            if (!tableNum) return '';
+            const num = parseInt(tableNum, 10);
+            return isNaN(num) ? tableNum.trim().toUpperCase() : num.toString();
+        }
+
+        /**
+         * Switches the active view in the application.
+         * @param {string} view - The view to switch to ('home', 'customer', 'admin-login', 'admin-dashboard').
+         */
+        function switchView(view) {
+            homePage.classList.add('hidden');
+            customerMode.classList.add('hidden');
+            adminLoginPage.classList.add('hidden');
+            adminDashboard.classList.add('hidden');
+            floatingCartBtn.classList.add('hidden'); // Hide floating cart by default
+
+            currentView = view;
+
+            switch (view) {
+                case 'home':
+                    homePage.classList.remove('hidden');
+                    break;
+                case 'customer':
+                    customerMode.classList.remove('hidden');
+                    floatingCartBtn.classList.remove('hidden'); // Show floating cart in customer mode
+                    renderMenu('food'); // Default to food tab
+                    break;
+                case 'admin-login':
+                    adminLoginPage.classList.remove('hidden');
+                    break;
+                case 'admin-dashboard':
+                    adminDashboard.classList.remove('hidden');
+                    // Ensure admin tabs are correctly displayed
+                    switchAdminTab('incoming-orders');
+                    break;
             }
+        }
 
-            function updateCartCount() {
-                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-                floatingCartCount.textContent = totalItems;
-                cartCountTop.textContent = totalItems;
+        /**
+         * Renders the menu items based on the selected tab.
+         * @param {string} type - 'food' or 'drink'.
+         */
+        function renderMenu(type) {
+            menuList.innerHTML = ''; // Clear existing menu items
+
+            const menuToRender = type === 'food' ? foodMenu : drinkMenu;
+
+            menuToRender.forEach(item => {
+                const itemInCart = cart.find(cartItem => cartItem.id === item.id);
+                const quantity = itemInCart ? itemInCart.quantity : 0;
+
+                const menuItemDiv = document.createElement('div');
+                menuItemDiv.className = 'menu-item w-full';
+                menuItemDiv.innerHTML = `
+                    <div>
+                        <p class="text-xl font-semibold">${item.name}</p>
+                        <p class="text-md text-gray-200">${item.price.toLocaleString()} ກີບ</p>
+                    </div>
+                    <div class="quantity-control">
+                        <button class="quantity-btn decrease-item" data-id="${item.id}">-</button>
+                        <span class="text-lg font-bold w-8 text-center" id="qty-${item.id}">${quantity}</span>
+                        <button class="quantity-btn increase-item" data-id="${item.id}">+</button>
+                    </div>
+                `;
+                menuList.appendChild(menuItemDiv);
+            });
+
+            // Update tab button active state
+            foodTabBtn.classList.remove('active');
+            drinkTabBtn.classList.remove('active');
+            if (type === 'food') {
+                foodTabBtn.classList.add('active');
+            } else {
+                drinkTabBtn.classList.add('active');
             }
+        }
 
-            function renderMenuItems(menu, container) {
-                container.innerHTML = '';
-                menu.forEach(item => {
-                    const itemElement = document.createElement('div');
-                    itemElement.classList.add('menu-item');
-                    itemElement.innerHTML = `
-                        <div class="item-info">
-                            <h3>${item.name}</h3>
-                            <p>${item.price.toLocaleString()} ກີບ</p>
-                        </div>
-                        <div class="item-controls">
-                            <button data-id="${item.id}" data-action="decrement">-</button>
-                            <span id="quantity-${item.id}">${(cart.find(cItem => cItem.id === item.id)?.quantity || 0)}</span>
-                            <button data-id="${item.id}" data-action="increment">+</button>
-                        </div>
-                    `;
-                    container.appendChild(itemElement);
-                });
-            }
+        /**
+         * Updates the cart count displayed on the floating button and top right.
+         */
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCountSpan.textContent = totalItems;
+            cartCountTopSpan.textContent = totalItems;
+        }
 
-            function updateCartItem(itemId, action) {
-                const allMenuItems = [...foodMenu, ...drinkMenu];
-                const item = allMenuItems.find(m => m.id === itemId);
-                if (!item) return;
+        /**
+         * Adds or updates an item in the cart.
+         * @param {string} itemId - The ID of the menu item.
+         * @param {number} change - The amount to change the quantity by (+1 or -1).
+         */
+        function updateCartItem(itemId, change) {
+            const existingItemIndex = cart.findIndex(item => item.id === itemId);
+            const menuItem = menuItems.find(item => item.id === itemId);
 
-                let cartItem = cart.find(c => c.id === itemId);
+            if (!menuItem) return; // Item not found in menu
 
-                if (action === 'increment') {
-                    if (cartItem) {
-                        cartItem.quantity++;
-                    } else {
-                        cart.push({ ...item, quantity: 1 });
-                    }
-                } else if (action === 'decrement') {
-                    if (cartItem && cartItem.quantity > 0) {
-                        cartItem.quantity--;
-                        if (cartItem.quantity === 0) {
-                            cart = cart.filter(c => c.id !== itemId);
-                        }
-                    }
+            if (existingItemIndex > -1) {
+                // Item exists in cart
+                cart[existingItemIndex].quantity += change;
+                if (cart[existingItemIndex].quantity <= 0) {
+                    cart.splice(existingItemIndex, 1); // Remove if quantity is 0 or less
                 }
-                updateCartCount();
-                renderMenuItems(foodMenu, foodItemsContainer);
-                renderMenuItems(drinkMenu, drinkItemsContainer);
+            } else if (change > 0) {
+                // Item not in cart, add it
+                cart.push({ ...menuItem, quantity: 1 });
             }
 
-            function renderCartDisplay(container) {
-                container.innerHTML = '';
-                if (cart.length === 0) {
-                    container.innerHTML = '<p>ບໍ່ມີລາຍການໃນກະຕ່າ</p>';
-                    totalPriceSpan.textContent = '0';
-                    return;
-                }
+            // Re-render the current menu view to reflect updated quantities
+            const activeTab = foodTabBtn.classList.contains('active') ? 'food' : 'drink';
+            renderMenu(activeTab);
+            updateCartCount();
+            renderCartItems(); // Update cart overlay if open
+        }
 
-                let totalPrice = 0;
+        /**
+         * Renders the items currently in the cart within the cart overlay.
+         */
+        function renderCartItems() {
+            cartItemsList.innerHTML = '';
+            let total = 0;
+
+            if (cart.length === 0) {
+                cartItemsList.innerHTML = '<p class="text-center text-gray-600">ກະຕ່າວ່າງເປົ່າ</p>';
+                confirmOrderBtn.disabled = true;
+                placeOrderBtn.disabled = true;
+            } else {
+                confirmOrderBtn.disabled = false;
+                placeOrderBtn.disabled = false;
                 cart.forEach(item => {
-                    const itemElement = document.createElement('div');
-                    itemElement.classList.add('cart-item');
                     const itemTotal = item.price * item.quantity;
-                    totalPrice += itemTotal;
-
-                    itemElement.innerHTML = `
-                        <span>${item.name} x ${item.quantity}</span>
+                    total += itemTotal;
+                    const cartItemDiv = document.createElement('div');
+                    cartItemDiv.className = 'cart-item';
+                    cartItemDiv.innerHTML = `
+                        <span class="font-medium">${item.name} x ${item.quantity}</span>
                         <span>${itemTotal.toLocaleString()} ກີບ</span>
                     `;
-                    container.appendChild(itemElement);
+                    cartItemsList.appendChild(cartItemDiv);
                 });
-                totalPriceSpan.textContent = totalPrice.toLocaleString();
+            }
+            cartTotalSpan.textContent = total.toLocaleString() + ' ກີບ';
+            confirmationTotalSpan.textContent = total.toLocaleString() + ' ກີບ';
+        }
+
+        /**
+         * Shows the cart overlay.
+         */
+        function showCartOverlay() {
+            renderCartItems();
+            cartOverlay.classList.add('active');
+            // Reset to initial state for cart overlay
+            tableInputSection.classList.remove('hidden');
+            orderConfirmationSection.classList.add('hidden');
+            confirmOrderBtn.classList.remove('hidden');
+            placeOrderBtn.classList.add('hidden');
+            cancelCustomerOrderBtn.classList.add('hidden'); // Hide cancel button by default
+        }
+
+        /**
+         * Hides the cart overlay.
+         */
+        function hideCartOverlay() {
+            cartOverlay.classList.remove('active');
+        }
+
+        /**
+         * Handles the order confirmation process.
+         */
+        async function handleConfirmOrder() {
+            const tableNum = normalizeTableNumber(tableNumberInput.value);
+            if (!tableNum) {
+                showMessageModal('ຂໍ້ມູນບໍ່ຄົບຖ້ວນ', 'ກະລຸນາລະບຸເລກໂຕະ.');
+                return;
             }
 
-            function processOrder() {
-                const tableNum = tableNumberInput.value.trim();
-                if (!tableNum) {
-                    alert('ກະລຸນາລະບຸເບີໂຕະ!');
-                    return;
-                }
-
-                const normalizedTableNum = parseInt(tableNum, 10).toString();
-
-                if (pendingOrders[normalizedTableNum]) {
-                    duplicateOrderPopup.classList.remove('hidden');
-                    return;
-                }
-
-                renderCartDisplay(orderSummaryModal);
-                orderConfirmModal.classList.remove('hidden');
-                currentTableNumber = normalizedTableNum;
+            if (cart.length === 0) {
+                showMessageModal('ກະຕ່າວ່າງເປົ່າ', 'ກະລຸນາເພີ່ມລາຍການໃສ່ກະຕ່າກ່ອນ.');
+                return;
             }
 
-            function confirmOrder() {
-                const orderDetails = {
-                    table: currentTableNumber,
-                    items: JSON.parse(JSON.stringify(cart)),
-                    timestamp: new Date().toLocaleString(),
-                    status: 'pending'
+            // Check for existing pending orders for this table
+            const ordersRef = collection(db, `artifacts/${appId}/public/data/orders`);
+            const q = query(ordersRef, where('tableNumber', '==', tableNum), where('status', '==', 'pending'));
+            const querySnapshot = await getDocs(q);
+
+            if (!querySnapshot.empty) {
+                showMessageModal('ລໍຖ້າອາຫານຂອງທ່ານກຳລັງຈະມາ', `ໂຕະ ${tableNum} ມີອໍເດີທີ່ຍັງລໍຖ້າການຢືນຢັນຢູ່. ກະລຸນາລໍຖ້າ.`);
+                return;
+            }
+
+            // Show confirmation section
+            tableInputSection.classList.add('hidden');
+            orderConfirmationSection.classList.remove('hidden');
+            confirmOrderBtn.classList.add('hidden');
+            placeOrderBtn.classList.remove('hidden');
+            cancelCustomerOrderBtn.classList.remove('hidden'); // Show cancel button after confirmation
+
+            // Populate confirmation details
+            confirmationTableNumberSpan.textContent = tableNum;
+            confirmationItemsList.innerHTML = '';
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                const confItemDiv = document.createElement('p');
+                confItemDiv.className = 'text-gray-800';
+                confItemDiv.textContent = `${item.name} x ${item.quantity} - ${itemTotal.toLocaleString()} ກີບ`;
+                confirmationItemsList.appendChild(confItemDiv);
+            });
+            // Total is already updated by renderCartItems
+        }
+
+        /**
+         * Places the order to Firestore.
+         */
+        async function handlePlaceOrder() {
+            const tableNum = normalizeTableNumber(tableNumberInput.value);
+
+            try {
+                const newOrder = {
+                    tableNumber: tableNum,
+                    items: cart.map(item => ({
+                        id: item.id,
+                        name: item.name,
+                        price: item.price,
+                        quantity: item.quantity
+                    })),
+                    total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
+                    status: 'pending', // 'pending', 'accepted', 'cleared', 'cancelled'
+                    timestamp: serverTimestamp(),
+                    userId: userId // Store the customer's anonymous user ID
                 };
-                pendingOrders[currentTableNumber] = orderDetails;
-                console.log('Order placed:', orderDetails);
 
-                cart = [];
+                const docRef = await addDoc(collection(db, `artifacts/${appId}/public/data/orders`), newOrder);
+                currentCustomerOrderId = docRef.id;
+                currentCustomerTableNumber = tableNum; // Store the table number for this customer's session
+
+                showMessageModal('ສັ່ງອາຫານສຳເລັດ', `ຄຳສັ່ງຊື້ຂອງທ່ານສຳລັບໂຕະ ${tableNum} ໄດ້ຖືກສົ່ງແລ້ວ. ກະລຸນາລໍຖ້າ.`);
+                cart = []; // Clear cart after placing order
                 updateCartCount();
-                tableNumberInput.value = '';
-                orderConfirmModal.classList.add('hidden');
-                showScreen(homeScreen);
-                alert('ຄໍາສັ່ງຊື້ຂອງທ່ານຖືກສົ່ງແລ້ວ! ກະລຸນາລໍຖ້າ.');
+                hideCartOverlay();
+                tableNumberInput.value = ''; // Clear table input
+                // No need to reset confirmation section, it will be hidden by hideCartOverlay
+            } catch (error) {
+                console.error("Error placing order: ", error);
+                showMessageModal('ເກີດຂໍ້ຜິດພາດ', 'ບໍ່ສາມາດສັ່ງອາຫານໄດ້. ກະລຸນາລອງໃໝ່.');
+            }
+        }
+
+        /**
+         * Allows a customer to cancel their own pending order.
+         */
+        async function handleCancelCustomerOrder() {
+            if (!currentCustomerOrderId || !currentCustomerTableNumber) {
+                showMessageModal('ບໍ່ມີອໍເດີ', 'ບໍ່ພົບອໍເດີທີ່ສາມາດຍົກເລີກໄດ້.');
+                return;
             }
 
-            function renderRealtimeOrders() {
-                realtimeOrdersDisplay.innerHTML = '';
-                const currentPendingOrders = Object.values(pendingOrders);
-                if (currentPendingOrders.length === 0) {
-                    realtimeOrdersDisplay.innerHTML = '<p>ບໍ່ມີຄຳສັ່ງຊື້ຄ້າງຢູ່.</p>';
-                    return;
+            try {
+                const orderDocRef = doc(db, `artifacts/${appId}/public/data/orders`, currentCustomerOrderId);
+                const orderDocSnap = await getDoc(orderDocRef);
+
+                if (orderDocSnap.exists() && orderDocSnap.data().status === 'pending' && orderDocSnap.data().tableNumber === currentCustomerTableNumber) {
+                    await updateDoc(orderDocRef, { status: 'cancelled' });
+                    showMessageModal('ຍົກເລີກອໍເດີສຳເລັດ', `ອໍເດີສຳລັບໂຕະ ${currentCustomerTableNumber} ຖືກຍົກເລີກແລ້ວ.`);
+                    currentCustomerOrderId = null; // Clear tracking
+                    currentCustomerTableNumber = null;
+                    hideCartOverlay();
+                } else {
+                    showMessageModal('ບໍ່ສາມາດຍົກເລີກໄດ້', 'ອໍເດີນີ້ບໍ່ສາມາດຍົກເລີກໄດ້ (ອາດຈະຖືກຢືນຢັນແລ້ວ ຫຼື ບໍ່ແມ່ນອໍເດີຂອງທ່ານ).');
                 }
-                currentPendingOrders.forEach(order => {
-                    const orderElement = document.createElement('div');
-                    orderElement.classList.add('admin-order-item');
-                    let itemsHtml = order.items.map(item => `${item.name} x ${item.quantity}`).join('<br>');
-                    orderElement.innerHTML = `
-                        <h3>ໂຕະ: ${order.table}</h3>
-                        <p>ເວລາ: ${order.timestamp}</p>
-                        <p>ລາຍການ:</p>
-                        <p>${itemsHtml}</p>
-                        <button class="admin-approve-btn" data-table="${order.table}">ຮັບ</button>
-                        <button class="admin-clear-btn" data-table="${order.table}">Clear</button>
-                    `;
-                    realtimeOrdersDisplay.appendChild(orderElement);
-                });
-
-                document.querySelectorAll('.admin-approve-btn').forEach(button => {
-                    button.onclick = (e) => {
-                        const tableToApprove = e.target.dataset.table;
-                        delete pendingOrders[tableToApprove];
-                        renderRealtimeOrders();
-                        alert(`Order for table ${tableToApprove} approved!`);
-                    };
-                });
-
-                document.querySelectorAll('.admin-clear-btn').forEach(button => {
-                    button.onclick = (e) => {
-                        const tableToClear = e.target.dataset.table;
-                        delete pendingOrders[tableToClear];
-                        renderRealtimeOrders();
-                        alert(`Order for table ${tableToClear} cleared!`);
-                    };
-                });
+            } catch (error) {
+                console.error("Error cancelling order: ", error);
+                showMessageModal('ເກີດຂໍ້ຜິດພາດ', 'ບໍ່ສາມາດຍົກເລີກອໍເດີໄດ້. ກະລຸນາລອງໃໝ່.');
             }
+        }
 
-            function startOrderPolling() {
-                if (orderPollingInterval) clearInterval(orderPollingInterval);
-                orderPollingInterval = setInterval(() => {
-                    if (adminDashboardScreen.classList.contains('active') || adminViewOrdersScreen.classList.contains('active')) {
-                        renderRealtimeOrders();
-                        console.log('Refreshing orders...');
+        /**
+         * Switches the active tab in the admin dashboard.
+         * @param {string} tabId - The ID of the tab to activate.
+         */
+        function switchAdminTab(tabId) {
+            // Hide all sections
+            incomingOrdersSection.classList.add('hidden');
+            revenueSummarySection.classList.add('hidden');
+            analysisSection.classList.add('hidden');
+            accountingSection.classList.add('hidden');
+            historySection.classList.add('hidden');
+
+            // Deactivate all tab buttons
+            incomingOrdersTab.classList.remove('active');
+            revenueSummaryTab.classList.remove('active');
+            analysisTab.classList.remove('active');
+            accountingTab.classList.remove('active');
+            historyTab.classList.remove('active');
+
+            // Show the selected section and activate its button
+            switch (tabId) {
+                case 'incoming-orders':
+                    incomingOrdersSection.classList.remove('hidden');
+                    incomingOrdersTab.classList.add('active');
+                    break;
+                case 'revenue-summary':
+                    revenueSummarySection.classList.remove('hidden');
+                    revenueSummaryTab.classList.add('active');
+                    calculateRevenueSummary();
+                    break;
+                case 'analysis':
+                    analysisSection.classList.remove('hidden');
+                    analysisTab.classList.add('active');
+                    analyzeBestSelling();
+                    break;
+                case 'accounting':
+                    accountingSection.classList.remove('hidden');
+                    accountingTab.classList.add('active');
+                    renderExpenses();
+                    break;
+                case 'history':
+                    historySection.classList.remove('hidden');
+                    historyTab.classList.add('active');
+                    renderOrderHistory();
+                    break;
+            }
+        }
+
+        /**
+         * Renders pending orders for the admin.
+         * Uses onSnapshot for real-time updates.
+         */
+        function setupIncomingOrdersListener() {
+            const ordersRef = collection(db, `artifacts/${appId}/public/data/orders`);
+            const q = query(ordersRef, where('status', 'in', ['pending', 'accepted'])); // Listen for pending and accepted orders
+
+            onSnapshot(q, (snapshot) => {
+                pendingOrdersList.innerHTML = '';
+                if (snapshot.empty) {
+                    pendingOrdersList.innerHTML = '<p class="text-center text-gray-300">ບໍ່ມີອໍເດີໃໝ່.</p>';
+                } else {
+                    snapshot.forEach(doc => {
+                        const order = doc.data();
+                        const orderId = doc.id;
+                        const orderCard = document.createElement('div');
+                        orderCard.className = `order-card ${order.status} mb-4`;
+                        orderCard.innerHTML = `
+                            <p class="text-lg font-bold">ໂຕະ: ${order.tableNumber}</p>
+                            <p class="text-sm text-gray-300 mb-2">ເວລາ: ${new Date(order.timestamp?.toDate()).toLocaleString('th-TH', { hour12: false }) || 'N/A'}</p>
+                            <ul class="list-disc list-inside mb-2 text-gray-200">
+                                ${order.items.map(item => `<li>${item.name} x ${item.quantity} (${item.price.toLocaleString()} ກີບ)</li>`).join('')}
+                            </ul>
+                            <p class="text-xl font-bold mb-2">ລວມ: ${order.total.toLocaleString()} ກີບ</p>
+                            <p class="text-md font-semibold mb-2">ສະຖານະ: <span class="capitalize">${order.status === 'pending' ? 'ລໍຖ້າ' : 'ຮັບແລ້ວ'}</span></p>
+                            <div class="flex gap-2 mt-4">
+                                <button class="btn bg-green-500 text-white text-sm accept-order-btn" data-id="${orderId}" ${order.status === 'accepted' ? 'disabled' : ''}>ຮັບ</button>
+                                <button class="btn bg-blue-500 text-white text-sm clear-order-btn" data-id="${orderId}">Clear</button>
+                            </div>
+                        `;
+                        pendingOrdersList.appendChild(orderCard);
+                    });
+                }
+            });
+        }
+
+        /**
+         * Calculates and displays the revenue summary.
+         */
+        async function calculateRevenueSummary() {
+            const ordersRef = collection(db, `artifacts/${appId}/public/data/orders`);
+            const q = query(ordersRef, where('status', 'in', ['accepted', 'cleared']));
+            const querySnapshot = await getDocs(q);
+
+            let totalRevenue = 0;
+            let totalOrders = 0;
+
+            querySnapshot.forEach(doc => {
+                const order = doc.data();
+                totalRevenue += order.total;
+                totalOrders++;
+            });
+
+            totalRevenueSpan.textContent = totalRevenue.toLocaleString() + ' ກີບ';
+            totalOrdersSpan.textContent = totalOrders;
+            averageOrderSpan.textContent = totalOrders > 0 ? (totalRevenue / totalOrders).toLocaleString() + ' ກີບ' : '0 ກີບ';
+        }
+
+        /**
+         * Analyzes and displays best-selling menu items.
+         */
+        async function analyzeBestSelling() {
+            const ordersRef = collection(db, `artifacts/${appId}/public/data/orders`);
+            const q = query(ordersRef, where('status', 'in', ['accepted', 'cleared']));
+            const querySnapshot = await getDocs(q);
+
+            const salesMap = new Map(); // Map<itemId, { name, quantitySold }>
+
+            querySnapshot.forEach(doc => {
+                const order = doc.data();
+                order.items.forEach(item => {
+                    if (salesMap.has(item.id)) {
+                        salesMap.get(item.id).quantitySold += item.quantity;
+                    } else {
+                        salesMap.set(item.id, { name: item.name, quantitySold: item.quantity });
                     }
-                }, 30000);
+                });
+            });
+
+            const sortedSales = Array.from(salesMap.values()).sort((a, b) => b.quantitySold - a.quantitySold);
+
+            bestSellingList.innerHTML = '';
+            if (sortedSales.length === 0) {
+                bestSellingList.innerHTML = '<p class="text-center text-gray-300">ບໍ່ມີຂໍ້ມູນການຂາຍ.</p>';
+            } else {
+                sortedSales.forEach((item, index) => {
+                    const listItem = document.createElement('div');
+                    listItem.className = 'bg-gray-700 bg-opacity-30 rounded-lg p-3 mb-2 flex justify-between items-center';
+                    listItem.innerHTML = `
+                        <span>${index + 1}. ${item.name}</span>
+                        <span class="font-bold">${item.quantitySold} ລາຍການ</span>
+                    `;
+                    bestSellingList.appendChild(listItem);
+                });
+            }
+        }
+
+        /**
+         * Renders the list of expenses and calculates net profit.
+         */
+        async function renderExpenses() {
+            const expensesRef = collection(db, `artifacts/${appId}/users/${userId}/expenses`);
+            const expensesSnapshot = await getDocs(expensesRef);
+
+            let totalExpenses = 0;
+            expenseList.innerHTML = '';
+            if (expensesSnapshot.empty) {
+                expenseList.innerHTML = '<p class="text-center text-gray-300">ບໍ່ມີລາຍການຄ່າໃຊ້ຈ່າຍ.</p>';
+            } else {
+                expensesSnapshot.forEach(doc => {
+                    const expense = doc.data();
+                    totalExpenses += expense.amount;
+                    const expenseItem = document.createElement('div');
+                    expenseItem.className = 'bg-gray-700 bg-opacity-30 rounded-lg p-3 mb-2 flex justify-between items-center';
+                    expenseItem.innerHTML = `
+                        <span>${expense.description}</span>
+                        <span class="font-bold">${expense.amount.toLocaleString()} ກີບ</span>
+                    `;
+                    expenseList.appendChild(expenseItem);
+                });
             }
 
-            function stopOrderPolling() {
-                clearInterval(orderPollingInterval);
+            // Calculate net profit
+            const ordersRef = collection(db, `artifacts/${appId}/public/data/orders`);
+            const q = query(ordersRef, where('status', 'in', ['accepted', 'cleared']));
+            const querySnapshot = await getDocs(q);
+            let totalRevenue = 0;
+            querySnapshot.forEach(doc => {
+                totalRevenue += doc.data().total;
+            });
+
+            const netProfit = totalRevenue - totalExpenses;
+            netProfitSpan.textContent = netProfit.toLocaleString() + ' ກີບ';
+            netProfitSpan.className = netProfit >= 0 ? 'text-yellow-300' : 'text-red-500'; // Color based on profit/loss
+        }
+
+        /**
+         * Adds a new expense to Firestore.
+         */
+        async function addExpense() {
+            const description = expenseDescriptionInput.value.trim();
+            const amount = parseFloat(expenseAmountInput.value);
+
+            if (!description || isNaN(amount) || amount <= 0) {
+                showMessageModal('ຂໍ້ມູນບໍ່ຖືກຕ້ອງ', 'ກະລຸນາປ້ອນລາຍລະອຽດແລະຈຳນວນທີ່ຖືກຕ້ອງ.');
+                return;
             }
 
+            try {
+                await addDoc(collection(db, `artifacts/${appId}/users/${userId}/expenses`), {
+                    description: description,
+                    amount: amount,
+                    timestamp: serverTimestamp()
+                });
+                showMessageModal('ເພີ່ມຄ່າໃຊ້ຈ່າຍສຳເລັດ', 'ຄ່າໃຊ້ຈ່າຍໄດ້ຖືກບັນທຶກແລ້ວ.');
+                expenseDescriptionInput.value = '';
+                expenseAmountInput.value = '';
+                renderExpenses(); // Re-render expenses and update net profit
+            } catch (error) {
+                console.error("Error adding expense: ", error);
+                showMessageModal('ເກີດຂໍ້ຜິດພາດ', 'ບໍ່ສາມາດເພີ່ມຄ່າໃຊ້ຈ່າຍໄດ້. ກະລຸນາລອງໃໝ່.');
+            }
+        }
+
+        /**
+         * Renders historical orders based on date filters.
+         */
+        async function renderOrderHistory() {
+            const startDateStr = historyStartDateInput.value;
+            const endDateStr = historyEndDateInput.value;
+
+            let startDate = null;
+            let endDate = null;
+
+            if (startDateStr) {
+                startDate = new Date(startDateStr);
+                startDate.setHours(0, 0, 0, 0); // Start of the day
+            }
+            if (endDateStr) {
+                endDate = new Date(endDateStr);
+                endDate.setHours(23, 59, 59, 999); // End of the day
+            }
+
+            const ordersRef = collection(db, `artifacts/${appId}/public/data/orders`);
+            let q = query(ordersRef, where('status', 'in', ['accepted', 'cleared', 'cancelled']));
+
+            if (startDate) {
+                q = query(q, where('timestamp', '>=', startDate));
+            }
+            if (endDate) {
+                q = query(q, where('timestamp', '<=', endDate));
+            }
+
+            const querySnapshot = await getDocs(q);
+
+            historyOrdersList.innerHTML = '';
+            if (querySnapshot.empty) {
+                historyOrdersList.innerHTML = '<p class="text-center text-gray-300">ບໍ່ມີປະຫວັດການສັ່ງຊື້.</p>';
+            } else {
+                querySnapshot.forEach(doc => {
+                    const order = doc.data();
+                    const orderCard = document.createElement('div');
+                    orderCard.className = `order-card ${order.status} mb-3`;
+                    orderCard.innerHTML = `
+                        <p class="text-lg font-bold">ໂຕະ: ${order.tableNumber}</p>
+                        <p class="text-sm text-gray-300 mb-1">ເວລາ: ${new Date(order.timestamp?.toDate()).toLocaleString('th-TH', { hour12: false }) || 'N/A'}</p>
+                        <ul class="list-disc list-inside mb-1 text-gray-200 text-sm">
+                            ${order.items.map(item => `<li>${item.name} x ${item.quantity}</li>`).join('')}
+                        </ul>
+                        <p class="text-md font-bold">ລວມ: ${order.total.toLocaleString()} ກີບ</p>
+                        <p class="text-sm">ສະຖານະ: <span class="capitalize">${order.status === 'pending' ? 'ລໍຖ້າ' : order.status === 'accepted' ? 'ຮັບແລ້ວ' : order.status === 'cleared' ? 'ສຳເລັດ' : 'ຍົກເລີກ'}</span></p>
+                    `;
+                    historyOrdersList.appendChild(orderCard);
+                });
+            }
+        }
+
+        // --- Event Listeners ---
+
+        // Splash screen fade out
+        window.addEventListener('load', () => {
             setTimeout(() => {
                 splashScreen.classList.add('hidden');
                 appContainer.classList.remove('hidden');
-            }, 2000);
+            }, 2000); // 2 seconds splash
+        });
 
-            startOrderBtn.addEventListener('click', () => {
-                showScreen(menuScreen);
-                floatingCartBtn.classList.remove('hidden');
-                renderMenuItems(foodMenu, foodItemsContainer);
-                renderMenuItems(drinkMenu, drinkItemsContainer);
-            });
+        // Home page buttons
+        startOrderBtn.addEventListener('click', () => switchView('customer'));
+        adminModeBtn.addEventListener('click', () => switchView('admin-login'));
 
-            adminModeBtn.addEventListener('click', () => {
-                showScreen(adminLoginScreen);
-                floatingCartBtn.classList.add('hidden');
-            });
+        // Customer mode tab switching
+        foodTabBtn.addEventListener('click', () => renderMenu('food'));
+        drinkTabBtn.addEventListener('click', () => renderMenu('drink'));
 
-            foodTab.addEventListener('click', () => {
-                foodTab.classList.add('active');
-                drinkTab.classList.remove('active');
-                foodItemsContainer.classList.add('active');
-                foodItemsContainer.classList.remove('hidden');
-                drinkItemsContainer.classList.add('hidden');
-                drinkItemsContainer.classList.remove('active');
-            });
+        // New Home button for customer mode
+        homeFromCustomerBtn.addEventListener('click', () => switchView('home'));
 
-            drinkTab.addEventListener('click', () => {
-                drinkTab.classList.add('active');
-                foodTab.classList.remove('active');
-                drinkItemsContainer.classList.add('active');
-                drinkItemsContainer.classList.remove('hidden');
-                foodItemsContainer.classList.add('hidden');
-                foodItemsContainer.classList.remove('active');
-            });
+        // Menu item quantity controls (delegated event listener)
+        menuList.addEventListener('click', (event) => {
+            const target = event.target;
+            if (target.classList.contains('increase-item')) {
+                const itemId = target.dataset.id;
+                updateCartItem(itemId, 1);
+            } else if (target.classList.contains('decrease-item')) {
+                const itemId = target.dataset.id;
+                updateCartItem(itemId, -1);
+            }
+        });
 
-            menuScreen.addEventListener('click', (event) => {
-                const target = event.target;
-                if (target.tagName === 'BUTTON' && target.dataset.id && target.dataset.action) {
-                    updateCartItem(target.dataset.id, target.dataset.action);
+        // Floating cart button and top right cart button
+        floatingCartBtn.addEventListener('click', showCartOverlay);
+        viewCartTopBtn.addEventListener('click', showCartOverlay);
+        closeCartBtn.addEventListener('click', hideCartOverlay);
+
+        // Cart overlay buttons
+        confirmOrderBtn.addEventListener('click', handleConfirmOrder);
+        placeOrderBtn.addEventListener('click', handlePlaceOrder);
+        cancelCustomerOrderBtn.addEventListener('click', handleCancelCustomerOrder);
+
+        // Message modal close button
+        closeMessageModalBtn.addEventListener('click', hideMessageModal);
+
+        // Admin Login
+        adminLoginBtn.addEventListener('click', () => {
+            const username = adminUsernameInput.value;
+            const password = adminPasswordInput.value;
+
+            // Simple hardcoded check for admin credentials
+            if (username === 'panda' && password === '123') {
+                isAdminLoggedIn = true;
+                switchView('admin-dashboard');
+                setupIncomingOrdersListener(); // Start listening for orders once admin logs in
+            } else {
+                showMessageModal('ເຂົ້າສູ່ລະບົບບໍຖືກຕ້ອງ', 'ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ.');
+            }
+        });
+        // Updated button text for Admin Login to Home
+        backToHomeFromAdminLoginBtn.addEventListener('click', () => switchView('home'));
+
+        // Admin Dashboard tabs
+        incomingOrdersTab.addEventListener('click', () => switchAdminTab('incoming-orders'));
+        revenueSummaryTab.addEventListener('click', () => switchAdminTab('revenue-summary'));
+        analysisTab.addEventListener('click', () => switchAdminTab('analysis'));
+        accountingTab.addEventListener('click', () => switchAdminTab('accounting'));
+        historyTab.addEventListener('click', () => switchAdminTab('history'));
+
+        // New Home button for admin dashboard
+        homeFromAdminBtn.addEventListener('click', () => switchView('home'));
+
+        // Admin Logout
+        adminLogoutBtn.addEventListener('click', () => {
+            isAdminLoggedIn = false;
+            switchView('home');
+            // Optionally, sign out from Firebase auth if admin was using a specific auth user
+            // For this simple case, just reset isAdminLoggedIn
+        });
+
+        // Admin incoming orders actions (delegated event listener)
+        pendingOrdersList.addEventListener('click', async (event) => {
+            const target = event.target;
+            const orderId = target.dataset.id;
+
+            if (orderId) {
+                const orderDocRef = doc(db, `artifacts/${appId}/public/data/orders`, orderId);
+                if (target.classList.contains('accept-order-btn')) {
+                    try {
+                        await updateDoc(orderDocRef, { status: 'accepted' });
+                        showMessageModal('ອໍເດີຖືກຮັບແລ້ວ', `ອໍເດີ ${orderId} ຖືກຮັບແລ້ວ.`);
+                    } catch (error) {
+                        console.error("Error accepting order: ", error);
+                        showMessageModal('ເກີດຂໍ້ຜິດພາດ', 'ບໍ່ສາມາດຮັບອໍເດີໄດ້.');
+                    }
+                } else if (target.classList.contains('clear-order-btn')) {
+                    try {
+                        await updateDoc(orderDocRef, { status: 'cleared' });
+                        showMessageModal('ອໍເດີຖືກລຶບລ້າງແລ້ວ', `ອໍເດີ ${orderId} ຖືກລຶບລ້າງແລ້ວ.`);
+                    } catch (error) {
+                        console.error("Error clearing order: ", error);
+                        showMessageModal('ເກີດຂໍ້ຜິດພາດ', 'ບໍ່ສາມາດລຶບລ້າງອໍເດີໄດ້.');
+                    }
                 }
-            });
+            }
+        });
 
-            floatingCartBtn.addEventListener('click', () => {
-                showScreen(cartScreen);
-                renderCartDisplay(cartItemsDisplay);
-            });
+        // Admin accounting
+        addExpenseBtn.addEventListener('click', addExpense);
 
-            cartIconTop.addEventListener('click', () => {
-                showScreen(cartScreen);
-                renderCartDisplay(cartItemsDisplay);
-            });
+        // Admin history filter
+        filterHistoryBtn.addEventListener('click', renderOrderHistory);
 
-            confirmOrderBtn.addEventListener('click', processOrder);
-            backToMenuBtn.addEventListener('click', () => showScreen(menuScreen));
-
-            modalConfirmBtn.addEventListener('click', () => {
-                confirmOrder();
-                orderConfirmModal.classList.add('hidden');
-            });
-            modalCancelBtn.addEventListener('click', () => {
-                orderConfirmModal.classList.add('hidden');
-            });
-
-            popupOkBtn.addEventListener('click', () => {
-                duplicateOrderPopup.classList.add('hidden');
-            });
-
-            adminLoginBtn.addEventListener('click', () => {
-                const username = adminUsernameInput.value;
-                const password = adminPasswordInput.value;
-                if (username === ADMIN_USER && password === ADMIN_PASS) {
-                    adminLoggedIn = true;
-                    showScreen(adminDashboardScreen);
-                    adminUsernameInput.value = '';
-                    adminPasswordInput.value = '';
-                    startOrderPolling();
-                } else {
-                    alert('ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ!');
+        // --- Firebase Authentication ---
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                userId = user.uid;
+                console.log("Firebase authenticated with user ID:", userId);
+            } else {
+                // Sign in anonymously if no user is logged in
+                try {
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (error) {
+                    console.error("Error during anonymous sign-in:", error);
                 }
-            });
-
-            backToHomeFromAdminLogin.addEventListener('click', () => {
-                showScreen(homeScreen);
-            });
-
-            viewOrdersBtn.addEventListener('click', () => {
-                if (adminLoggedIn) {
-                    showScreen(adminViewOrdersScreen);
-                    renderRealtimeOrders();
-                } else {
-                    alert('ກະລຸນາເຂົ້າສູ່ລະບົບແອັດມິນກ່ອນ!');
-                }
-            });
-
-            summaryRevenueBtn.addEventListener('click', () => {
-                if (adminLoggedIn) {
-                    alert('ສະຫຼຸບລາຍຮັບ (ຍັງບໍ່ມີການຈັດຕັ້ງປະຕິບັດ)');
-                }
-            });
-
-            analyzeMenuBtn.addEventListener('click', () => {
-                if (adminLoggedIn) {
-                    alert('ວິເຄາະເມນູ (ຍັງບໍ່ມີການຈັດຕັ້ງປະຕິບັດ)');
-                }
-            });
-
-            accountingBtn.addEventListener('click', () => {
-                if (adminLoggedIn) {
-                    alert('ລະບົບບັນຊີ (ຍັງບໍ່ມີການຈັດຕັ້ງປະຕິບັດ)');
-                }
-            });
-
-            historyViewBtn.addEventListener('click', () => {
-                if (adminLoggedIn) {
-                    alert('ເບິ່ງຂໍ້ມູນຍ້ອນຫຼັງ (1 ປີ) (ຍັງບໍ່ມີການຈັດຕັ້ງປະຕິບັດ)');
-                }
-            });
-
-            adminLogoutBtn.addEventListener('click', () => {
-                adminLoggedIn = false;
-                showScreen(homeScreen);
-                stopOrderPolling();
-                alert('ອອກຈາກລະບົບສຳເລັດແລ້ວ.');
-            });
-
-            backToAdminDashboardBtn.addEventListener('click', () => {
-                showScreen(adminDashboardScreen);
-            });
-
-            updateCartCount();
+            }
         });
     </script>
 </body>
