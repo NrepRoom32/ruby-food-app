@@ -3,1968 +3,1362 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ruby Food</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+    <title>ຂາຍແຕ່ຕຳ - Food Ordering App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* CSS styles will go here */
-        :root {
-            --primary-color: #4CAF50; /* Green */
-            --secondary-color: #2196F3; /* Blue */
-            --tertiary-color: #FF9800; /* Orange for highlights/accents */
-            --gradient-start: #FFFFFF; /* White */
-            --gradient-middle: #CCCCCC; /* Light Gray */
-            --gradient-end: #000000; /* Black */
-            --text-color-dark: #333;
-            --text-color-light: #f5f5f5;
-            --shadow-light: rgba(0, 0, 0, 0.1);
-            --shadow-medium: rgba(0, 0, 0, 0.2);
-            --shadow-heavy: rgba(0, 0, 0, 0.4);
-            --border-radius: 10px;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
         body {
             font-family: 'Noto Sans Lao', sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-middle), var(--gradient-end));
-            overflow: hidden;
-            color: var(--text-color-dark);
+            overflow-x: hidden;
         }
 
-        .container {
-            background-color: #fff;
-            border-radius: var(--border-radius);
-            box-shadow: 0 10px 30px var(--shadow-medium);
-            padding: 20px;
-            text-align: center;
-            width: 95%; /* Default for smaller screens */
-            max-width: 1200px; /* Max width for very large screens */
-            box-sizing: border-box;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInScale 0.8s forwards;
-            position: relative;
-            display: flex; /* Use flex for main container to manage pages */
-            flex-direction: column;
-            align-items: center;
-            max-height: 95vh; /* Limit overall container height */
-            min-height: 500px; /* Minimum height for better appearance */
+        .app-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
         }
-
-        /* --- Page Specific Layouts --- */
 
         /* Splash Screen */
-        #splash-screen {
+        .splash-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, var(--gradient-start), var(--gradient-middle), var(--gradient-end));
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            z-index: 1000;
-            transition: opacity 1s ease-out;
+            z-index: 9999;
+            animation: splashFade 3s ease-in-out forwards;
         }
 
-        .spinner {
-            border: 8px solid rgba(255, 255, 255, 0.3);
-            border-top: 8px solid var(--primary-color);
+        .splash-logo {
+            width: 150px;
+            height: 150px;
+            background: #ffeb3b;
             border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            animation: bounce 2s infinite;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
         }
 
         .splash-text {
-            margin-top: 20px;
-            color: var(--text-color-dark);
-            font-size: 1.2em;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Home Page, Admin Login, Admin Dashboard common styles */
-        #home-page, #admin-login-page, #admin-dashboard {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            padding: 10px; /* Reduced padding here as container has it */
-            width: 100%;
-            box-sizing: border-box;
-            overflow-y: auto; /* Allow scrolling for content that overflows */
-            max-height: calc(95vh - 40px); /* Adjust max-height to fit within container */
-        }
-
-        /* Home Page App Icon (Emoji) */
-        .app-icon {
-            width: 300px;
-            height: 300px;
-            background-color: var(--primary-color);
-            border-radius: 20%;
-            margin-bottom: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 8em; /* Size for emoji */
             color: white;
-            box-shadow: 0 8px 16px var(--shadow-medium);
-            animation: bounce 1s infinite alternate;
-            overflow: hidden;
-            position: relative;
+            font-size: 24px;
+            font-weight: 600;
+            margin-top: 20px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        @keyframes splashFade {
+            0%, 80% { opacity: 1; }
+            100% { opacity: 0; pointer-events: none; }
         }
 
         @keyframes bounce {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-10px); }
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-30px); }
+            60% { transform: translateY(-15px); }
         }
 
-        h1 {
-            color: var(--primary-color);
+        /* Home Screen */
+        .home-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 50%, #fecfef 100%);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .app-logo {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(45deg, #ffeb3b, #ffc107);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 120px;
             margin-bottom: 30px;
-            font-size: 2.5em;
-            text-shadow: 1px 1px 2px var(--shadow-light);
+            animation: logoFloat 3s ease-in-out infinite;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            border: 8px solid white;
         }
 
-        .button {
-            background-color: var(--primary-color);
+        .app-title {
+            font-size: 48px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 40px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            animation: slideUp 1s ease-out 0.5s both;
+        }
+
+        .start-btn, .admin-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
             color: white;
-            padding: 15px 30px;
             border: none;
+            padding: 20px 40px;
+            font-size: 20px;
+            font-weight: 600;
             border-radius: 50px;
-            font-size: 1.2em;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 8px var(--shadow-light);
-            text-decoration: none;
-            display: inline-block;
             margin: 10px;
-        }
-
-        .button:hover {
-            background-color: #45a049;
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px var(--shadow-medium);
-        }
-
-        /* Input fields */
-        .input-group {
-            margin-bottom: 20px;
-            width: 100%;
-            max-width: 300px;
-        }
-
-        .input-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
-            text-align: left;
-        }
-
-        .input-group input[type="text"],
-        .input-group input[type="password"],
-        .input-group input[type="number"],
-        .input-group select { /* Style for select dropdowns */
-            width: calc(100% - 20px);
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: var(--border-radius);
-            font-size: 1em;
-            box-shadow: inset 0 1px 3px var(--shadow-light);
-            transition: border-color 0.3s ease;
-            background-color: white; /* Ensure consistent background */
-            -webkit-appearance: none; /* Remove default arrow on select for custom styling */
-            -moz-appearance: none;
-            appearance: none;
-            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23007BB5%22%20d%3D%22M287%2C197.942L146.2%2C57.042L5.4%2C197.942H287z%22%2F%3E%3C%2Fsvg%3E'); /* Custom arrow for select */
-            background-repeat: no-repeat;
-            background-position: right 10px top 50%;
-            background-size: 10px auto;
-        }
-
-        .input-group input[type="text"]:focus,
-        .input-group input[type="password"]:focus,
-        .input-group input[type="number"]:focus,
-        .input-group select:focus {
-            border-color: var(--primary-color);
-            outline: none;
-        }
-
-        /* --- Customer Page Layout (Tabs on Side) --- */
-        #customer-page {
-            display: none; /* Hidden by default */
-            flex-direction: column; /* Default: stack header, layout, footer */
-            width: 100%;
-            box-sizing: border-box;
-            height: 100%; /* Take full height of container */
-            max-height: calc(95vh - 40px); /* Max height within container */
-        }
-
-        /* Order Summary (Always at top of customer page) */
-        .order-summary {
-            background-color: #f9f9f9;
-            border-radius: var(--border-radius);
-            padding: 15px;
-            margin-bottom: 15px; /* Space below summary */
-            border: 1px solid #eee;
-            text-align: left;
-            width: 100%;
-            box-sizing: border-box;
-            box-shadow: 0 2px 10px var(--shadow-light);
-            flex-shrink: 0; /* Prevent shrinking */
-        }
-
-        .order-summary h3 {
-            margin-top: 0;
-            color: var(--primary-color);
-        }
-
-        .order-total {
-            font-weight: bold;
-            font-size: 1.2em;
-            margin-top: 10px;
-            display: flex;
-            justify-content: space-between;
-            color: var(--primary-color);
-        }
-
-        /* Main layout for tabs and menu content */
-        .customer-page-layout {
-            display: flex;
-            flex-grow: 1; /* Take up available space between header and footer */
-            width: 100%;
-            overflow: hidden; /* Manage internal scrolling */
-        }
-
-        .sidebar-tabs {
-            display: flex;
-            flex-direction: column; /* Vertical tabs by default */
-            border-right: 2px solid #eee;
-            margin-right: 20px;
-            padding-right: 10px;
-            flex-shrink: 0; /* Don't shrink */
-            width: 150px; /* Fixed width for sidebar */
-            overflow-y: auto; /* If many tabs */
-        }
-
-        .tab-button {
-            padding: 15px 10px;
-            cursor: pointer;
-            border: none;
-            background-color: transparent;
-            font-size: 1.1em;
-            color: var(--text-color-dark);
             transition: all 0.3s ease;
-            border-right: 3px solid transparent; /* For vertical */
-            text-align: left;
-            margin-bottom: 5px; /* Space between vertical tabs */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            animation: slideUp 1s ease-out 0.7s both;
         }
 
-        .tab-button.active {
-            color: var(--primary-color);
-            border-right-color: var(--primary-color); /* For vertical */
-            font-weight: bold;
-            background-color: #e8f5e9; /* Light background for active tab */
+        .start-btn:hover, .admin-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
         }
 
-        .tab-button:hover:not(.active) {
-            background-color: #f0f0f0;
+        @keyframes logoFloat {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Main App Layout */
+        .main-app {
+            display: none;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .app-header {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .app-header h1 {
+            font-size: 32px;
+            font-weight: 700;
+        }
+
+        .back-btn {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .content-container {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 20px;
+            box-shadow: 4px 0 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .tab-btn {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateX(5px);
+        }
+
+        .tab-btn.active {
+            background: rgba(255, 255, 255, 0.9);
+            color: #667eea;
+            transform: translateX(10px);
         }
 
         .main-content {
-            flex-grow: 1; /* Take remaining space horizontally */
-            overflow-y: auto; /* Scrollable menu content */
-            padding-right: 5px; /* Account for scrollbar */
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column; /* Stack menu-content and any other elements */
-            align-items: center;
+            flex: 1;
+            padding: 30px;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            overflow-y: auto;
         }
 
-        /* Menu Content Area (Retaining original card flow) */
-        .menu-content {
-            display: flex;
-            flex-wrap: wrap; /* Allow items to wrap to next line */
-            justify-content: center; /* Center items within the available width */
-            gap: 20px; /* Space between menu cards */
-            width: 100%; /* Take full width of main-content */
-            padding-bottom: 10px; /* Space from bottom */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            animation: fadeIn 0.8s ease-in-out;
         }
 
-        .menu-item-card {
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: 0 5px 15px var(--shadow-light);
-            padding: 15px;
-            text-align: left;
-            width: calc(100% - 20px); /* Default: 1 item per row (mobile) */
-            max-width: 300px; /* Max width for a single card */
-            box-sizing: border-box;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-            opacity: 0;
-            animation: fadeIn 0.5s forwards;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+        .menu-item {
+            background: white;
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            animation: slideUp 0.6s ease-out;
         }
 
-        .menu-item-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 20px var(--shadow-medium);
+        .menu-item:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
         }
 
-        .menu-item-card h3 {
-            margin-top: 0;
-            color: var(--primary-color);
-            font-size: 1.3em;
+        .menu-item h3 {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            font-weight: 600;
         }
 
-        .menu-item-card p {
-            margin: 5px 0;
-            color: #666;
+        .menu-item .price {
+            font-size: 20px;
+            color: #e74c3c;
+            font-weight: 700;
+            margin-bottom: 15px;
         }
 
-        .menu-item-card .price {
-            font-weight: bold;
-            color: var(--text-color-dark);
-            font-size: 1.1em;
-        }
-
-        .favorite-button {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background: none;
-            border: none;
-            font-size: 1.5em;
-            cursor: pointer;
-            color: #ccc;
-            transition: color 0.3s ease, transform 0.2s ease;
-        }
-
-        .favorite-button.active {
-            color: #ff6347; /* Red for favorited */
-            transform: scale(1.1);
-        }
-
-        .favorite-button:hover {
-            color: #ff6347;
-            transform: scale(1.2);
-        }
-
-        .add-to-cart-controls {
+        .quantity-controls {
             display: flex;
             align-items: center;
-            justify-content: flex-end;
-            margin-top: auto;
-            padding-top: 10px;
-        }
-
-        .add-to-cart-button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            font-size: 0.9em;
-            margin-left: auto;
-        }
-
-        .add-to-cart-button:hover {
-            background-color: #45a049;
-            transform: translateY(-2px);
-        }
-
-        /* Checkout Buttons (Always at bottom of customer page) */
-        .checkout-button-container {
-            width: 100%;
-            padding: 10px 0;
-            background-color: #fff; /* Cover content when scrolling */
-            z-index: 10;
-            border-top: 1px solid #eee; /* Visual separation */
-            box-shadow: 0 -2px 10px var(--shadow-light); /* Shadow above */
-            flex-shrink: 0; /* Prevent shrinking */
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
+            gap: 15px;
             margin-top: 15px;
         }
 
-        .checkout-button {
-            width: 100%;
-            background-color: var(--secondary-color);
+        .qty-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+            font-weight: bold;
+            transition: all 0.3s ease;
         }
 
-        .checkout-button:hover {
-            background-color: #1a7bce;
+        .qty-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
         }
 
-        /* Admin Dashboard NEW STYLES */
-        #admin-dashboard {
-            text-align: left;
-            width: 100%;
-            max-width: 900px;
-            box-sizing: border-box;
-            max-height: 80vh;
-            overflow: hidden; /* Manage internal tab content overflow */
-            padding-right: 0; /* No right padding here */
-            display: flex;
-            flex-direction: column;
-        }
-
-        #admin-dashboard h2 {
-            color: var(--primary-color);
-            margin-bottom: 20px;
+        .qty-display {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            min-width: 30px;
             text-align: center;
         }
 
-        /* Admin Tabs Navigation */
-        .admin-tabs {
-            display: flex;
-            justify-content: center; /* Center tabs horizontally */
-            width: 100%;
-            border-bottom: 2px solid #eee;
-            margin-bottom: 20px;
-            flex-wrap: wrap; /* Allow tabs to wrap on smaller screens */
-        }
-
-        .admin-tab-button {
-            padding: 15px 20px;
-            cursor: pointer;
-            border: none;
-            background-color: transparent;
-            font-size: 1.1em;
-            color: var(--text-color-dark);
-            transition: all 0.3s ease;
-            border-bottom: 3px solid transparent;
-            margin-bottom: -2px; /* Pull up to hide border of parent */
-            white-space: nowrap; /* Prevent text wrap */
-        }
-
-        .admin-tab-button.active {
-            color: var(--primary-color);
-            border-bottom-color: var(--primary-color);
-            font-weight: bold;
-            background-color: #e8f5e9;
-        }
-
-        .admin-tab-button:hover:not(.active) {
-            background-color: #f0f0f0;
-        }
-
-        /* Date Filters and Search */
-        .filter-and-search-container {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-
-        .date-filters {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap; /* Allow filters to wrap */
-            width: 100%;
-        }
-        .date-filters .input-group {
-            margin-bottom: 0;
-            max-width: 120px; /* Adjust width for select boxes */
-            width: auto; /* Allow auto width based on content */
-            flex-grow: 1; /* Allow inputs to grow if space available */
-            min-width: 80px; /* Minimum width for filters */
-        }
-        .date-filters label {
-            font-size: 0.9em; /* Smaller label for filters */
-        }
-        .date-filters select {
-            width: 100%; /* Make select boxes take full width of their group */
-        }
-
-        .search-group {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            width: 100%;
-        }
-
-        .search-group input {
-            flex-grow: 1;
-            max-width: 300px;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: var(--border-radius);
-            font-size: 1em;
-            box-shadow: inset 0 1px 3px var(--shadow-light);
-            transition: border-color 0.3s ease;
-        }
-        .search-group input:focus {
-            border-color: var(--primary-color);
-            outline: none;
-        }
-
-        .search-button {
-            padding: 10px 20px;
-            background-color: var(--secondary-color);
-            color: white;
-            border: none;
-            border-radius: var(--border-radius);
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            font-size: 1em;
-            flex-shrink: 0; /* Prevent button from shrinking */
-        }
-        .search-button:hover {
-            background-color: #1a7bce;
-        }
-
-
-        /* Admin Tab Content */
-        .admin-tab-content {
-            display: none; /* Hidden by default */
-            flex-direction: column;
-            width: 100%;
-            flex-grow: 1; /* Take remaining space */
-            overflow-y: auto; /* Scroll individual tab content */
-            padding-right: 5px; /* Account for scrollbar */
-            box-sizing: border-box;
-        }
-
-        .admin-tab-content.active {
-            display: flex;
-        }
-
-        .admin-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 20px;
-        }
-
-        .admin-card {
-            background-color: #f9f9f9;
-            border-radius: var(--border-radius);
+        /* Order Summary */
+        .order-summary {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: white;
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            transition: right 0.4s ease;
+            overflow-y: auto;
             padding: 20px;
-            box-shadow: 0 5px 15px var(--shadow-light);
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
 
-        .admin-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px var(--shadow-medium);
+        .order-summary.show {
+            right: 0;
         }
 
-        .admin-card h3 {
-            margin-top: 0;
-            color: var(--secondary-color);
-            border-bottom: 1px solid #eee;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .admin-card h3 .count {
-            background-color: var(--tertiary-color);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8em;
-        }
-
-        .order-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .order-item-admin {
-            background-color: white;
-            border: 1px solid #eee;
-            border-radius: var(--border-radius);
-            padding: 15px;
-            margin-bottom: 10px;
-            box-shadow: 0 1px 5px var(--shadow-light);
-            display: flex;
-            flex-direction: column;
-            position: relative;
-        }
-
-        .order-item-admin strong {
-            color: var(--primary-color);
-        }
-
-        .order-item-admin .order-details {
-            display: flex;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            margin-bottom: 10px;
-            font-size: 0.95em;
-        }
-
-        .order-item-admin .order-items-list {
-            margin-top: 10px;
-            padding-left: 20px;
-            border-top: 1px dashed #eee;
-            padding-top: 10px;
-        }
-
-        .order-item-admin .order-items-list li {
-            margin-bottom: 5px;
-        }
-
-        .order-item-admin .order-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .order-item-admin .action-button {
-            padding: 8px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            font-size: 0.9em;
-        }
-
-        .order-item-admin .success-button {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .order-item-admin .success-button:hover {
-            background-color: #45a049;
-        }
-
-        .order-item-admin .clear-button {
-            background-color: #f44336; /* Red */
-            color: white;
-        }
-
-        .order-item-admin .clear-button:hover {
-            background-color: #da190b;
-        }
-        
-        .admin-total-summary {
-            font-size: 1.1em;
-            font-weight: bold;
-            margin-top: 10px;
-            padding-top: 10px;
-            border-top: 1px solid #ddd;
-            display: flex;
-            justify-content: space-between;
-            color: var(--text-color-dark);
-        }
-
-        /* Accounting Form */
-        .accounting-form {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            margin-top: 15px;
-        }
-
-        .accounting-form button {
-            width: 100%;
-        }
-
-        #cost-list {
-            list-style: none;
-            padding: 0;
-            margin-top: 15px;
-        }
-        #cost-list li {
+        .order-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px dashed #eee;
-            font-size: 0.95em;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f0f0f0;
         }
-        #cost-list li:last-child {
-            border-bottom: none;
+
+        .order-header h3 {
+            font-size: 24px;
+            color: #2c3e50;
+            font-weight: 700;
         }
-        .remove-cost-btn {
+
+        .close-order {
             background: none;
             border: none;
-            color: #f44336;
+            font-size: 24px;
             cursor: pointer;
-            font-size: 0.9em;
-            margin-left: 10px;
-            transition: color 0.2s ease;
-        }
-        .remove-cost-btn:hover {
-            color: #da190b;
+            color: #e74c3c;
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
         }
 
-        /* Popups */
-        .popup-overlay {
+        .close-order:hover {
+            background: #f8f9fa;
+            transform: scale(1.1);
+        }
+
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .order-total {
+            font-size: 24px;
+            font-weight: 700;
+            color: #e74c3c;
+            text-align: center;
+            margin: 20px 0;
+            padding: 20px;
+            background: linear-gradient(45deg, #ff9a9e, #fecfef);
+            border-radius: 15px;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .checkout-btn {
+            width: 100%;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 20px;
+            font-size: 20px;
+            font-weight: 600;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .checkout-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .checkout-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Floating Order Button */
+        .floating-order-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 24px;
+            cursor: pointer;
+            z-index: 999;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        .floating-order-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+
+        .order-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #ffeb3b;
+            color: #2c3e50;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.6);
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            animation: slideUp 0.3s ease-out;
+        }
+
+        .modal h3 {
+            font-size: 24px;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .modal input {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-family: 'Noto Sans Lao', sans-serif;
+        }
+
+        .modal input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 10px rgba(102, 126, 234, 0.3);
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 15px 30px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .modal-btn.secondary {
+            background: #f8f9fa;
+            color: #2c3e50;
+            border: 2px solid #ddd;
+        }
+
+        .modal-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Admin Styles */
+        .admin-panel {
+            display: none;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+        }
+
+        .admin-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .admin-header h2 {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .admin-tabs {
             display: flex;
             justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s ease, visibility 0.3s ease;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
         }
 
-        .popup-overlay.active {
-            opacity: 1;
-            visibility: visible;
+        .admin-tab {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
 
-        .popup-content {
-            background-color: white;
+        .admin-tab:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .admin-tab.active {
+            background: rgba(255, 255, 255, 0.9);
+            color: #667eea;
+        }
+
+        .admin-content {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
             padding: 30px;
-            border-radius: var(--border-radius);
-            box-shadow: 0 10px 30px var(--shadow-heavy);
-            text-align: center;
-            transform: scale(0.8);
-            transition: transform 0.3s ease;
-            max-width: 450px;
-            width: 90%;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-
-        .popup-overlay.active .popup-content {
-            transform: scale(1);
-        }
-
-        .popup-content h3 {
-            color: var(--primary-color);
-            margin-top: 0;
             margin-bottom: 20px;
         }
 
-        .popup-content button {
-            margin-top: 20px;
+        .orders-grid {
+            display: grid;
+            gap: 20px;
         }
-        
-        .order-confirmation-summary {
-            text-align: center;
+
+        .order-card {
+            background: rgba(255, 255, 255, 0.9);
+            color: #2c3e50;
+            padding: 20px;
+            border-radius: 15px;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        .order-card h4 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #667eea;
+        }
+
+        .order-actions {
+            display: flex;
+            gap: 10px;
             margin-top: 15px;
-            padding-top: 10px;
-            font-size: 1.1em;
-            font-weight: bold;
-            color: var(--primary-color);
         }
 
-        /* NEW: Order Review Popup specific styles */
-        #order-review-popup .popup-content {
-            max-width: 550px; /* Wider for item list */
-            text-align: left;
-        }
-        #order-review-items {
-            list-style: none;
-            padding: 0;
-            margin: 20px 0;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-        }
-        #order-review-items li {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px dashed #eee;
-        }
-        #order-review-items li:last-child {
-            border-bottom: none;
-        }
-        #order-review-items .item-name {
-            font-weight: bold;
-            flex-grow: 1;
-        }
-        #order-review-items .item-qty {
-            margin: 0 10px;
-            color: #555;
-        }
-        #order-review-items .item-subtotal {
-            font-weight: bold;
-            color: var(--text-color-dark);
-        }
-        .order-review-total {
-            display: flex;
-            justify-content: space-between;
-            font-size: 1.3em;
-            font-weight: bold;
-            margin-top: 20px;
-            padding-top: 15px;
-            border-top: 2px solid var(--primary-color);
-            color: var(--primary-color);
-        }
-        .order-review-buttons {
-            display: flex;
-            justify-content: space-around;
-            gap: 15px;
-            margin-top: 30px;
-        }
-        .order-review-buttons button {
-            flex: 1;
-            margin: 0; /* Override default button margin */
+        .action-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
         }
 
-
-        /* Animations */
-        @keyframes fadeInScale {
-            0% { opacity: 0; transform: scale(0.95); }
-            100% { opacity: 1; transform: scale(1); }
+        .success-btn {
+            background: linear-gradient(45deg, #27ae60, #2ecc71);
+            color: white;
         }
 
-        @keyframes fadeIn {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
+        .clear-btn {
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
         }
 
-        .slide-in-right {
-            animation: slideInRight 0.5s forwards;
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
         }
 
-        @keyframes slideInRight {
-            0% { transform: translateX(100%); opacity: 0; }
-            100% { transform: translateX(0); opacity: 1; }
-        }
-
-        .slide-out-left {
-            animation: slideOutLeft 0.5s forwards;
-        }
-
-        @keyframes slideOutLeft {
-            0% { transform: translateX(0); opacity: 1; }
-            100% { transform: translateX(-100%); opacity: 0; }
-        }
-
-        .slide-in-left {
-            animation: slideInLeft 0.5s forwards;
-        }
-
-        @keyframes slideInLeft {
-            0% { transform: translateX(-100%); opacity: 0; }
-            100% { transform: translateX(0); opacity: 1; }
-        }
-
-        .slide-out-right {
-            animation: slideOutRight 0.5s forwards;
-        }
-
-        @keyframes slideOutRight {
-            0% { transform: translateX(0); opacity: 1; }
-            100% { transform: translateX(100%); opacity: 0; }
-        }
-
-        /* --- Responsive Design (Media Queries) --- */
-
-        /* Smartphones (Portrait - max 767px wide, aiming for ~9:16 aspect ratio roughly) */
-        @media (max-width: 767px) {
-            .container {
-                width: 95%;
-                max-width: 400px; /* Limit width for phone screens */
-                height: 90vh; /* Take up most of the viewport height */
-                max-height: 700px; /* Cap the height even on very tall phones */
-                padding: 15px;
-            }
-            #customer-page {
-                height: 100%; /* Take full height of its container */
-                max-height: unset; /* Remove specific max-height from default */
-            }
-            .sidebar-tabs {
-                flex-direction: row; /* Horizontal tabs for mobile */
-                border-right: none;
-                border-bottom: 2px solid #eee;
-                margin-right: 0;
-                padding-right: 0;
-                width: 100%;
-                justify-content: space-around;
-                margin-bottom: 15px;
-            }
-            .tab-button {
-                border-right: none;
-                border-bottom: 3px solid transparent; /* For horizontal tabs */
-                text-align: center;
-                flex-grow: 1;
-                margin-bottom: 0;
-            }
-            .tab-button.active {
-                border-bottom-color: var(--primary-color);
-                border-right-color: transparent;
-            }
-            .main-content {
-                padding-left: 0;
-                padding-right: 0; /* No right padding on mobile */
-            }
-            .menu-item-card {
-                width: calc(100% - 20px); /* 1 item per row */
-            }
-            .admin-grid {
-                grid-template-columns: 1fr; /* Single column for admin on small screens */
-            }
-            .app-icon {
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .app-logo {
                 width: 200px;
                 height: 200px;
-                font-size: 6em;
+                font-size: 80px;
             }
-            h1 {
-                font-size: 2em;
+
+            .app-title {
+                font-size: 32px;
             }
-            .button {
-                padding: 12px 25px;
-                font-size: 1.1em;
+
+            .content-container {
+                flex-direction: column;
             }
-            .popup-content {
+
+            .sidebar {
+                width: 100%;
+                padding: 15px;
+            }
+
+            .order-summary {
+                width: 100%;
+                right: -100%;
+            }
+
+            .menu-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .floating-order-btn {
+                bottom: 15px;
+                right: 15px;
+                width: 50px;
+                height: 50px;
+                font-size: 20px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .app-logo {
+                width: 150px;
+                height: 150px;
+                font-size: 60px;
+            }
+
+            .app-title {
+                font-size: 24px;
+            }
+
+            .start-btn, .admin-btn {
+                padding: 15px 30px;
+                font-size: 16px;
+            }
+
+            .modal-content {
+                padding: 30px 20px;
+            }
+
+            .main-content {
+                padding: 20px 15px;
+            }
+
+            .menu-item {
                 padding: 20px;
-            }
-            .checkout-button-container {
-                padding: 5px 0;
-            }
-            #order-review-popup .popup-content {
-                max-width: 95%;
-            }
-            .admin-tabs {
-                flex-direction: column; /* Stack admin tabs vertically on small screens */
-                align-items: center;
-            }
-            .admin-tab-button {
-                width: 100%; /* Full width for stacked tabs */
-                border-bottom: none; /* Remove bottom border */
-                border-right: 3px solid transparent; /* Add a side border for selected tab */
-            }
-            .admin-tab-button.active {
-                border-right-color: var(--primary-color);
-                border-bottom-color: transparent; /* Ensure no bottom border */
-            }
-            .filter-and-search-container {
-                gap: 10px;
-            }
-            .date-filters {
-                flex-direction: column; /* Stack date filters vertically */
-                align-items: center;
-                gap: 5px;
-            }
-            .date-filters .input-group {
-                width: 100%;
-                max-width: 250px; /* Limit width of stacked filters */
-            }
-            .search-group {
-                flex-direction: column; /* Stack search input and button */
-                align-items: center;
-                gap: 5px;
-            }
-            .search-group input {
-                width: 100%;
-                max-width: 250px; /* Limit width of stacked search input */
-            }
-            .search-button {
-                width: 100%;
-                max-width: 250px; /* Limit width of stacked search button */
-            }
-        }
-
-        /* iPads (Portrait and Landscape - 768px to 1024px wide) */
-        @media (min-width: 768px) and (max-width: 1024px) {
-            .container {
-                width: 90%;
-                max-width: 900px;
-                height: 90vh; /* Fixed height for tablets */
-                max-height: 800px;
-            }
-            #customer-page {
-                height: 100%;
-            }
-            .customer-page-layout {
-                flex-direction: row; /* Tabs on side */
-            }
-            .sidebar-tabs {
-                flex-direction: column; /* Vertical tabs */
-                border-right: 2px solid #eee;
-                border-bottom: none; /* Remove bottom border */
-                margin-right: 20px; /* Space between sidebar and content */
-                padding-right: 10px;
-                width: 150px; /* Fixed width for sidebar */
-                margin-bottom: 0; /* Remove bottom margin */
-            }
-            .tab-button {
-                border-bottom: none; /* Remove bottom border for tabs */
-                border-right: 3px solid transparent; /* For vertical */
-                text-align: left;
-                padding: 15px 10px;
-                margin-bottom: 5px;
-            }
-            .tab-button.active {
-                border-right-color: var(--primary-color);
-                border-bottom-color: transparent;
-            }
-            .main-content {
-                padding-left: 0;
-            }
-            .menu-item-card {
-                width: calc(50% - 20px); /* 2 items per row */
-            }
-            .admin-grid {
-                grid-template-columns: 1fr; /* Single column for admin on tablets, can be 2 if needed */
-            }
-            .admin-tabs {
-                flex-wrap: wrap; /* Allow tabs to wrap if too many */
-            }
-            .date-filters, .search-group {
-                justify-content: center;
-            }
-        }
-
-        /* Desktops and Laptops (min-width: 1025px) */
-        @media (min-width: 1025px) {
-            .container {
-                width: 80%; /* Wider for desktops */
-                max-width: 1200px; /* Max width for large screens */
-                height: 85vh; /* Fixed height for desktops */
-                min-height: 600px;
-            }
-            #customer-page {
-                height: 100%;
-            }
-            .customer-page-layout {
-                flex-direction: row; /* Tabs on side */
-            }
-            .sidebar-tabs {
-                flex-direction: column; /* Vertical tabs */
-                border-right: 2px solid #eee;
-                margin-right: 30px; /* More space */
-                padding-right: 15px;
-                width: 180px; /* Wider sidebar */
-            }
-            .tab-button {
-                border-right: 3px solid transparent;
-                text-align: left;
-                padding: 15px 15px;
-            }
-            .tab-button.active {
-                border-right-color: var(--primary-color);
-            }
-            .main-content {
-                padding-left: 0;
-            }
-            .menu-item-card {
-                width: calc(33.33% - 20px); /* 3 items per row */
-            }
-            .admin-grid {
-                grid-template-columns: 1fr 1fr; /* Two columns for admin on desktops */
-            }
-            .date-filters {
-                justify-content: center;
-            }
-            .search-group {
-                justify-content: center;
             }
         }
     </style>
 </head>
 <body>
-    <div id="splash-screen">
-        <div class="spinner"></div>
-        <p class="splash-text">ກຳລັງໂຫລດ...</p>
+    <!-- Splash Screen -->
+    <div class="splash-screen" id="splashScreen">
+        <div class="splash-logo">😊</div>
+        <div class="splash-text">ຂາຍແຕ່ຕຳ</div>
     </div>
 
-    <div class="container" id="main-container">
-        <div id="home-page">
-            <div class="app-icon">
-                😊
-            </div>
-            <h1>Ruby Food</h1>
-            <button class="button" id="start-ordering-button">ເລີ່ມສັ່ງອາຫານ</button>
-            <button class="button" id="admin-mode-button">ໂໝດແອັດມິ້ນ</button>
+    <div class="app-container">
+        <!-- Home Screen -->
+        <div class="home-screen" id="homeScreen">
+            <div class="app-logo">😊</div>
+            <h1 class="app-title">ຂາຍແຕ່ຕຳ</h1>
+            <button class="start-btn" onclick="startApp()">ເລີ່ມສັ່ງອາຫານ</button>
+            <button class="admin-btn" onclick="showAdminLogin()">ໂໝດແອັດມິ້ນ</button>
         </div>
 
-        <div id="admin-login-page">
-            <h2>ເຂົ້າສູ່ລະບົບແອັດມິ້ນ</h2>
-            <div class="input-group">
-                <label for="admin-username">ຊື່ຜູ້ໃຊ້:</label>
-                <input type="text" id="admin-username" placeholder="ຊື່ຜູ້ໃຊ້">
+        <!-- Main App -->
+        <div class="main-app" id="mainApp">
+            <div class="app-header">
+                <button class="back-btn" onclick="goHome()">← ກັບຫນ້າຫລັກ</button>
+                <h1>ຂາຍແຕ່ຕຳ</h1>
             </div>
-            <div class="input-group">
-                <label for="admin-password">ລະຫັດຜ່ານ:</label>
-                <input type="password" id="admin-password" placeholder="ລະຫັດຜ່ານ">
-            </div>
-            <button class="button" id="admin-login-button">ເຂົ້າສູ່ລະບົບ</button>
-            <button class="button" id="back-to-home-from-admin-login">ກັບຄືນ</button>
-        </div>
-
-        <div id="customer-page">
-            <div class="order-summary">
-                <h3>ລາຍການສັ່ງຊື້</h3>
-                <div id="cart-items">
-                    <p>ຍັງບໍ່ມີລາຍການໃນກະຕ່າ.</p>
+            
+            <div class="content-container">
+                <div class="sidebar">
+                    <button class="tab-btn active" onclick="showTab('food')">🍽️ ອາຫານ</button>
+                    <button class="tab-btn" onclick="showTab('drinks')">🥤 ເຄື່ອງດື່ມ</button>
                 </div>
-                <div class="order-total">
-                    <span>ລວມທັງໝົດ:</span>
-                    <span id="total-price">0 ກີບ</span>
+                
+                <div class="main-content" id="mainContent">
+                    <div class="menu-grid" id="menuGrid">
+                        <!-- Menu items will be populated by JavaScript -->
+                    </div>
                 </div>
-            </div>
-
-            <div class="customer-page-layout">
-                <div class="sidebar-tabs">
-                    <button class="tab-button active" data-tab="food">ອາຫານ</button>
-                    <button class="tab-button" data-tab="drinks">ເຄື່ອງດື່ມ</button>
-                </div>
-                <div class="main-content">
-                    <div id="food-menu" class="menu-content">
-                        </div>
-                    <div id="drinks-menu" class="menu-content" style="display: none;">
-                        </div>
-                </div>
-            </div>
-
-            <div class="checkout-button-container">
-                <button class="button checkout-button" id="checkout-button">ສັ່ງເລີຍ</button>
-                <button class="button" id="back-to-home-from-customer" style="background-color: #f44336;">ກັບຄືນໜ້າຫຼັກ</button>
             </div>
         </div>
 
-        <div id="admin-dashboard">
-            <h2>ແດດບອດແອັດມິ້ນ</h2>
+        <!-- Order Summary -->
+        <div class="order-summary" id="orderSummary">
+            <div class="order-header">
+                <h3>ລາຍການສັ່ງ</h3>
+                <button class="close-order" onclick="closeOrderSummary()">×</button>
+            </div>
+            <div id="orderItems"></div>
+            <div class="order-total" id="orderTotal">ລວມ: 0 ກີບ</div>
+            <button class="checkout-btn" onclick="checkout()">ສັ່ງອາຫານ</button>
+        </div>
 
+        <!-- Floating Order Button -->
+        <button class="floating-order-btn" onclick="showOrderSummary()" id="floatingOrderBtn" style="display: none;">
+            🛒
+            <span class="order-count" id="orderCount">0</span>
+        </button>
+
+        <!-- Admin Panel -->
+        <div class="admin-panel" id="adminPanel">
+            <div class="admin-header">
+                <h2>ແອັດມິ້ນ</h2>
+                <button class="back-btn" onclick="goHome()" style="position: absolute; top: 20px; left: 20px;">← ກັບຫນ້າຫລັກ</button>
+            </div>
+            
             <div class="admin-tabs">
-                <button class="admin-tab-button active" data-tab="pending-orders">ອໍເດີ້ທີ່ຍັງຄ້າງ</button>
-                <button class="admin-tab-button" data-tab="completed-orders">ອໍເດີ້ທີ່ສຳເລັດ</button>
-                <button class="admin-tab-button" data-tab="accounting">ຕົ້ນທຶນ ແລະ ສະຫຼຸບກຳໄລ-ຂາດທຶນ</button>
+                <button class="admin-tab active" onclick="showAdminTab('orders')">ອໍເດີເຂົ້າ</button>
+                <button class="admin-tab" onclick="showAdminTab('revenue')">ສະຫຼຸບລາຍຮັບ</button>
+                <button class="admin-tab" onclick="showAdminTab('analytics')">ວິເຄາະ</button>
+                <button class="admin-tab" onclick="showAdminTab('accounting')">ລາຍຈ່າຍ</button>
             </div>
-
-            <div class="filter-and-search-container">
-                <div class="date-filters">
-                    <div class="input-group">
-                        <label for="filter-day">ວັນທີ:</label>
-                        <select id="filter-day"></select>
-                    </div>
-                    <div class="input-group">
-                        <label for="filter-month">ເດືອນ:</label>
-                        <select id="filter-month"></select>
-                    </div>
-                    <div class="input-group">
-                        <label for="filter-year">ປີ:</label>
-                        <select id="filter-year"></select>
-                    </div>
-                </div>
-                <div class="search-group">
-                    <input type="text" id="admin-search-input" placeholder="ຄົ້ນຫາ (ເຊັ່ນ: ໂຕະ, ລາຍການ, ຕົ້ນທຶນ)">
-                    <button class="search-button" id="admin-search-button">ຄົ້ນຫາ</button>
-                </div>
-            </div>
-
-            <div id="admin-pending-tab" class="admin-tab-content active">
-                <div class="admin-card">
-                    <h3>
-                        <span>ອໍເດີ້ທີ່ຍັງຄ້າງ</span>
-                        <span class="count" id="pending-orders-count">0</span>
-                    </h3>
-                    <ul id="admin-order-list" class="order-list">
-                        <p>ຍັງບໍ່ມີອໍເດີ້.</p>
-                    </ul>
-                </div>
-            </div>
-
-            <div id="admin-completed-tab" class="admin-tab-content">
-                <div class="admin-card">
-                    <h3>
-                        <span>ອໍເດີ້ທີ່ສຳເລັດ</span>
-                        <span class="count" id="completed-orders-count">0</span>
-                    </h3>
-                    <ul id="admin-completed-order-list" class="order-list">
-                        <p>ຍັງບໍ່ມີອໍເດີ້ທີ່ສຳເລັດ.</p>
-                    </ul>
-                    <div class="admin-total-summary">
-                        <span>ລາຍຮັບລວມ:</span>
-                        <span id="total-revenue">0 ກີບ</span>
-                    </div>
-                </div>
-            </div>
-
-            <div id="admin-accounting-tab" class="admin-tab-content">
-                <div class="admin-card">
-                    <h3>ການຄຸ້ມຄອງຕົ້ນທຶນ</h3>
-                    <div class="accounting-form">
-                        <div class="input-group">
-                            <label for="cost-description">ລາຍລະອຽດຕົ້ນທຶນ:</label>
-                            <input type="text" id="cost-description" placeholder="ເຊັ່ນ: ຄ່າວັດຖຸດິບ, ຄ່າແຮງງານ">
-                        </div>
-                        <div class="input-group">
-                            <label for="cost-amount">ຈຳນວນຕົ້ນທຶນ (ກີບ):</label>
-                            <input type="number" id="cost-amount" min="0" value="0" placeholder="ຈຳນວນ">
-                        </div>
-                        <button class="button" id="add-cost-button">ເພີ່ມຕົ້ນທຶນ</button>
-                    </div>
-                    <h4>ລາຍການຕົ້ນທຶນ</h4>
-                    <ul id="cost-list">
-                        </ul>
-                    <div class="admin-total-summary">
-                        <span>ຕົ້ນທຶນລວມ:</span>
-                        <span id="total-cost">0 ກີບ</span>
-                    </div>
-                </div>
-
-                <div class="admin-card">
-                    <h3>ສະຫຼຸບກຳໄລ-ຂາດທຶນ</h3>
-                    <div class="admin-total-summary" style="font-size: 1.3em;">
-                        <span>ກຳໄລສຸດທິ:</span>
-                        <span id="net-profit" style="color: var(--primary-color);">0 ກີບ</span>
-                    </div>
-                    <p style="text-align: center; font-size: 0.9em; color: #888; margin-top: 20px;">
-                        (ກຳໄລສຸດທິ = ລາຍຮັບລວມ - ຕົ້ນທຶນລວມ)
-                    </p>
-                </div>
-            </div>
-
-            <button class="button" id="back-to-home-from-admin-dashboard" style="background-color: #f44336; margin-top: 20px;">ກັບຄືນໜ້າຫຼັກ</button>
-        </div>
-    </div>
-
-    <div id="table-number-popup" class="popup-overlay">
-        <div class="popup-content">
-            <h3>ກະລຸນາໃສ່ໝາຍເລກໂຕະ</h3>
-            <div class="input-group">
-                <label for="table-number-input">ໝາຍເລກໂຕະ:</label>
-                <input type="text" id="table-number-input" placeholder="ຕົວຢ່າງ: 01" maxlength="2">
-            </div>
-            <button class="button" id="confirm-table-number">ຢືນຢັນ</button>
-        </div>
-    </div>
-
-    <div id="order-review-popup" class="popup-overlay">
-        <div class="popup-content">
-            <h3>ກວດສອບລາຍການສັ່ງຊື້</h3>
-            <p>ໝາຍເລກໂຕະ: <strong id="review-popup-table-number"></strong></p>
-            <ul id="order-review-items">
-                </ul>
-            <div class="order-review-total">
-                <span>ລວມທັງໝົດ:</span>
-                <span id="review-popup-total-price">0 ກີບ</span>
-            </div>
-            <div class="order-review-buttons">
-                <button class="button" id="confirm-order-button">ຢືນຢັນ</button>
-                <button class="button" id="cancel-order-review-button" style="background-color: #f44336;">ຍົກເລີກ</button>
+            
+            <div class="admin-content" id="adminContent">
+                <!-- Admin content will be populated by JavaScript -->
             </div>
         </div>
     </div>
 
-    <div id="order-confirmation-popup" class="popup-overlay">
-        <div class="popup-content">
-            <h3>ສັ່ງອາຫານສຳເລັດ!</h3>
-            <p>ໝາຍເລກໂຕະຂອງທ່ານ: <strong id="confirmed-table-number"></strong></p>
-            <p>ຍອດລວມທັງໝົດ: <strong id="confirmed-total-price"></strong></p>
-            <button class="button" id="close-confirmation-popup">ຕົກລົງ</button>
+    <!-- Modals -->
+    <div class="modal" id="tableModal">
+        <div class="modal-content">
+            <h3>ລະບູເລກໂຕ໊ະ</h3>
+            <input type="number" id="tableNumber" placeholder="ໃສ່ເລກໂຕ໊ະ" min="1">
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="closeModal()">ຍົກເລີກ</button>
+                <button class="modal-btn primary" onclick="confirmTable()">ຢືນຢັນ</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <h3>ຢືນຢັນການສັ່ງອາຫານ</h3>
+            <div id="confirmOrderDetails"></div>
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="closeModal()">ຍົກເລີກ</button>
+                <button class="modal-btn primary" onclick="finalizeOrder()">ຢືນຢັນສັ່ງ</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="adminLoginModal">
+        <div class="modal-content">
+            <h3>ເຂົ້າສູ່ລະບົບແອັດມິ້ນ</h3>
+            <input type="text" id="adminUser" placeholder="ຊື່ຜູ້ໃຊ້">
+            <input type="password" id="adminPass" placeholder="ລະຫັດຜ່ານ">
+            <div class="modal-buttons">
+                <button class="modal-btn secondary" onclick="closeModal()">ຍົກເລີກ</button>
+                <button class="modal-btn primary" onclick="adminLogin()">ເຂົ້າສູ່ລະບົບ</button>
+            </div>
         </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const splashScreen = document.getElementById('splash-screen');
-            const mainContainer = document.getElementById('main-container');
-            const homePage = document.getElementById('home-page');
-            const customerPage = document.getElementById('customer-page');
-            const adminLoginPage = document.getElementById('admin-login-page');
-            const adminDashboard = document.getElementById('admin-dashboard');
+        // Menu data
+        const menuData = {
+            food: [
+                { id: 1, name: 'ຕຳໝີ່ຂາວ', price: 30000 },
+                { id: 2, name: 'ຕຳໝີ່ໄວໆ', price: 30000 },
+                { id: 3, name: 'ຕຳຕ່ອນ', price: 50000 },
+                { id: 4, name: 'ຕຳເຂົ້າປຸ້ນ / ຕຳໝາກຮຸ່ງ', price: 25000 },
+                { id: 5, name: 'ຕົ້ມເລືອດ', price: 30000 },
+                { id: 6, name: 'ລາບງົວ', price: 50000 },
+                { id: 7, name: 'ເຂົ້າໜຽວ', price: 15000 }
+            ],
+            drinks: [
+                { id: 8, name: 'ນ້ຳດື່ມນ້ອຍ', price: 8000 },
+                { id: 9, name: 'ນ້ຳດື່ມໃຫຍ່', price: 10000 },
+                { id: 10, name: 'ແປບຊີ່', price: 15000 }
+            ]
+        };
 
-            const startOrderingButton = document.getElementById('start-ordering-button');
-            const adminModeButton = document.getElementById('admin-mode-button');
-            const adminLoginButton = document.getElementById('admin-login-button');
-            const backToHomeFromAdminLogin = document.getElementById('back-to-home-from-admin-login');
-            const backToHomeFromCustomer = document.getElementById('back-to-home-from-customer');
-            const backToHomeFromAdminDashboard = document.getElementById('back-to-home-from-admin-dashboard');
+        // Global variables
+        let currentTab = 'food';
+        let cart = {};
+        let orders = [];
+        let tableOrders = {};
+        let currentTableNumber = null;
+        let totalRevenue = 0;
+        let expenses = [];
+        let menuStats = {};
 
-            const tableNumberPopup = document.getElementById('table-number-popup');
-            const tableNumberInput = document.getElementById('table-number-input');
-            const confirmTableNumberButton = document.getElementById('confirm-table-number');
-
-            // NEW: Order Review Popup elements
-            const orderReviewPopup = document.getElementById('order-review-popup');
-            const reviewPopupTableNumber = document.getElementById('review-popup-table-number');
-            const orderReviewItemsUl = document.getElementById('order-review-items');
-            const reviewPopupTotalPrice = document.getElementById('review-popup-total-price');
-            const confirmOrderButton = document.getElementById('confirm-order-button'); // This is the new "ຢືນຢັນ" button
-            const cancelOrderReviewButton = document.getElementById('cancel-order-review-button');
-
-            const orderConfirmationPopup = document.getElementById('order-confirmation-popup');
-            const confirmedTableNumberSpan = document.getElementById('confirmed-table-number');
-            const confirmedTotalPriceSpan = document.getElementById('confirmed-total-price');
-            const closeConfirmationPopupButton = document.getElementById('close-confirmation-popup');
-
-            const foodMenuDiv = document.getElementById('food-menu');
-            const drinksMenuDiv = document.getElementById('drinks-menu');
-            const cartItemsDiv = document.getElementById('cart-items');
-            const totalPriceSpan = document.getElementById('total-price');
-            const checkoutButton = document.getElementById('checkout-button');
-            const tabButtons = document.querySelectorAll('.tab-button'); // Customer page tabs
-
-            const adminUsernameInput = document.getElementById('admin-username');
-            const adminPasswordInput = document.getElementById('admin-password');
-
-            // Admin Dashboard Tab elements
-            const adminTabButtons = document.querySelectorAll('.admin-tab-button');
-            const adminPendingTab = document.getElementById('admin-pending-tab');
-            const adminCompletedTab = document.getElementById('admin-completed-tab');
-            const adminAccountingTab = document.getElementById('admin-accounting-tab');
-
-            // Admin Dashboard filter and search elements
-            const filterDaySelect = document.getElementById('filter-day');
-            const filterMonthSelect = document.getElementById('filter-month');
-            const filterYearSelect = document.getElementById('filter-year');
-            const adminSearchInput = document.getElementById('admin-search-input');
-            const adminSearchButton = document.getElementById('admin-search-button');
-
-            // Admin Dashboard list elements
-            const adminOrderList = document.getElementById('admin-order-list');
-            const adminCompletedOrderList = document.getElementById('admin-completed-order-list');
-            const pendingOrdersCountSpan = document.getElementById('pending-orders-count');
-            const completedOrdersCountSpan = document.getElementById('completed-orders-count');
-            const totalRevenueSpan = document.getElementById('total-revenue');
-            const totalCostSpan = document.getElementById('total-cost');
-            const netProfitSpan = document.getElementById('net-profit');
-
-            // Accounting elements
-            const costDescriptionInput = document.getElementById('cost-description');
-            const costAmountInput = document.getElementById('cost-amount');
-            const addCostButton = document.getElementById('add-cost-button');
-            const costListUl = document.getElementById('cost-list');
-
-            // --- Data Storage (using LocalStorage for persistence) ---
-            let cart = JSON.parse(localStorage.getItem('cart')) || [];
-            let orders = JSON.parse(localStorage.getItem('orders')) || []; // Stores pending orders
-            let completedOrders = JSON.parse(localStorage.getItem('completedOrders')) || []; // Stores completed orders for revenue calculation
-            let costs = JSON.parse(localStorage.getItem('costs')) || [];
-
-            let currentTableNumber = '';
-            // MODIFIED: Admin Username and Password
-            const ADMIN_USERNAME = 'panda'; 
-            const ADMIN_PASSWORD = '123'; 
-
-            // --- Menu Data ---
-            const menuItems = {
-                food: [
-                    { id: 'f1', name: 'ເຂົ້າປຽກ', price: 25000, isFavorite: false },
-                    { id: 'f2', name: 'ເຝີ', price: 20000, isFavorite: false },
-                    { id: 'f3', name: 'ເຂົ້າຜັດ', price: 22000, isFavorite: false },
-                    { id: 'f4', name: 'ຕຳໝາກຫຸ່ງ', price: 18000, isFavorite: false },
-                    { id: 'f5', name: 'ລາບປາ', price: 30000, isFavorite: false },
-                    { id: 'f6', name: 'ໝີ່ກອບ', price: 28000, isFavorite: false }
-                ],
-                drinks: [
-                    { id: 'd1', name: 'ນ້ຳອັດລົມ', price: 10000, isFavorite: false },
-                    { id: 'd2', name: 'ນ້ຳໝາກໄມ້', price: 15000, isFavorite: false },
-                    { id: 'd3', name: 'ກາເຟເຢັນ', price: 12000, isFavorite: false },
-                    { id: 'd4', name: 'ຊາເຢັນ', price: 10000, isFavorite: false },
-                    // NEW: Add more drink items here
-                    { id: 'd5', name: 'ນ້ຳດື່ມ', price: 5000, isFavorite: false },
-                    { id: 'd6', name: 'ໂຄກ', price: 8000, isFavorite: false }
-                ]
-            };
-
-            // --- Helper Functions ---
-
-            // Function to generate unique IDs for orders
-            function generateUniqueId() {
-                return Date.now().toString(36) + Math.random().toString(36).substr(2, 5);
-            }
-
-            function saveCart() {
-                localStorage.setItem('cart', JSON.stringify(cart));
-            }
-
-            function saveOrders() {
-                localStorage.setItem('orders', JSON.stringify(orders));
-            }
-
-            function saveCompletedOrders() {
-                localStorage.setItem('completedOrders', JSON.stringify(completedOrders));
-            }
-
-            function saveCosts() {
-                localStorage.setItem('costs', JSON.stringify(costs));
-            }
-
-            function formatCurrency(amount) {
-                return amount.toLocaleString('lo-LA') + ' ກີບ';
-            }
-
-            function showPopup(popupElement) {
-                popupElement.classList.add('active');
-            }
-
-            function hidePopup(popupElement) {
-                popupElement.classList.remove('active');
-            }
-
-            function showPage(pageId) {
-                const pages = [homePage, customerPage, adminLoginPage, adminDashboard];
-                pages.forEach(page => {
-                    if (page.id === pageId) {
-                        page.style.display = 'flex';
-                        page.classList.add('fadeInScale');
-                    } else {
-                        page.style.display = 'none';
-                        page.classList.remove('fadeInScale');
-                    }
-                });
-
-                if (pageId === 'admin-dashboard') {
-                    // Re-render admin dashboard content when shown
-                    renderAdminDashboardContent();
-                    populateDateFilters();
-                    setActiveAdminTab('pending-orders'); // Default to pending orders tab
-                } else if (pageId === 'customer-page') {
-                    renderCart();
-                    populateMenu('food'); // Default to food menu
-                    setActiveCustomerTab('food');
-                }
-            }
-
-            function setActiveCustomerTab(tabName) {
-                tabButtons.forEach(button => {
-                    if (button.dataset.tab === tabName) {
-                        button.classList.add('active');
-                    } else {
-                        button.classList.remove('active');
-                    }
-                });
-                document.querySelectorAll('.menu-content').forEach(content => {
-                    if (content.id === `${tabName}-menu`) {
-                        content.style.display = 'flex';
-                    } else {
-                        content.style.display = 'none';
-                    }
-                });
-            }
-
-            function setActiveAdminTab(tabName) {
-                adminTabButtons.forEach(button => {
-                    if (button.dataset.tab === tabName) {
-                        button.classList.add('active');
-                    } else {
-                        button.classList.remove('active');
-                    }
-                });
-
-                const adminTabContents = [adminPendingTab, adminCompletedTab, adminAccountingTab];
-                adminTabContents.forEach(content => {
-                    if (content.id === `admin-${tabName}-tab`) {
-                        content.classList.add('active');
-                    } else {
-                        content.classList.remove('active');
-                    }
-                });
-                renderAdminDashboardContent(); // Re-render content when tab changes
-            }
-
-            // --- Menu Rendering (Customer Page) ---
-            function populateMenu(category) {
-                const menuDiv = category === 'food' ? foodMenuDiv : drinksMenuDiv;
-                menuDiv.innerHTML = ''; // Clear previous items
-
-                menuItems[category].forEach(item => {
-                    const card = document.createElement('div');
-                    card.classList.add('menu-item-card');
-                    card.innerHTML = `
-                        <h3>${item.name}</h3>
-                        <p class="price">${formatCurrency(item.price)}</p>
-                        <div class="add-to-cart-controls">
-                            <button class="add-to-cart-button" data-id="${item.id}" data-name="${item.name}" data-price="${item.price}">
-                                ເພີ່ມໃສ່ກະຕ່າ
-                            </button>
-                        </div>
-                    `;
-                    menuDiv.appendChild(card);
-                });
-
-                // Add event listeners for "Add to Cart" buttons
-                menuDiv.querySelectorAll('.add-to-cart-button').forEach(button => {
-                    button.addEventListener('click', (event) => {
-                        const id = event.target.dataset.id;
-                        const name = event.target.dataset.name;
-                        const price = parseFloat(event.target.dataset.price);
-                        addToCart({ id, name, price });
-                    });
-                });
-            }
-
-            // --- Cart Management (Customer Page) ---
-            function addToCart(item) {
-                const existingItem = cart.find(cartItem => cartItem.id === item.id);
-                if (existingItem) {
-                    existingItem.quantity++;
-                } else {
-                    cart.push({ ...item, quantity: 1 });
-                }
-                saveCart();
-                renderCart();
-            }
-
-            function removeFromCart(itemId) {
-                cart = cart.filter(item => item.id !== itemId);
-                saveCart();
-                renderCart();
-            }
-
-            function updateCartQuantity(itemId, change) {
-                const item = cart.find(cartItem => cartItem.id === itemId);
-                if (item) {
-                    item.quantity += change;
-                    if (item.quantity <= 0) {
-                        removeFromCart(itemId);
-                    } else {
-                        saveCart();
-                        renderCart();
-                    }
-                }
-            }
-
-            function renderCart() {
-                cartItemsDiv.innerHTML = '';
-                if (cart.length === 0) {
-                    cartItemsDiv.innerHTML = '<p>ຍັງບໍ່ມີລາຍການໃນກະຕ່າ.</p>';
-                    checkoutButton.disabled = true;
-                } else {
-                    let fragment = document.createDocumentFragment();
-                    cart.forEach(item => {
-                        const itemElement = document.createElement('div');
-                        itemElement.classList.add('cart-item');
-                        itemElement.innerHTML = `
-                            <span>${item.name} x ${item.quantity}</span>
-                            <span>${formatCurrency(item.price * item.quantity)}</span>
-                            <div class="cart-item-actions" style="display: flex; gap: 5px; margin-left: 10px;">
-                                <button class="button small-button" data-id="${item.id}" data-action="decrease" style="padding: 5px 10px; font-size: 0.8em; background-color: #f44336;">-</button>
-                                <button class="button small-button" data-id="${item.id}" data-action="increase" style="padding: 5px 10px; font-size: 0.8em;">+</button>
-                            </div>
-                        `;
-                        fragment.appendChild(itemElement);
-                    });
-                    cartItemsDiv.appendChild(fragment);
-                    checkoutButton.disabled = false;
-                }
-                updateTotalPrice();
-
-                cartItemsDiv.querySelectorAll('.small-button').forEach(button => {
-                    button.addEventListener('click', (event) => {
-                        const itemId = event.target.dataset.id;
-                        const action = event.target.dataset.action;
-                        if (action === 'decrease') {
-                            updateCartQuantity(itemId, -1);
-                        } else if (action === 'increase') {
-                            updateCartQuantity(itemId, 1);
-                        }
-                    });
-                });
-            }
-
-            function updateTotalPrice() {
-                const total = cart.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-                totalPriceSpan.textContent = formatCurrency(total);
-            }
-
-            function clearCart() {
-                cart = [];
-                saveCart();
-                renderCart();
-            }
-
-            // --- Admin Dashboard Functions ---
-            function renderAdminDashboardContent() {
-                const currentActiveTab = document.querySelector('.admin-tab-button.active').dataset.tab;
-                let filteredOrders = [];
-                let filteredCosts = [];
-
-                const filters = {
-                    day: filterDaySelect.value,
-                    month: filterMonthSelect.value,
-                    year: filterYearSelect.value,
-                    search: adminSearchInput.value.toLowerCase()
-                };
-
-                const isDateMatch = (timestamp, filters) => {
-                    const date = new Date(timestamp);
-                    const dayMatch = filters.day === 'all' || date.getDate().toString() === filters.day;
-                    const monthMatch = filters.month === 'all' || (date.getMonth() + 1).toString() === filters.month;
-                    const yearMatch = filters.year === 'all' || date.getFullYear().toString() === filters.year;
-                    return dayMatch && monthMatch && yearMatch;
-                };
-
-                // Render Pending Orders
-                if (currentActiveTab === 'pending-orders') {
-                    filteredOrders = orders.filter(order =>
-                        order.status === 'pending' &&
-                        isDateMatch(order.timestamp, filters) &&
-                        (filters.search === '' ||
-                         order.tableNumber.toLowerCase().includes(filters.search) ||
-                         order.items.some(item => item.name.toLowerCase().includes(filters.search)))
-                    );
-
-                    adminOrderList.innerHTML = '';
-                    if (filteredOrders.length === 0) {
-                        adminOrderList.innerHTML = '<p>ຍັງບໍ່ມີອໍເດີ້ທີ່ຍັງຄ້າງ.</p>';
-                    } else {
-                        filteredOrders.forEach(order => {
-                            const orderElement = document.createElement('li');
-                            orderElement.classList.add('order-item-admin');
-                            orderElement.innerHTML = `
-                                <div class="order-details">
-                                    <span><strong>ໂຕະ:</strong> ${order.tableNumber}</span>
-                                    <span><strong>ວັນທີ:</strong> ${new Date(order.timestamp).toLocaleString('lo-LA')}</span>
-                                    <span><strong>ລວມ:</strong> ${formatCurrency(order.total)}</span>
-                                </div>
-                                <h4>ລາຍການ:</h4>
-                                <ul class="order-items-list">
-                                    ${order.items.map(item => `<li>${item.name} x ${item.quantity} (${formatCurrency(item.price * item.quantity)})</li>`).join('')}
-                                </ul>
-                                <div class="order-actions">
-                                    <button class="action-button success-button" data-id="${order.id}" data-action="complete">ສຳເລັດ</button>
-                                </div>
-                            `;
-                            adminOrderList.appendChild(orderElement);
-                        });
-                    }
-                    pendingOrdersCountSpan.textContent = filteredOrders.length;
-                }
-                // Render Completed Orders
-                else if (currentActiveTab === 'completed-orders') {
-                    filteredOrders = completedOrders.filter(order =>
-                        isDateMatch(order.timestamp, filters) &&
-                        (filters.search === '' ||
-                         order.tableNumber.toLowerCase().includes(filters.search) ||
-                         order.items.some(item => item.name.toLowerCase().includes(filters.search)))
-                    );
-
-                    adminCompletedOrderList.innerHTML = '';
-                    if (filteredOrders.length === 0) {
-                        adminCompletedOrderList.innerHTML = '<p>ຍັງບໍ່ມີອໍເດີ້ທີ່ສຳເລັດ.</p>';
-                    } else {
-                        filteredOrders.forEach(order => {
-                            const orderElement = document.createElement('li');
-                            orderElement.classList.add('order-item-admin');
-                            orderElement.innerHTML = `
-                                <div class="order-details">
-                                    <span><strong>ໂຕະ:</strong> ${order.tableNumber}</span>
-                                    <span><strong>ວັນທີ:</strong> ${new Date(order.timestamp).toLocaleString('lo-LA')}</span>
-                                    <span><strong>ລວມ:</strong> ${formatCurrency(order.total)}</span>
-                                </div>
-                                <h4>ລາຍການ:</h4>
-                                <ul class="order-items-list">
-                                    ${order.items.map(item => `<li>${item.name} x ${item.quantity} (${formatCurrency(item.price * item.quantity)})</li>`).join('')}
-                                </ul>
-                                <div class="order-actions">
-                                    <button class="action-button clear-button" data-id="${order.id}" data-action="clear">ລຶບ</button>
-                                </div>
-                            `;
-                            adminCompletedOrderList.appendChild(orderElement);
-                        });
-                    }
-                    completedOrdersCountSpan.textContent = filteredOrders.length;
-
-                    // Calculate and display total revenue for completed orders
-                    const totalRevenue = filteredOrders.reduce((sum, order) => sum + order.total, 0);
-                    totalRevenueSpan.textContent = formatCurrency(totalRevenue);
-                }
-                // Render Accounting Tab
-                else if (currentActiveTab === 'accounting') {
-                    filteredCosts = costs.filter(cost =>
-                        isDateMatch(cost.timestamp, filters) &&
-                        (filters.search === '' || cost.description.toLowerCase().includes(filters.search))
-                    );
-
-                    costListUl.innerHTML = '';
-                    if (filteredCosts.length === 0) {
-                        costListUl.innerHTML = '<p>ຍັງບໍ່ມີລາຍການຕົ້ນທຶນ.</p>';
-                    } else {
-                        filteredCosts.forEach(cost => {
-                            const costItem = document.createElement('li');
-                            costItem.innerHTML = `
-                                <span>${cost.description} (${new Date(cost.timestamp).toLocaleDateString('lo-LA')})</span>
-                                <span>${formatCurrency(cost.amount)} <button class="remove-cost-btn" data-id="${cost.id}">ລຶບ</button></span>
-                            `;
-                            costListUl.appendChild(costItem);
-                        });
-                    }
-
-                    // Calculate and display total cost and net profit
-                    const totalCost = filteredCosts.reduce((sum, cost) => sum + cost.amount, 0);
-                    totalCostSpan.textContent = formatCurrency(totalCost);
-
-                    const currentRevenue = completedOrders
-                        .filter(order => isDateMatch(order.timestamp, filters))
-                        .reduce((sum, order) => sum + order.total, 0);
-                    
-                    const netProfit = currentRevenue - totalCost;
-                    netProfitSpan.textContent = formatCurrency(netProfit);
-                    netProfitSpan.style.color = netProfit >= 0 ? 'var(--primary-color)' : '#f44336'; // Green for profit, Red for loss
-                }
-
-                // Attach event listeners for admin actions
-                adminOrderList.querySelectorAll('.action-button[data-action="complete"]').forEach(button => {
-                    button.addEventListener('click', (event) => {
-                        const orderId = event.target.dataset.id;
-                        completeOrder(orderId);
-                    });
-                });
-
-                adminCompletedOrderList.querySelectorAll('.action-button[data-action="clear"]').forEach(button => {
-                    button.addEventListener('click', (event) => {
-                        const orderId = event.target.dataset.id;
-                        clearCompletedOrder(orderId);
-                    });
-                });
-
-                costListUl.querySelectorAll('.remove-cost-btn').forEach(button => {
-                    button.addEventListener('click', (event) => {
-                        const costId = event.target.dataset.id;
-                        removeCost(costId);
-                    });
-                });
-            }
-
-            function completeOrder(orderId) {
-                const index = orders.findIndex(order => order.id === orderId);
-                if (index > -1) {
-                    const [completedOrder] = orders.splice(index, 1);
-                    completedOrder.status = 'completed';
-                    completedOrders.push(completedOrder);
-                    saveOrders();
-                    saveCompletedOrders();
-                    renderAdminDashboardContent(); // Re-render to update lists
-                }
-            }
-
-            function clearCompletedOrder(orderId) {
-                completedOrders = completedOrders.filter(order => order.id !== orderId);
-                saveCompletedOrders();
-                renderAdminDashboardContent();
-            }
-
-            function addCost() {
-                const description = costDescriptionInput.value.trim();
-                const amount = parseFloat(costAmountInput.value);
-
-                if (description && amount > 0) {
-                    const newCost = {
-                        id: generateUniqueId(),
-                        description,
-                        amount,
-                        timestamp: new Date().toISOString()
-                    };
-                    costs.push(newCost);
-                    saveCosts();
-                    costDescriptionInput.value = '';
-                    costAmountInput.value = '0';
-                    renderAdminDashboardContent(); // Re-render accounting tab
-                } else {
-                    alert('ກະລຸນາໃສ່ລາຍລະອຽດ ແລະ ຈຳນວນຕົ້ນທຶນທີ່ຖືກຕ້ອງ.');
-                }
-            }
-
-            function removeCost(costId) {
-                costs = costs.filter(cost => cost.id !== costId);
-                saveCosts();
-                renderAdminDashboardContent();
-            }
-
-
-            // --- Date Filtering (Admin Dashboard) ---
-            function populateDateFilters() {
-                const currentYear = new Date().getFullYear();
-                const years = Array.from({ length: 5 }, (_, i) => currentYear - i); // Current year and past 4 years
-                const months = Array.from({ length: 12 }, (_, i) => (i + 1).toString().padStart(2, '0'));
-                const days = Array.from({ length: 31 }, (_, i) => (i + 1).toString().padStart(2, '0'));
-
-                function populateSelect(selectElement, options, includeAll = true) {
-                    selectElement.innerHTML = '';
-                    if (includeAll) {
-                        const allOption = document.createElement('option');
-                        allOption.value = 'all';
-                        allOption.textContent = 'ທັງໝົດ';
-                        selectElement.appendChild(allOption);
-                    }
-                    options.forEach(optionValue => {
-                        const option = document.createElement('option');
-                        option.value = optionValue;
-                        option.textContent = optionValue;
-                        selectElement.appendChild(option);
-                    });
-                }
-
-                populateSelect(filterDaySelect, days);
-                populateSelect(filterMonthSelect, months);
-                populateSelect(filterYearSelect, years);
-            }
-
-            // --- Event Listeners ---
-
-            // Splash screen fades out
+        // Initialize app
+        document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
-                splashScreen.style.opacity = 0;
-                splashScreen.style.visibility = 'hidden';
-                mainContainer.style.opacity = 1;
-                mainContainer.style.transform = 'translateY(0)';
-                showPage('home-page');
-            }, 2000); // 2 second splash
-
-            // Home Page buttons
-            startOrderingButton.addEventListener('click', () => {
-                showPopup(tableNumberPopup);
-                tableNumberInput.value = ''; // Clear previous input
-                tableNumberInput.focus();
-            });
-
-            adminModeButton.addEventListener('click', () => {
-                showPage('admin-login-page');
-            });
-
-            // Admin Login Page
-            adminLoginButton.addEventListener('click', () => {
-                const username = adminUsernameInput.value;
-                const password = adminPasswordInput.value;
-
-                if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
-                    showPage('admin-dashboard');
-                    adminUsernameInput.value = ''; // Clear fields
-                    adminPasswordInput.value = '';
-                } else {
-                    alert('ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ!');
-                }
-            });
-
-            backToHomeFromAdminLogin.addEventListener('click', () => {
-                showPage('home-page');
-            });
-
-            // Table Number Popup
-            confirmTableNumberButton.addEventListener('click', () => {
-                const tableNum = tableNumberInput.value.trim();
-                if (tableNum) {
-                    currentTableNumber = tableNum;
-                    hidePopup(tableNumberPopup);
-                    showPage('customer-page');
-                } else {
-                    alert('ກະລຸນາໃສ່ໝາຍເລກໂຕະ.');
-                }
-            });
-
-            // Customer Page buttons
-            backToHomeFromCustomer.addEventListener('click', () => {
-                clearCart(); // Clear cart when returning to home from customer page
-                showPage('home-page');
-            });
-
-            tabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    setActiveCustomerTab(button.dataset.tab);
-                });
-            });
-
-            checkoutButton.addEventListener('click', () => {
-                if (cart.length > 0) {
-                    // Populate order review popup
-                    reviewPopupTableNumber.textContent = currentTableNumber;
-                    orderReviewItemsUl.innerHTML = '';
-                    let reviewTotal = 0;
-                    cart.forEach(item => {
-                        const li = document.createElement('li');
-                        li.innerHTML = `
-                            <span class="item-name">${item.name}</span>
-                            <span class="item-qty">x${item.quantity}</span>
-                            <span class="item-subtotal">${formatCurrency(item.price * item.quantity)}</span>
-                        `;
-                        orderReviewItemsUl.appendChild(li);
-                        reviewTotal += (item.price * item.quantity);
-                    });
-                    reviewPopupTotalPrice.textContent = formatCurrency(reviewTotal);
-                    showPopup(orderReviewPopup);
-                } else {
-                    alert('ກະລຸນາເພີ່ມລາຍການໃສ່ກະຕ່າກ່ອນ!');
-                }
-            });
-
-            confirmOrderButton.addEventListener('click', () => {
-                // Save order to the 'orders' array (pending orders)
-                const newOrder = {
-                    id: generateUniqueId(),
-                    tableNumber: currentTableNumber,
-                    items: [...cart], // Copy cart items
-                    total: cart.reduce((sum, item) => sum + (item.price * item.quantity), 0),
-                    timestamp: new Date().toISOString(), // Store as ISO string
-                    status: 'pending'
-                };
-                orders.push(newOrder);
-                saveOrders(); // Save to local storage
-
-                // Display confirmation
-                confirmedTableNumberSpan.textContent = currentTableNumber;
-                confirmedTotalPriceSpan.textContent = formatCurrency(newOrder.total);
-                hidePopup(orderReviewPopup);
-                showPopup(orderConfirmationPopup);
-
-                clearCart(); // Clear the cart after order is placed
-            });
-
-            cancelOrderReviewButton.addEventListener('click', () => {
-                hidePopup(orderReviewPopup);
-            });
-
-            closeConfirmationPopupButton.addEventListener('click', () => {
-                hidePopup(orderConfirmationPopup);
-                showPage('home-page'); // Go back to home page after confirmation
-            });
-
-            // Admin Dashboard
-            backToHomeFromAdminDashboard.addEventListener('click', () => {
-                showPage('home-page');
-            });
-
-            adminTabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    setActiveAdminTab(button.dataset.tab);
-                });
-            });
-
-            // Admin Filters and Search
-            filterDaySelect.addEventListener('change', renderAdminDashboardContent);
-            filterMonthSelect.addEventListener('change', renderAdminDashboardContent);
-            filterYearSelect.addEventListener('change', renderAdminDashboardContent);
-            adminSearchButton.addEventListener('click', renderAdminDashboardContent);
-            adminSearchInput.addEventListener('keyup', (event) => {
-                if (event.key === 'Enter') {
-                    renderAdminDashboardContent();
-                }
-            });
-
-            // Accounting
-            addCostButton.addEventListener('click', addCost);
-            costAmountInput.addEventListener('keyup', (event) => {
-                if (event.key === 'Enter') {
-                    addCost();
-                }
-            });
-
-            // Initial Data Load & Render (after splash screen)
-            // No initial renderAdminDashboardContent() or populateDateFilters() call here.
-            // They will be called when admin dashboard is first shown via showPage('admin-dashboard')
-            // which also calls populateDateFilters() and setActiveAdminTab().
+                document.getElementById('splashScreen').style.display = 'none';
+            }, 3000);
+            
+            loadMenuItems();
+            startAdminAutoRefresh();
         });
+
+        // Navigation functions
+        function startApp() {
+            document.getElementById('homeScreen').style.display = 'none';
+            document.getElementById('mainApp').style.display = 'block';
+            loadMenuItems();
+        }
+
+        function goHome() {
+            document.getElementById('homeScreen').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'none';
+            closeOrderSummary();
+        }
+
+        function showTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            loadMenuItems();
+        }
+
+        function loadMenuItems() {
+            const menuGrid = document.getElementById('menuGrid');
+            menuGrid.innerHTML = '';
+            
+            const items = menuData[currentTab];
+            items.forEach(item => {
+                const menuItem = document.createElement('div');
+                menuItem.className = 'menu-item';
+                menuItem.innerHTML = `
+                    <h3>${item.name}</h3>
+                    <div class="price">${item.price.toLocaleString()} ກີບ</div>
+                    <div class="quantity-controls">
+                        <button class="qty-btn" onclick="changeQuantity(${item.id}, -1)">-</button>
+                        <span class="qty-display" id="qty-${item.id}">${cart[item.id] || 0}</span>
+                        <button class="qty-btn" onclick="changeQuantity(${item.id}, 1)">+</button>
+                    </div>
+                `;
+                menuGrid.appendChild(menuItem);
+            });
+        }
+
+        function changeQuantity(itemId, change) {
+            if (!cart[itemId]) cart[itemId] = 0;
+            cart[itemId] += change;
+            
+            if (cart[itemId] < 0) cart[itemId] = 0;
+            if (cart[itemId] === 0) delete cart[itemId];
+            
+            document.getElementById(`qty-${itemId}`).textContent = cart[itemId] || 0;
+            updateFloatingButton();
+            updateOrderSummary();
+        }
+
+        function updateFloatingButton() {
+            const totalItems = Object.values(cart).reduce((sum, qty) => sum + qty, 0);
+            const floatingBtn = document.getElementById('floatingOrderBtn');
+            const orderCount = document.getElementById('orderCount');
+            
+            if (totalItems > 0) {
+                floatingBtn.style.display = 'block';
+                orderCount.textContent = totalItems;
+            } else {
+                floatingBtn.style.display = 'none';
+            }
+        }
+
+        function showOrderSummary() {
+            document.getElementById('orderSummary').classList.add('show');
+            updateOrderSummary();
+        }
+
+        function closeOrderSummary() {
+            document.getElementById('orderSummary').classList.remove('show');
+        }
+
+        function updateOrderSummary() {
+            const orderItems = document.getElementById('orderItems');
+            const orderTotal = document.getElementById('orderTotal');
+            
+            orderItems.innerHTML = '';
+            let total = 0;
+            
+            Object.keys(cart).forEach(itemId => {
+                const item = findItemById(parseInt(itemId));
+                if (item && cart[itemId] > 0) {
+                    const itemTotal = item.price * cart[itemId];
+                    total += itemTotal;
+                    
+                    const orderItem = document.createElement('div');
+                    orderItem.className = 'order-item';
+                    orderItem.innerHTML = `
+                        <div>
+                            <strong>${item.name}</strong><br>
+                            ${item.price.toLocaleString()} ກີບ × ${cart[itemId]}
+                        </div>
+                        <div>${itemTotal.toLocaleString()} ກີບ</div>
+                    `;
+                    orderItems.appendChild(orderItem);
+                }
+            });
+            
+            orderTotal.textContent = `ລວມ: ${total.toLocaleString()} ກີບ`;
+        }
+
+        function findItemById(id) {
+            return [...menuData.food, ...menuData.drinks].find(item => item.id === id);
+        }
+
+        function checkout() {
+            if (Object.keys(cart).length === 0) {
+                alert('ກະລຸນາເລືອກອາຫານກ່ອນ');
+                return;
+            }
+            
+            document.getElementById('tableModal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.querySelectorAll('.modal').forEach(modal => {
+                modal.style.display = 'none';
+            });
+        }
+
+        function confirmTable() {
+            const tableNumber = document.getElementById('tableNumber').value;
+            if (!tableNumber || tableNumber < 1) {
+                alert('ກະລຸນາໃສ່ເລກໂຕ໊ະ');
+                return;
+            }
+            
+            // Check if table is already occupied
+            if (tableOrders[tableNumber] && tableOrders[tableNumber].status === 'ລໍຖ້າ') {
+                alert('ໂຕ໊ະນີ້ຍັງມີອໍເດີທີ່ລໍຖ້າຢູ່ ກະລຸນາລໍຖ້າໃຫ້ແອັດມິ້ນອະນຸມັດກ່ອນ');
+                return;
+            }
+            
+            currentTableNumber = tableNumber;
+            closeModal();
+            showConfirmOrder();
+        }
+
+        function showConfirmOrder() {
+            const confirmDetails = document.getElementById('confirmOrderDetails');
+            let html = `<h4>ໂຕ໊ະ: ${currentTableNumber}</h4><br>`;
+            
+            let total = 0;
+            Object.keys(cart).forEach(itemId => {
+                const item = findItemById(parseInt(itemId));
+                if (item && cart[itemId] > 0) {
+                    const itemTotal = item.price * cart[itemId];
+                    total += itemTotal;
+                    html += `<div style="text-align: left; margin-bottom: 10px;">
+                        ${item.name} × ${cart[itemId]} = ${itemTotal.toLocaleString()} ກີບ
+                    </div>`;
+                }
+            });
+            
+            html += `<br><strong>ລວມທັງໝົດ: ${total.toLocaleString()} ກີບ</strong>`;
+            confirmDetails.innerHTML = html;
+            
+            document.getElementById('confirmModal').style.display = 'block';
+        }
+
+        function finalizeOrder() {
+            const orderId = Date.now();
+            const orderTime = new Date().toLocaleString('lo-LA');
+            
+            let total = 0;
+            const orderItems = [];
+            
+            Object.keys(cart).forEach(itemId => {
+                const item = findItemById(parseInt(itemId));
+                if (item && cart[itemId] > 0) {
+                    const itemTotal = item.price * cart[itemId];
+                    total += itemTotal;
+                    orderItems.push({
+                        name: item.name,
+                        quantity: cart[itemId],
+                        price: item.price,
+                        total: itemTotal
+                    });
+                    
+                    // Update menu stats
+                    if (!menuStats[item.name]) {
+                        menuStats[item.name] = { quantity: 0, revenue: 0 };
+                    }
+                    menuStats[item.name].quantity += cart[itemId];
+                    menuStats[item.name].revenue += itemTotal;
+                }
+            });
+            
+            const order = {
+                id: orderId,
+                tableNumber: currentTableNumber,
+                items: orderItems,
+                total: total,
+                time: orderTime,
+                status: 'ລໍຖ້າ'
+            };
+            
+            orders.push(order);
+            tableOrders[currentTableNumber] = order;
+            totalRevenue += total;
+            
+            // Clear cart
+            cart = {};
+            loadMenuItems();
+            updateFloatingButton();
+            closeOrderSummary();
+            closeModal();
+            
+            alert(`ສັ່ງອາຫານສຳເລັດ!\nໂຕ໊ະ: ${currentTableNumber}\nລວມ: ${total.toLocaleString()} ກີບ`);
+        }
+
+        // Admin functions
+        function showAdminLogin() {
+            document.getElementById('adminLoginModal').style.display = 'block';
+        }
+
+        function adminLogin() {
+            const user = document.getElementById('adminUser').value;
+            const pass = document.getElementById('adminPass').value;
+            
+            if (user === 'panda' && pass === '123') {
+                closeModal();
+                document.getElementById('homeScreen').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                showAdminTab('orders');
+            } else {
+                alert('ຊື່ຜູ້ໃຊ້ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ');
+            }
+            
+            document.getElementById('adminUser').value = '';
+            document.getElementById('adminPass').value = '';
+        }
+
+        function showAdminTab(tab) {
+            document.querySelectorAll('.admin-tab').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const adminContent = document.getElementById('adminContent');
+            
+            switch(tab) {
+                case 'orders':
+                    showOrdersTab();
+                    break;
+                case 'revenue':
+                    showRevenueTab();
+                    break;
+                case 'analytics':
+                    showAnalyticsTab();
+                    break;
+                case 'accounting':
+                    showAccountingTab();
+                    break;
+            }
+        }
+
+        function showOrdersTab() {
+            const adminContent = document.getElementById('adminContent');
+            let html = `<h3>ອໍເດີທັງໝົດ: ${orders.length}</h3><div class="orders-grid">`;
+            
+            orders.filter(order => order.status === 'ລໍຖ້າ').forEach(order => {
+                html += `
+                    <div class="order-card">
+                        <h4>ໂຕ໊ະ: ${order.tableNumber}</h4>
+                        <p><strong>ເວລາ:</strong> ${order.time}</p>
+                        <p><strong>ສະຖານະ:</strong> ${order.status}</p>
+                        <div style="margin: 10px 0;">
+                            <strong>ລາຍການ:</strong><br>
+                            ${order.items.map(item => 
+                                `${item.name} × ${item.quantity} = ${item.total.toLocaleString()} ກີບ`
+                            ).join('<br>')}
+                        </div>
+                        <p><strong>ລວມ:</strong> ${order.total.toLocaleString()} ກີບ</p>
+                        <div class="order-actions">
+                            <button class="action-btn success-btn" onclick="markOrderSuccess(${order.id})">Success</button>
+                            <button class="action-btn clear-btn" onclick="clearOrder(${order.id})">Clear</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            adminContent.innerHTML = html;
+        }
+
+        function showRevenueTab() {
+            const adminContent = document.getElementById('adminContent');
+            const completedOrders = orders.filter(order => order.status === 'ສຳເລັດ');
+            const totalOrders = completedOrders.length;
+            const avgOrder = totalOrders > 0 ? totalRevenue / totalOrders : 0;
+            
+            let html = `
+                <h3>ສະຫຼຸບລາຍຮັບ</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                    <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 15px; text-align: center;">
+                        <h4>ລາຍຮັບລວມ</h4>
+                        <p style="font-size: 24px; font-weight: bold;">${totalRevenue.toLocaleString()} ກີບ</p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 15px; text-align: center;">
+                        <h4>ອໍເດີທັງໝົດ</h4>
+                        <p style="font-size: 24px; font-weight: bold;">${totalOrders}</p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 15px; text-align: center;">
+                        <h4>ເຄື່ອງອໍເດີ</h4>
+                        <p style="font-size: 24px; font-weight: bold;">${avgOrder.toLocaleString()} ກີບ</p>
+                    </div>
+                </div>
+                <h4>ລາຍການອໍເດີທີ່ສຳເລັດ:</h4>
+                <div style="max-height: 400px; overflow-y: auto;">
+            `;
+            
+            completedOrders.forEach(order => {
+                html += `
+                    <div style="background: rgba(255,255,255,0.2); padding: 15px; margin-bottom: 10px; border-radius: 10px;">
+                        <p><strong>ໂຕ໊ະ ${order.tableNumber}</strong> - ${order.time}</p>
+                        <p>ລວມ: ${order.total.toLocaleString()} ກີບ</p>
+                    </div>
+                `;
+            });
+            
+            html += '</div>';
+            adminContent.innerHTML = html;
+        }
+
+        function showAnalyticsTab() {
+            const adminContent = document.getElementById('adminContent');
+            let html = `
+                <h3>ວິເຄາະເມນູ</h3>
+                <div style="display: grid; gap: 15px;">
+            `;
+            
+            // Sort menu items by popularity
+            const sortedMenus = Object.entries(menuStats)
+                .sort(([,a], [,b]) => b.quantity - a.quantity);
+            
+            sortedMenus.forEach(([itemName, stats], index) => {
+                const rank = index + 1;
+                html += `
+                    <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 15px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <h4>#${rank} ${itemName}</h4>
+                            <p>ຂາຍໄດ້: ${stats.quantity} ຈາກ</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="font-size: 18px; font-weight: bold;">${stats.revenue.toLocaleString()} ກີບ</p>
+                            <p style="font-size: 14px; opacity: 0.8;">ລາຍຮັບ</p>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            if (sortedMenus.length === 0) {
+                html += '<p>ຍັງບໍ່ມີຂໍ້ມູນການຂາຍ</p>';
+            }
+            
+            html += '</div>';
+            adminContent.innerHTML = html;
+        }
+
+        function showAccountingTab() {
+            const adminContent = document.getElementById('adminContent');
+            const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const profit = totalRevenue - totalExpenses;
+            
+            let html = `
+                <h3>ລະບົບບັນຊີ</h3>
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px;">
+                    <div style="background: rgba(46, 204, 113, 0.2); padding: 20px; border-radius: 15px; text-align: center;">
+                        <h4>ລາຍຮັບ</h4>
+                        <p style="font-size: 24px; font-weight: bold; color: #27ae60;">+${totalRevenue.toLocaleString()} ກີບ</p>
+                    </div>
+                    <div style="background: rgba(231, 76, 60, 0.2); padding: 20px; border-radius: 15px; text-align: center;">
+                        <h4>ລາຍຈ່າຍ</h4>
+                        <p style="font-size: 24px; font-weight: bold; color: #e74c3c;">-${totalExpenses.toLocaleString()} ກີບ</p>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 15px; text-align: center;">
+                        <h4>ກຳໄລສຸດທິ</h4>
+                        <p style="font-size: 24px; font-weight: bold; color: ${profit >= 0 ? '#27ae60' : '#e74c3c'};">
+                            ${profit >= 0 ? '+' : ''}${profit.toLocaleString()} ກີບ
+                        </p>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+                    <h4>ເພີ່ມລາຍຈ່າຍ</h4>
+                    <div style="display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap;">
+                        <input type="text" id="expenseDescription" placeholder="ລາຍລະອຽດ" style="flex: 1; min-width: 200px; padding: 10px; border-radius: 5px; border: none;">
+                        <input type="number" id="expenseAmount" placeholder="ຈຳນວນເງິນ" style="flex: 1; min-width: 150px; padding: 10px; border-radius: 5px; border: none;">
+                        <button onclick="addExpense()" style="padding: 10px 20px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer;">ເພີ່ມ</button>
+                    </div>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.1); padding: 20px; border-radius: 15px;">
+                    <h4>ລາຍການຄ່າໃຊ້ຈ່າຍ</h4>
+                    <div id="expensesList" style="max-height: 300px; overflow-y: auto;">
+            `;
+            
+            expenses.forEach((expense, index) => {
+                html += `
+                    <div style="background: rgba(255,255,255,0.1); padding: 15px; margin-bottom: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <p><strong>${expense.description}</strong></p>
+                            <p style="font-size: 14px; opacity: 0.8;">${expense.date}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <p style="font-size: 18px; font-weight: bold; color: #e74c3c;">-${expense.amount.toLocaleString()} ກີບ</p>
+                            <button onclick="removeExpense(${index})" style="padding: 5px 10px; background: #e74c3c; color: white; border: none; border-radius: 3px; cursor: pointer; font-size: 12px;">ລົບ</button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            if (expenses.length === 0) {
+                html += '<p>ຍັງບໍ່ມີລາຍຈ່າຍ</p>';
+            }
+            
+            html += '</div></div>';
+            adminContent.innerHTML = html;
+        }
+
+        function addExpense() {
+            const description = document.getElementById('expenseDescription').value;
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            
+            if (!description || !amount || amount <= 0) {
+                alert('ກະລຸນາໃສ່ຂໍ້ມູນໃຫ້ຄົບຖ້ວນ');
+                return;
+            }
+            
+            const expense = {
+                description: description,
+                amount: amount,
+                date: new Date().toLocaleString('lo-LA')
+            };
+            
+            expenses.push(expense);
+            
+            document.getElementById('expenseDescription').value = '';
+            document.getElementById('expenseAmount').value = '';
+            
+            showAccountingTab();
+        }
+
+        function removeExpense(index) {
+            if (confirm('ຕ້ອງການລົບລາຍຈ່າຍນີ້ແທ້ຫຼືບໍ?')) {
+                expenses.splice(index, 1);
+                showAccountingTab();
+            }
+        }
+
+        function markOrderSuccess(orderId) {
+            const order = orders.find(o => o.id === orderId);
+            if (order) {
+                order.status = 'ສຳເລັດ';
+                showOrdersTab();
+            }
+        }
+
+        function clearOrder(orderId) {
+            if (confirm('ຕ້ອງການລົບອໍເດີນີ້ແທ້ຫຼືບໍ?')) {
+                const orderIndex = orders.findIndex(o => o.id === orderId);
+                if (orderIndex !== -1) {
+                    const order = orders[orderIndex];
+                    delete tableOrders[order.tableNumber];
+                    orders.splice(orderIndex, 1);
+                    showOrdersTab();
+                }
+            }
+        }
+
+        function startAdminAutoRefresh() {
+            setInterval(() => {
+                if (document.getElementById('adminPanel').style.display === 'block') {
+                    // Auto refresh admin panel every 30 seconds
+                    const activeTab = document.querySelector('.admin-tab.active');
+                    if (activeTab) {
+                        activeTab.click();
+                    }
+                }
+            }, 30000);
+        }
+
+        // Auto-save data to prevent loss
+        function saveData() {
+            const data = {
+                orders: orders,
+                tableOrders: tableOrders,
+                totalRevenue: totalRevenue,
+                expenses: expenses,
+                menuStats: menuStats
+            };
+            // In a real app, you would save this to a database
+            // For now, we'll just keep it in memory
+        }
+
+        // Auto-save every 5 minutes
+        setInterval(saveData, 300000);
     </script>
 </body>
 </html>
