@@ -1,1064 +1,1096 @@
-import React, { useState, useEffect, useRef, createContext, useContext } from 'react';
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, getDocs, serverTimestamp } from 'firebase/firestore';
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบสั่งอาหาร</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Noto Sans Lao -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        /* กำหนดฟอนต์หลัก */
+        body {
+            font-family: 'Noto Sans Lao', sans-serif;
+            overflow: hidden; /* ป้องกันการเลื่อนหน้าหลัก */
+            margin: 0;
+            padding: 0;
+        }
 
-// Global variables for Firebase configuration (provided by the Canvas environment)
-const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
-const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+        .font-noto-sans-lao {
+            font-family: 'Noto Sans Lao', sans-serif;
+        }
 
-// Create a context for Firebase and User data
-const AppContext = createContext(null);
+        /* Custom Animations */
+        @keyframes fade-out {
+            0% { opacity: 1; }
+            80% { opacity: 1; }
+            100% { opacity: 0; visibility: hidden; }
+        }
+        .animate-fade-out {
+            animation: fade-out 2s forwards;
+        }
 
-// Custom Modal Component (replaces alert/confirm)
-const Modal = ({ show, title, message, onConfirm, onCancel, confirmText = 'ตกลง', cancelText = 'ยกเลิก' }) => {
-    if (!show) return null;
+        @keyframes fade-in-up {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .animate-fade-in-up {
+            animation: fade-in-up 0.5s ease-out forwards;
+        }
 
-    return (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 p-4">
-            <div className="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full transform transition-all duration-300 scale-100 opacity-100 animate-bounce-in">
-                <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">{title}</h3>
-                <p className="text-gray-700 mb-6 text-center">{message}</p>
-                <div className="flex justify-around space-x-4">
-                    {onCancel && (
-                        <button
-                            onClick={onCancel}
-                            className="flex-1 bg-gray-300 text-gray-800 py-3 px-6 rounded-lg font-semibold hover:bg-gray-400 transition duration-300 ease-in-out shadow-md"
-                        >
-                            {cancelText}
-                        </button>
-                    )}
-                    {onConfirm && (
-                        <button
-                            onClick={onConfirm}
-                            className="flex-1 bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-pink-600 hover:to-purple-700 transition duration-300 ease-in-out shadow-md"
-                        >
-                            {confirmText}
-                        </button>
-                    )}
+        @keyframes bounce-effect {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            25% {
+                transform: translateY(-5px);
+            }
+            50% {
+                transform: translateY(0);
+            }
+            75% {
+                transform: translateY(-2px);
+            }
+        }
+        .animate-bounce-effect:hover {
+            animation: bounce-effect 0.8s ease-in-out infinite;
+        }
+
+        @keyframes bounce-in {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            70% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        .animate-bounce-in {
+            animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
+        }
+
+        /* Responsive adjustments for smaller screens */
+        @media (max-width: 640px) {
+            .text-5xl { font-size: 3rem; /* ~48px */ }
+            .text-4xl { font-size: 2.25rem; /* ~36px */ }
+            .text-3xl { font-size: 1.875rem; /* ~30px */ }
+            .text-2xl { font-size: 1.5rem; /* ~24px */ }
+            .text-xl { font-size: 1.25rem; /* ~20px */ }
+            .text-lg { font-size: 1.125rem; /* ~18px */ }
+            .p-4 { padding: 1rem; }
+            .m-4 { margin: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- React CDN -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <!-- Babel for JSX transformation (for development, use build process for production) -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, addDoc, setDoc, updateDoc, deleteDoc, onSnapshot, collection, query, where, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Global variables for Firebase configuration (replace with your actual Firebase config)
+        // หากคุณนำไปใช้จริงนอก Canvas ให้แทนที่ค่าเหล่านี้ด้วยข้อมูลโปรเจกต์ Firebase ของคุณ
+        // คุณสามารถหาค่าเหล่านี้ได้จาก Firebase Console -> Project settings -> General -> Your apps
+        const appId = 'YOUR_APP_ID_HERE'; // เช่น 'your-app-id'
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY_HERE",
+            authDomain: "YOUR_AUTH_DOMAIN_HERE",
+            projectId: "YOUR_PROJECT_ID_HERE",
+            storageBucket: "YOUR_STORAGE_BUCKET_HERE",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID_HERE",
+            appId: "YOUR_FIREBASE_APP_ID_HERE"
+        };
+        const initialAuthToken = null; // หากมี Custom Auth Token ให้ใส่ที่นี่ (ปกติจะใช้ null สำหรับ Anonymous/Email-Password)
+
+        // Create a context for Firebase and User data
+        const AppContext = React.createContext(null);
+
+        // Custom Modal Component (replaces alert/confirm)
+        const Modal = ({ show, title, message, onConfirm, onCancel, confirmText = 'ตกลง', cancelText = 'ยกเลิก' }) => {
+            if (!show) return null;
+
+            return (
+                <div className="fixed inset-0 bg-gray-600 bg-opacity-75 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-xl shadow-2xl p-6 max-w-sm w-full transform transition-all duration-300 scale-100 opacity-100 animate-bounce-in">
+                        <h3 className="text-xl font-bold text-gray-800 mb-4 text-center">{title}</h3>
+                        <p className="text-gray-700 mb-6 text-center">{message}</p>
+                        <div className="flex justify-around space-x-4">
+                            {onCancel && (
+                                <button
+                                    onClick={onCancel}
+                                    className="flex-1 bg-gray-300 text-gray-800 py-3 px-6 rounded-lg font-semibold hover:bg-gray-400 transition duration-300 ease-in-out shadow-md"
+                                >
+                                    {cancelText}
+                                </button>
+                            )}
+                            {onConfirm && (
+                                <button
+                                    onClick={onConfirm}
+                                    className="flex-1 bg-gradient-to-r from-pink-500 to-purple-600 text-white py-3 px-6 rounded-lg font-semibold hover:from-pink-600 hover:to-purple-700 transition duration-300 ease-in-out shadow-md"
+                                >
+                                    {confirmText}
+                                </button>
+                            )}
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </div>
-    );
-};
+            );
+        };
 
-// Splash Screen Component
-const SplashScreen = ({ onComplete }) => {
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            onComplete(true);
-        }, 2000); // Show splash for 2 seconds
-        return () => clearTimeout(timer);
-    }, [onComplete]);
+        // Splash Screen Component
+        const SplashScreen = ({ onComplete }) => {
+            React.useEffect(() => {
+                const timer = setTimeout(() => {
+                    onComplete(true);
+                }, 2000); // แสดง Splash Screen 2 วินาที
+                return () => clearTimeout(timer);
+            }, [onComplete]);
 
-    return (
-        <div className="fixed inset-0 bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 flex items-center justify-center z-50 animate-fade-out">
-            <div className="text-white text-4xl font-bold animate-pulse">
-                <img src="https://placehold.co/300x300/ffffff/000000?text=%F0%9F%98%84" alt="Smiling Icon" className="w-64 h-64 mx-auto mb-8 rounded-full shadow-lg animate-bounce-in" />
-                <p className="text-center text-3xl font-bold text-white drop-shadow-lg">ยินดีต้อนรับ</p>
-            </div>
-        </div>
-    );
-};
+            return (
+                <div className="fixed inset-0 bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 flex items-center justify-center z-50 animate-fade-out">
+                    <div className="text-white text-4xl font-bold animate-pulse">
+                        <img src="https://placehold.co/300x300/ffffff/000000?text=%F0%9F%98%84" alt="Smiling Icon" className="w-64 h-64 mx-auto mb-8 rounded-full shadow-lg animate-bounce-in" />
+                        <p className="text-center text-3xl font-bold text-white drop-shadow-lg">ยินดีต้อนรับ</p>
+                    </div>
+                </div>
+            );
+        };
 
-// Home Page Component
-const HomePage = ({ setView }) => {
-    return (
-        <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 text-white font-noto-sans-lao">
-            <div className="text-center mb-12">
-                <img src="https://placehold.co/300x300/ffffff/000000?text=%F0%9F%98%84" alt="Smiling Icon" className="w-64 h-64 mx-auto mb-8 rounded-full shadow-lg animate-bounce-in" />
-                <h1 className="text-5xl font-extrabold drop-shadow-lg animate-fade-in-up">ร้านอาหาร</h1>
-            </div>
-            <div className="w-full max-w-xs space-y-6">
-                <button
-                    onClick={() => setView('customer')}
-                    className="w-full bg-white text-purple-600 py-4 rounded-xl text-2xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 ease-in-out animate-bounce-effect"
-                >
-                    เริ่มสั่งอาหาร
-                </button>
-                <button
-                    onClick={() => setView('admin-login')}
-                    className="w-full bg-purple-700 text-white py-4 rounded-xl text-2xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 ease-in-out animate-bounce-effect"
-                >
-                    โหมดแอดมิน
-                </button>
-            </div>
-        </div>
-    );
-};
+        // Home Page Component
+        const HomePage = ({ setView }) => {
+            return (
+                <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 text-white font-noto-sans-lao">
+                    <div className="text-center mb-12">
+                        <img src="https://placehold.co/300x300/ffffff/000000?text=%F0%9F%98%84" alt="Smiling Icon" className="w-64 h-64 mx-auto mb-8 rounded-full shadow-lg animate-bounce-in" />
+                        <h1 className="text-5xl font-extrabold drop-shadow-lg animate-fade-in-up">ร้านอาหาร</h1>
+                    </div>
+                    <div className="w-full max-w-xs space-y-6">
+                        <button
+                            onClick={() => setView('customer')}
+                            className="w-full bg-white text-purple-600 py-4 rounded-xl text-2xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 ease-in-out animate-bounce-effect"
+                        >
+                            เริ่มสั่งอาหาร
+                        </button>
+                        <button
+                            onClick={() => setView('admin-login')}
+                            className="w-full bg-purple-700 text-white py-4 rounded-xl text-2xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 ease-in-out animate-bounce-effect"
+                        >
+                            โหมดแอดมิน
+                        </button>
+                    </div>
+                </div>
+            );
+        };
 
-// Customer Order Page Component
-const CustomerOrderPage = ({ setView }) => {
-    const { db, auth, userId } = useContext(AppContext);
-    const [activeTab, setActiveTab] = useState('food');
-    const [cartItems, setCartItems] = useState([]);
-    const [showCartModal, setShowCartModal] = useState(false);
-    const [tableNumber, setTableNumber] = useState('');
-    const [showConfirmOrderModal, setShowConfirmOrderModal] = useState(false);
-    const [showPendingOrderModal, setShowPendingOrderModal] = useState(false);
-    const [pendingOrders, setPendingOrders] = useState([]);
-    const [showMyOrdersModal, setShowMyOrdersModal] = useState(false);
-    const [modalConfig, setModalConfig] = useState({ show: false, title: '', message: '', onConfirm: null, onCancel: null });
+        // Customer Order Page Component
+        const CustomerOrderPage = ({ setView }) => {
+            const { db, auth, userId } = React.useContext(AppContext);
+            const [activeTab, setActiveTab] = React.useState('food');
+            const [cartItems, setCartItems] = React.useState([]);
+            const [showCartModal, setShowCartModal] = React.useState(false);
+            const [tableNumber, setTableNumber] = React.useState('');
+            const [showConfirmOrderModal, setShowConfirmOrderModal] = React.useState(false);
+            const [showPendingOrderModal, setShowPendingOrderModal] = React.useState(false);
+            const [pendingOrders, setPendingOrders] = React.useState([]);
+            const [showMyOrdersModal, setShowMyOrdersModal] = React.useState(false);
+            const [modalConfig, setModalConfig] = React.useState({ show: false, title: '', message: '', onConfirm: null, onCancel: null });
 
-    const menu = {
-        food: [
-            { id: 'f1', name: 'ຕຳໝີ່ຂາວ', price: 30000, type: 'food' },
-            { id: 'f2', name: 'ຕຳໝີ່ໄວໆ', price: 30000, type: 'food' },
-            { id: 'f3', name: 'ຕຳຕ່ອນ', price: 50000, type: 'food' },
-            { id: 'f4', name: 'ຕຳເຂົ້າປຸ້ນ / ຕຳໝາກຮຸ່ງ', price: 25000, type: 'food' },
-            { id: 'f5', name: 'ຕົ້ມເລືອດ', price: 30000, type: 'food' },
-            { id: 'f6', name: 'ລາບງົວ', price: 50000, type: 'food' },
-            { id: 'f7', name: 'ເຂົ້າໜຽວ', price: 15000, type: 'food' },
-        ],
-        drinks: [
-            { id: 'd1', name: 'ນ້ຳດື່ມນ້ອຍ', price: 8000, type: 'drink' },
-            { id: 'd2', name: 'ນ້ຳດື່ມໃຫຍ່', price: 10000, type: 'drink' },
-            { id: 'd3', name: 'ແປບຊີ່', price: 15000, type: 'drink' },
-        ],
-    };
+            const menu = {
+                food: [
+                    { id: 'f1', name: 'ຕຳໝີ່ຂາວ', price: 30000, type: 'food' },
+                    { id: 'f2', name: 'ຕຳໝີ່ໄວໆ', price: 30000, type: 'food' },
+                    { id: 'f3', name: 'ຕຳຕ່ອນ', price: 50000, type: 'food' },
+                    { id: 'f4', name: 'ຕຳເຂົ້າປຸ້ນ / ຕຳໝາກຮຸ່ງ', price: 25000, type: 'food' },
+                    { id: 'f5', name: 'ຕົ້ມເລືອດ', price: 30000, type: 'food' },
+                    { id: 'f6', name: 'ລາບງົວ', price: 50000, type: 'food' },
+                    { id: 'f7', name: 'ເຂົ້າໜຽວ', price: 15000, type: 'food' },
+                ],
+                drinks: [
+                    { id: 'd1', name: 'ນ້ຳດື່ມນ້ອຍ', price: 8000, type: 'drink' },
+                    { id: 'd2', name: 'ນ້ຳດື່ມໃຫຍ່', price: 10000, type: 'drink' },
+                    { id: 'd3', name: 'ແປບຊີ່', price: 15000, type: 'drink' },
+                ],
+            };
 
-    // Normalize table number: remove leading zeros and convert to string
-    const normalizeTableNumber = (num) => {
-        if (!num) return '';
-        return String(parseInt(num, 10));
-    };
+            // Normalize table number: remove leading zeros and convert to string
+            const normalizeTableNumber = (num) => {
+                if (!num) return '';
+                return String(parseInt(num, 10));
+            };
 
-    useEffect(() => {
-        if (!db || !userId) return;
+            React.useEffect(() => {
+                if (!db || !userId) return;
 
-        // Listen for pending orders for the current user
-        const q = query(collection(db, `artifacts/${appId}/public/data/orders`), where('userId', '==', userId), where('status', '==', 'pending'));
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setPendingOrders(orders);
-        }, (error) => {
-            console.error("Error fetching pending orders:", error);
-        });
-
-        return () => unsubscribe();
-    }, [db, userId]);
-
-    const handleAddToCart = (item) => {
-        setCartItems((prevItems) => {
-            const existingItem = prevItems.find((i) => i.id === item.id);
-            if (existingItem) {
-                return prevItems.map((i) =>
-                    i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
-                );
-            } else {
-                return [...prevItems, { ...item, quantity: 1 }];
-            }
-        });
-    };
-
-    const handleRemoveFromCart = (item) => {
-        setCartItems((prevItems) => {
-            const existingItem = prevItems.find((i) => i.id === item.id);
-            if (existingItem && existingItem.quantity > 1) {
-                return prevItems.map((i) =>
-                    i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i
-                );
-            } else {
-                return prevItems.filter((i) => i.id !== item.id);
-            }
-        });
-    };
-
-    const getTotalItemsInCart = () => {
-        return cartItems.reduce((total, item) => total + item.quantity, 0);
-    };
-
-    const getTotalCartPrice = () => {
-        return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
-    };
-
-    const handlePlaceOrderClick = () => {
-        if (cartItems.length === 0) {
-            setModalConfig({
-                show: true,
-                title: 'ตะกร้าสินค้าว่างเปล่า',
-                message: 'กรุณาเลือกรายการอาหารก่อนสั่ง',
-                onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                confirmText: 'ตกลง'
-            });
-            return;
-        }
-        setShowConfirmOrderModal(true);
-    };
-
-    const confirmOrder = async () => {
-        setShowConfirmOrderModal(false);
-        const normalizedTable = normalizeTableNumber(tableNumber);
-
-        if (!normalizedTable) {
-            setModalConfig({
-                show: true,
-                title: 'แจ้งเตือน',
-                message: 'กรุณาระบุเลขโต๊ะก่อนสั่งอาหาร',
-                onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                confirmText: 'ตกลง'
-            });
-            return;
-        }
-
-        try {
-            // Check for existing pending orders for this table
-            const q = query(collection(db, `artifacts/${appId}/public/data/orders`), where('tableNumber', '==', normalizedTable), where('status', '==', 'pending'));
-            const querySnapshot = await getDocs(q);
-
-            if (!querySnapshot.empty) {
-                // If there's an existing pending order for this table, show the message
-                setModalConfig({
-                    show: true,
-                    title: 'แจ้งเตือน',
-                    message: 'ລໍຖ້າອາຫານຂອງທ່ານກຳລັງຈະມາ',
-                    onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                    confirmText: 'ตกลง'
+                // Listen for pending orders for the current user
+                const q = query(collection(db, `artifacts/${appId}/public/data/orders`), where('userId', '==', userId), where('status', '==', 'pending'));
+                const unsubscribe = onSnapshot(q, (snapshot) => {
+                    const orders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    setPendingOrders(orders);
+                }, (error) => {
+                    console.error("Error fetching pending orders:", error);
                 });
-                return;
-            }
 
-            // If no pending order, proceed to add new order
-            await addDoc(collection(db, `artifacts/${appId}/public/data/orders`), {
-                tableNumber: normalizedTable,
-                items: cartItems.map(item => ({ id: item.id, name: item.name, quantity: item.quantity, price: item.price })),
-                totalPrice: getTotalCartPrice(),
-                timestamp: serverTimestamp(),
-                status: 'pending',
-                userId: userId, // Store userId to allow user to cancel their own pending order
-            });
-            setCartItems([]);
-            setTableNumber('');
-            setModalConfig({
-                show: true,
-                title: 'สั่งอาหารสำเร็จ',
-                message: 'คำสั่งซื้อของคุณถูกส่งแล้ว กรุณารอการยืนยันจากแอดมิน',
-                onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                confirmText: 'ตกลง'
-            });
-        } catch (e) {
-            console.error("Error adding document: ", e);
-            setModalConfig({
-                show: true,
-                title: 'เกิดข้อผิดพลาด',
-                message: 'ไม่สามารถส่งคำสั่งซื้อได้ กรุณาลองใหม่อีกครั้ง',
-                onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                confirmText: 'ตกลง'
-            });
-        }
-    };
+                return () => unsubscribe();
+            }, [db, userId]);
 
-    const handleCancelPendingOrder = async (orderId) => {
-        setModalConfig({
-            show: true,
-            title: 'ยืนยันการยกเลิก',
-            message: 'คุณต้องการยกเลิกคำสั่งซื้อนี้ใช่หรือไม่?',
-            onConfirm: async () => {
-                try {
-                    await updateDoc(doc(db, `artifacts/${appId}/public/data/orders`, orderId), {
-                        status: 'cancelled'
-                    });
-                    setModalConfig({ ...modalConfig, show: false });
+            const handleAddToCart = (item) => {
+                setCartItems((prevItems) => {
+                    const existingItem = prevItems.find((i) => i.id === item.id);
+                    if (existingItem) {
+                        return prevItems.map((i) =>
+                            i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+                        );
+                    } else {
+                        return [...prevItems, { ...item, quantity: 1 }];
+                    }
+                });
+            };
+
+            const handleRemoveFromCart = (item) => {
+                setCartItems((prevItems) => {
+                    const existingItem = prevItems.find((i) => i.id === item.id);
+                    if (existingItem && existingItem.quantity > 1) {
+                        return prevItems.map((i) =>
+                            i.id === item.id ? { ...i, quantity: i.quantity - 1 } : i
+                        );
+                    } else {
+                        return prevItems.filter((i) => i.id !== item.id);
+                    }
+                });
+            };
+
+            const getTotalItemsInCart = () => {
+                return cartItems.reduce((total, item) => total + item.quantity, 0);
+            };
+
+            const getTotalCartPrice = () => {
+                return cartItems.reduce((total, item) => total + item.price * item.quantity, 0);
+            };
+
+            const handlePlaceOrderClick = () => {
+                if (cartItems.length === 0) {
                     setModalConfig({
                         show: true,
-                        title: 'ยกเลิกสำเร็จ',
-                        message: 'คำสั่งซื้อถูกยกเลิกแล้ว',
+                        title: 'ตะกร้าสินค้าว่างเปล่า',
+                        message: 'กรุณาเลือกรายการอาหารก่อนสั่ง',
+                        onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
+                        confirmText: 'ตกลง'
+                    });
+                    return;
+                }
+                setShowConfirmOrderModal(true);
+            };
+
+            const confirmOrder = async () => {
+                setShowConfirmOrderModal(false);
+                const normalizedTable = normalizeTableNumber(tableNumber);
+
+                if (!normalizedTable) {
+                    setModalConfig({
+                        show: true,
+                        title: 'แจ้งเตือน',
+                        message: 'กรุณาระบุเลขโต๊ะก่อนสั่งอาหาร',
+                        onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
+                        confirmText: 'ตกลง'
+                    });
+                    return;
+                }
+
+                try {
+                    // Check for existing pending orders for this table
+                    const q = query(collection(db, `artifacts/${appId}/public/data/orders`), where('tableNumber', '==', normalizedTable), where('status', '==', 'pending'));
+                    const querySnapshot = await getDocs(q);
+
+                    if (!querySnapshot.empty) {
+                        // If there's an existing pending order for this table, show the message
+                        setModalConfig({
+                            show: true,
+                            title: 'แจ้งเตือน',
+                            message: 'ລໍຖ້າອາຫານຂອງທ່ານກຳລັງຈະມາ',
+                            onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
+                            confirmText: 'ตกลง'
+                        });
+                        return;
+                    }
+
+                    // If no pending order, proceed to add new order
+                    await addDoc(collection(db, `artifacts/${appId}/public/data/orders`), {
+                        tableNumber: normalizedTable,
+                        items: cartItems.map(item => ({ id: item.id, name: item.name, quantity: item.quantity, price: item.price })),
+                        totalPrice: getTotalCartPrice(),
+                        timestamp: serverTimestamp(),
+                        status: 'pending',
+                        userId: userId, // Store userId to allow user to cancel their own pending order
+                    });
+                    setCartItems([]);
+                    setTableNumber('');
+                    setModalConfig({
+                        show: true,
+                        title: 'สั่งอาหารสำเร็จ',
+                        message: 'คำสั่งซื้อของคุณถูกส่งแล้ว กรุณารอการยืนยันจากแอดมิน',
                         onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
                         confirmText: 'ตกลง'
                     });
                 } catch (e) {
-                    console.error("Error cancelling order: ", e);
+                    console.error("Error adding document: ", e);
                     setModalConfig({
                         show: true,
                         title: 'เกิดข้อผิดพลาด',
-                        message: 'ไม่สามารถยกเลิกคำสั่งซื้อได้',
+                        message: 'ไม่สามารถส่งคำสั่งซื้อได้ กรุณาลองใหม่อีกครั้ง',
                         onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
                         confirmText: 'ตกลง'
                     });
                 }
-            },
-            onCancel: () => setModalConfig({ ...modalConfig, show: false }),
-            confirmText: 'ยืนยัน',
-            cancelText: 'ยกเลิก'
-        });
-    };
+            };
 
-    return (
-        <div className="min-h-screen flex flex-col bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 text-white font-noto-sans-lao relative">
-            {/* Header */}
-            <div className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg p-4 flex justify-between items-center shadow-md sticky top-0 z-10 rounded-b-xl">
-                <button
-                    onClick={() => setView('home')}
-                    className="text-white text-xl p-2 rounded-full hover:bg-white hover:bg-opacity-30 transition-all duration-300"
-                    aria-label="Back to Home"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                </button>
-                <h2 className="text-3xl font-extrabold text-white drop-shadow-lg">สั่งอาหาร</h2>
-                <button
-                    onClick={() => setShowMyOrdersModal(true)}
-                    className="relative text-white text-xl p-2 rounded-full hover:bg-white hover:bg-opacity-30 transition-all duration-300"
-                    aria-label="My Orders"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M19 20H5c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2zm-7-2c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4-8h8V6H8v4z"/>
-                    </svg>
-                    {pendingOrders.length > 0 && (
-                        <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
-                            {pendingOrders.length}
-                        </span>
-                    )}
-                </button>
-            </div>
+            const handleCancelPendingOrder = async (orderId) => {
+                setModalConfig({
+                    show: true,
+                    title: 'ยืนยันการยกเลิก',
+                    message: 'คุณต้องการยกเลิกคำสั่งซื้อนี้ใช่หรือไม่?',
+                    onConfirm: async () => {
+                        try {
+                            await updateDoc(doc(db, `artifacts/${appId}/public/data/orders`, orderId), {
+                                status: 'cancelled'
+                            });
+                            setModalConfig({ ...modalConfig, show: false }); // Close confirmation modal
+                            setModalConfig({
+                                show: true,
+                                title: 'ยกเลิกสำเร็จ',
+                                message: 'คำสั่งซื้อถูกยกเลิกแล้ว',
+                                onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
+                                confirmText: 'ตกลง'
+                            });
+                        } catch (e) {
+                            console.error("Error cancelling order: ", e);
+                            setModalConfig({
+                                show: true,
+                                title: 'เกิดข้อผิดพลาด',
+                                message: 'ไม่สามารถยกเลิกคำสั่งซื้อได้',
+                                onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
+                                confirmText: 'ตกลง'
+                            });
+                        }
+                    },
+                    onCancel: () => setModalConfig({ ...modalConfig, show: false }),
+                    confirmText: 'ยืนยัน',
+                    cancelText: 'ยกเลิก'
+                });
+            };
 
-            {/* Table Number Input */}
-            <div className="p-4 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg m-4 rounded-xl shadow-lg flex items-center space-x-3">
-                <label htmlFor="tableNumber" className="text-white text-lg font-semibold">ລະບຸໂຕະ:</label>
-                <input
-                    type="number"
-                    id="tableNumber"
-                    value={tableNumber}
-                    onChange={(e) => setTableNumber(e.target.value)}
-                    placeholder="ใส่เลขโต๊ะ"
-                    className="flex-grow p-3 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
-                />
-            </div>
-
-            {/* Menu Tabs */}
-            <div className="flex justify-center p-4 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg m-4 rounded-xl shadow-lg">
-                <button
-                    onClick={() => setActiveTab('food')}
-                    className={`flex-1 py-3 text-xl font-bold rounded-l-lg transition-all duration-300 ${
-                        activeTab === 'food' ? 'bg-purple-600 text-white shadow-inner' : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
-                    }`}
-                >
-                    อาหาร
-                </button>
-                <button
-                    onClick={() => setActiveTab('drinks')}
-                    className={`flex-1 py-3 text-xl font-bold rounded-r-lg transition-all duration-300 ${
-                        activeTab === 'drinks' ? 'bg-purple-600 text-white shadow-inner' : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
-                    }`}
-                >
-                    เครื่องดื่ม
-                </button>
-            </div>
-
-            {/* Menu Items */}
-            <div className="flex-grow p-4 overflow-y-auto">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-24"> {/* Added pb-24 for floating button */}
-                    {(activeTab === 'food' ? menu.food : menu.drinks).map((item) => (
-                        <div
-                            key={item.id}
-                            className="bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg rounded-xl p-5 shadow-xl flex flex-col items-center text-center transform hover:scale-105 transition duration-300 ease-in-out animate-fade-in-up"
+            return (
+                <div className="min-h-screen flex flex-col bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 text-white font-noto-sans-lao relative">
+                    {/* Header */}
+                    <div className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg p-4 flex justify-between items-center shadow-md sticky top-0 z-10 rounded-b-xl">
+                        <button
+                            onClick={() => setView('home')}
+                            className="text-white text-xl p-2 rounded-full hover:bg-white hover:bg-opacity-30 transition-all duration-300"
+                            aria-label="Back to Home"
                         >
-                            {activeTab === 'food' ? (
-                                <img src="https://placehold.co/100x100/ffffff/000000?text=%F0%9F%8D%9B" alt="Food Icon" className="w-24 h-24 mb-4 rounded-full shadow-md" />
-                            ) : (
-                                <img src="https://placehold.co/100x100/ffffff/000000?text=%F0%9F%8D%B7" alt="Drink Icon" className="w-24 h-24 mb-4 rounded-full shadow-md" />
-                            )}
-                            <h3 className="text-2xl font-bold mb-2 text-white drop-shadow-md">{item.name}</h3>
-                            <p className="text-xl text-gray-100 mb-4 font-semibold">{item.price.toLocaleString()} ກີບ</p>
-                            <div className="flex items-center space-x-3 mt-auto">
-                                <button
-                                    onClick={() => handleRemoveFromCart(item)}
-                                    className="bg-red-500 text-white w-10 h-10 rounded-full flex items-center justify-center text-2xl font-bold shadow-md hover:bg-red-600 transition duration-300"
-                                >
-                                    -
-                                </button>
-                                <span className="text-2xl font-bold text-white">
-                                    {cartItems.find((i) => i.id === item.id)?.quantity || 0}
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                        </button>
+                        <h2 className="text-3xl font-extrabold text-white drop-shadow-lg">สั่งอาหาร</h2>
+                        <button
+                            onClick={() => setShowMyOrdersModal(true)}
+                            className="relative text-white text-xl p-2 rounded-full hover:bg-white hover:bg-opacity-30 transition-all duration-300"
+                            aria-label="My Orders"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-7 w-7" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M19 20H5c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2h14c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2zm-7-2c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-4-8h8V6H8v4z"/>
+                            </svg>
+                            {pendingOrders.length > 0 && (
+                                <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full">
+                                    {pendingOrders.length}
                                 </span>
-                                <button
-                                    onClick={() => handleAddToCart(item)}
-                                    className="bg-green-500 text-white w-10 h-10 rounded-full flex items-center justify-center text-2xl font-bold shadow-md hover:bg-green-600 transition duration-300"
+                            )}
+                        </button>
+                    </div>
+
+                    {/* Table Number Input */}
+                    <div className="p-4 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg m-4 rounded-xl shadow-lg flex items-center space-x-3">
+                        <label htmlFor="tableNumber" className="text-white text-lg font-semibold">ລະບຸໂຕະ:</label>
+                        <input
+                            type="number"
+                            id="tableNumber"
+                            value={tableNumber}
+                            onChange={(e) => setTableNumber(e.target.value)}
+                            placeholder="ใส่เลขโต๊ะ"
+                            className="flex-grow p-3 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
+                        />
+                    </div>
+
+                    {/* Menu Tabs */}
+                    <div className="flex justify-center p-4 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg m-4 rounded-xl shadow-lg">
+                        <button
+                            onClick={() => setActiveTab('food')}
+                            className={`flex-1 py-3 text-xl font-bold rounded-l-lg transition-all duration-300 ${
+                                activeTab === 'food' ? 'bg-purple-600 text-white shadow-inner' : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
+                            }`}
+                        >
+                            อาหาร
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('drinks')}
+                            className={`flex-1 py-3 text-xl font-bold rounded-r-lg transition-all duration-300 ${
+                                activeTab === 'drinks' ? 'bg-purple-600 text-white shadow-inner' : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
+                            }`}
+                        >
+                            เครื่องดื่ม
+                        </button>
+                    </div>
+
+                    {/* Menu Items */}
+                    <div className="flex-grow p-4 overflow-y-auto">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 pb-24"> {/* Added pb-24 for floating button */}
+                            {(activeTab === 'food' ? menu.food : menu.drinks).map((item) => (
+                                <div
+                                    key={item.id}
+                                    className="bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg rounded-xl p-5 shadow-xl flex flex-col items-center text-center transform hover:scale-105 transition duration-300 ease-in-out animate-fade-in-up"
                                 >
-                                    +
-                                </button>
-                            </div>
+                                    {activeTab === 'food' ? (
+                                        <img src="https://placehold.co/100x100/ffffff/000000?text=%F0%9F%8D%9B" alt="Food Icon" className="w-24 h-24 mb-4 rounded-full shadow-md" />
+                                    ) : (
+                                        <img src="https://placehold.co/100x100/ffffff/000000?text=%F0%9F%8D%B7" alt="Drink Icon" className="w-24 h-24 mb-4 rounded-full shadow-md" />
+                                    )}
+                                    <h3 className="text-2xl font-bold mb-2 text-white drop-shadow-md">{item.name}</h3>
+                                    <p className="text-xl text-gray-100 mb-4 font-semibold">{item.price.toLocaleString()} ກີບ</p>
+                                    <div className="flex items-center space-x-3 mt-auto">
+                                        <button
+                                            onClick={() => handleRemoveFromCart(item)}
+                                            className="bg-red-500 text-white w-10 h-10 rounded-full flex items-center justify-center text-2xl font-bold shadow-md hover:bg-red-600 transition duration-300"
+                                        >
+                                            -
+                                        </button>
+                                        <span className="text-2xl font-bold text-white">
+                                            {cartItems.find((i) => i.id === item.id)?.quantity || 0}
+                                        </span>
+                                        <button
+                                            onClick={() => handleAddToCart(item)}
+                                            className="bg-green-500 text-white w-10 h-10 rounded-full flex items-center justify-center text-2xl font-bold shadow-md hover:bg-green-600 transition duration-300"
+                                        >
+                                            +
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
                         </div>
-                    ))}
-                </div>
-            </div>
+                    </div>
 
-            {/* Floating Cart Button */}
-            {getTotalItemsInCart() > 0 && (
-                <button
-                    onClick={() => setShowCartModal(true)}
-                    className="fixed bottom-6 right-6 bg-gradient-to-r from-pink-500 to-purple-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-3xl font-bold shadow-2xl hover:scale-110 transition duration-300 ease-in-out z-40 animate-bounce-effect"
-                    aria-label="View Cart"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zm-8.7-18H5.2c-.7 0-1.2.4-1.4.9L.4 11.2c-.3.6-.1 1.3.4 1.7.5.4 1.2.4 1.7-.1l2.4-4.8h11.3l-2.4 4.8c-.5.9-.1 2 1 2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-3.2c-.7 0-1.2.4-1.4.9L16.4 0H8.3zM18 10H6l-1.5-3H18v3z"/>
-                    </svg>
-                    <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full transform translate-x-1/2 -translate-y-1/2">
-                        {getTotalItemsInCart()}
-                    </span>
-                </button>
-            )}
+                    {/* Floating Cart Button */}
+                    {getTotalItemsInCart() > 0 && (
+                        <button
+                            onClick={() => setShowCartModal(true)}
+                            className="fixed bottom-6 right-6 bg-gradient-to-r from-pink-500 to-purple-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-3xl font-bold shadow-2xl hover:scale-110 transition duration-300 ease-in-out z-40 animate-bounce-effect"
+                            aria-label="View Cart"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zm10 0c-1.1 0-1.99.9-1.99 2S15.9 22 17 22s2-.9 2-2-.9-2-2-2zm-8.7-18H5.2c-.7 0-1.2.4-1.4.9L.4 11.2c-.3.6-.1 1.3.4 1.7.5.4 1.2.4 1.7-.1l2.4-4.8h11.3l-2.4 4.8c-.5.9-.1 2 1 2h7c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2h-3.2c-.7 0-1.2.4-1.4.9L16.4 0H8.3zM18 10H6l-1.5-3H18v3z"/>
+                            </svg>
+                            <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-red-100 bg-red-600 rounded-full transform translate-x-1/2 -translate-y-1/2">
+                                {getTotalItemsInCart()}
+                            </span>
+                        </button>
+                    )}
 
-            {/* Cart Modal */}
-            <Modal
-                show={showCartModal}
-                title="ตะกร้าสินค้าของคุณ"
-                message={
-                    <div className="text-left">
-                        {cartItems.length === 0 ? (
-                            <p className="text-gray-700 text-center">ยังไม่มีสินค้าในตะกร้า</p>
-                        ) : (
-                            <>
+                    {/* Cart Modal */}
+                    <Modal
+                        show={showCartModal}
+                        title="ตะกร้าสินค้าของคุณ"
+                        message={
+                            <div className="text-left">
+                                {cartItems.length === 0 ? (
+                                    <p className="text-gray-700 text-center">ยังไม่มีสินค้าในตะกร้า</p>
+                                ) : (
+                                    <>
+                                        {cartItems.map((item) => (
+                                            <div key={item.id} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-b-0">
+                                                <span className="text-gray-800 text-lg">{item.name} x {item.quantity}</span>
+                                                <span className="text-gray-800 text-lg">{(item.price * item.quantity).toLocaleString()} ກີບ</span>
+                                            </div>
+                                        ))}
+                                        <div className="flex justify-between items-center py-2 mt-4 font-bold text-gray-900 text-xl">
+                                            <span>รวม:</span>
+                                            <span>{getTotalCartPrice().toLocaleString()} ກີບ</span>
+                                        </div>
+                                    </>
+                                )}
+                            </div>
+                        }
+                        onConfirm={cartItems.length > 0 ? handlePlaceOrderClick : null}
+                        onCancel={() => setShowCartModal(false)}
+                        confirmText="สั่งอาหาร"
+                        cancelText="ปิด"
+                    />
+
+                    {/* Confirm Order Modal */}
+                    <Modal
+                        show={showConfirmOrderModal}
+                        title="ยืนยันการสั่งอาหาร"
+                        message={
+                            <div className="text-left">
+                                <p className="text-gray-800 font-bold mb-2">โต๊ะที่: {normalizeTableNumber(tableNumber)}</p>
                                 {cartItems.map((item) => (
-                                    <div key={item.id} className="flex justify-between items-center py-2 border-b border-gray-200 last:border-b-0">
-                                        <span className="text-gray-800 text-lg">{item.name} x {item.quantity}</span>
-                                        <span className="text-gray-800 text-lg">{(item.price * item.quantity).toLocaleString()} ກີບ</span>
+                                    <div key={item.id} className="flex justify-between items-center py-1 text-gray-700">
+                                        <span>{item.name} x {item.quantity}</span>
+                                        <span>{(item.price * item.quantity).toLocaleString()} ກີບ</span>
                                     </div>
                                 ))}
-                                <div className="flex justify-between items-center py-2 mt-4 font-bold text-gray-900 text-xl">
-                                    <span>รวม:</span>
+                                <div className="flex justify-between items-center py-2 mt-4 font-bold text-gray-900 text-xl border-t-2 border-gray-300 pt-4">
+                                    <span>รวมทั้งหมด:</span>
                                     <span>{getTotalCartPrice().toLocaleString()} ກີບ</span>
                                 </div>
-                            </>
-                        )}
-                    </div>
-                }
-                onConfirm={cartItems.length > 0 ? handlePlaceOrderClick : null}
-                onCancel={() => setShowCartModal(false)}
-                confirmText="สั่งอาหาร"
-                cancelText="ปิด"
-            />
-
-            {/* Confirm Order Modal */}
-            <Modal
-                show={showConfirmOrderModal}
-                title="ยืนยันการสั่งอาหาร"
-                message={
-                    <div className="text-left">
-                        <p className="text-gray-800 font-bold mb-2">โต๊ะที่: {normalizeTableNumber(tableNumber)}</p>
-                        {cartItems.map((item) => (
-                            <div key={item.id} className="flex justify-between items-center py-1 text-gray-700">
-                                <span>{item.name} x {item.quantity}</span>
-                                <span>{(item.price * item.quantity).toLocaleString()} ກີບ</span>
                             </div>
-                        ))}
-                        <div className="flex justify-between items-center py-2 mt-4 font-bold text-gray-900 text-xl border-t-2 border-gray-300 pt-4">
-                            <span>รวมทั้งหมด:</span>
-                            <span>{getTotalCartPrice().toLocaleString()} ກີບ</span>
-                        </div>
-                    </div>
-                }
-                onConfirm={confirmOrder}
-                onCancel={() => setShowConfirmOrderModal(false)}
-                confirmText="ยืนยันการสั่ง"
-                cancelText="แก้ไข"
-            />
+                        }
+                        onConfirm={confirmOrder}
+                        onCancel={() => setShowConfirmOrderModal(false)}
+                        confirmText="ยืนยันการสั่ง"
+                        cancelText="แก้ไข"
+                    />
 
-            {/* My Orders Modal (Top Right Cart Icon) */}
-            <Modal
-                show={showMyOrdersModal}
-                title="คำสั่งซื้อของฉัน"
-                message={
-                    <div className="text-left max-h-80 overflow-y-auto">
-                        {pendingOrders.length === 0 ? (
-                            <p className="text-gray-700 text-center">ไม่มีคำสั่งซื้อที่รอดำเนินการ</p>
-                        ) : (
-                            pendingOrders.map((order) => (
-                                <div key={order.id} className="bg-gray-50 p-4 rounded-lg shadow-sm mb-4">
-                                    <p className="text-gray-800 font-bold mb-2">โต๊ะที่: {order.tableNumber}</p>
-                                    <p className="text-gray-600 text-sm mb-2">สถานะ: <span className="font-semibold text-orange-500">{order.status === 'pending' ? 'รอดำเนินการ' : order.status}</span></p>
-                                    <ul className="list-disc pl-5 text-gray-700 mb-3">
-                                        {order.items.map((item, idx) => (
-                                            <li key={idx}>{item.name} x {item.quantity} ({(item.price * item.quantity).toLocaleString()} ກີບ)</li>
-                                        ))}
-                                    </ul>
-                                    <p className="text-gray-900 font-bold text-lg text-right">รวม: {order.totalPrice.toLocaleString()} ກີບ</p>
-                                    {order.status === 'pending' && (
-                                        <button
-                                            onClick={() => handleCancelPendingOrder(order.id)}
-                                            className="mt-3 w-full bg-red-500 text-white py-2 rounded-lg font-semibold hover:bg-red-600 transition duration-300"
-                                        >
-                                            ยกเลิกคำสั่งซื้อ
-                                        </button>
-                                    )}
-                                </div>
-                            ))
-                        )}
-                    </div>
-                }
-                onConfirm={null} // No confirm button for this modal
-                onCancel={() => setShowMyOrdersModal(false)}
-                cancelText="ปิด"
-            />
+                    {/* My Orders Modal (Top Right Cart Icon) */}
+                    <Modal
+                        show={showMyOrdersModal}
+                        title="คำสั่งซื้อของฉัน"
+                        message={
+                            <div className="text-left max-h-80 overflow-y-auto">
+                                {pendingOrders.length === 0 ? (
+                                    <p className="text-gray-700 text-center">ไม่มีคำสั่งซื้อที่รอดำเนินการ</p>
+                                ) : (
+                                    pendingOrders.map((order) => (
+                                        <div key={order.id} className="bg-gray-50 p-4 rounded-lg shadow-sm mb-4">
+                                            <p className="text-gray-800 font-bold mb-2">โต๊ะที่: {order.tableNumber}</p>
+                                            <p className="text-gray-600 text-sm mb-2">สถานะ: <span className="font-semibold text-orange-500">{order.status === 'pending' ? 'รอดำเนินการ' : order.status}</span></p>
+                                            <ul className="list-disc pl-5 text-gray-700 mb-3">
+                                                {order.items.map((item, idx) => (
+                                                    <li key={idx}>{item.name} x {item.quantity} ({(item.price * item.quantity).toLocaleString()} ກີບ)</li>
+                                                ))}
+                                            </ul>
+                                            <p className="text-gray-900 font-bold text-lg text-right">รวม: {order.totalPrice.toLocaleString()} ກີບ</p>
+                                            {order.status === 'pending' && (
+                                                <button
+                                                    onClick={() => handleCancelPendingOrder(order.id)}
+                                                    className="mt-3 w-full bg-red-500 text-white py-2 rounded-lg font-semibold hover:bg-red-600 transition duration-300"
+                                                >
+                                                    ยกเลิกคำสั่งซื้อ
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        }
+                        onConfirm={null} // No confirm button for this modal
+                        onCancel={() => setShowMyOrdersModal(false)}
+                        cancelText="ปิด"
+                    />
 
-            {/* Global Modal for general messages */}
-            <Modal
-                show={modalConfig.show}
-                title={modalConfig.title}
-                message={modalConfig.message}
-                onConfirm={modalConfig.onConfirm}
-                onCancel={modalConfig.onCancel}
-                confirmText={modalConfig.confirmText}
-                cancelText={modalConfig.cancelText}
-            />
-        </div>
-    );
-};
-
-// Admin Login Page
-const AdminLoginPage = ({ setView, setIsAdmin }) => {
-    const [username, setUsername] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-
-    const handleLogin = () => {
-        if (username === 'panda' && password === '123') {
-            setIsAdmin(true);
-            setView('admin-dashboard');
-        } else {
-            setError('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
-        }
-    };
-
-    return (
-        <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 text-white font-noto-sans-lao">
-            <div className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg p-8 rounded-xl shadow-2xl w-full max-w-md animate-fade-in-up">
-                <h2 className="text-4xl font-extrabold mb-8 text-center text-white drop-shadow-lg">แอดมินล็อกอิน</h2>
-                <div className="mb-6">
-                    <label htmlFor="username" className="block text-white text-lg font-semibold mb-2">ชื่อผู้ใช้:</label>
-                    <input
-                        type="text"
-                        id="username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        className="w-full p-4 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
-                        placeholder="panda"
+                    {/* Global Modal for general messages */}
+                    <Modal
+                        show={modalConfig.show}
+                        title={modalConfig.title}
+                        message={modalConfig.message}
+                        onConfirm={modalConfig.onConfirm}
+                        onCancel={modalConfig.onCancel}
+                        confirmText={modalConfig.confirmText}
+                        cancelText={modalConfig.cancelText}
                     />
                 </div>
-                <div className="mb-8">
-                    <label htmlFor="password" className="block text-white text-lg font-semibold mb-2">รหัสผ่าน:</label>
-                    <input
-                        type="password"
-                        id="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="w-full p-4 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
-                        placeholder="123"
-                    />
-                </div>
-                {error && <p className="text-red-300 text-center mb-6 text-lg animate-bounce-effect">{error}</p>}
-                <button
-                    onClick={handleLogin}
-                    className="w-full bg-purple-700 text-white py-4 rounded-xl text-2xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 ease-in-out animate-bounce-effect"
-                >
-                    เข้าสู่ระบบ
-                </button>
-                <button
-                    onClick={() => setView('home')}
-                    className="mt-4 w-full bg-gray-600 text-white py-3 rounded-xl text-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 ease-in-out"
-                >
-                    กลับหน้าหลัก
-                </button>
-            </div>
-        </div>
-    );
-};
-
-// Admin Dashboard Component
-const AdminDashboard = ({ setView, setIsAdmin }) => {
-    const { db } = useContext(AppContext);
-    const [activeTab, setActiveTab] = useState('incoming-orders');
-    const [orders, setOrders] = useState([]);
-    const [expenses, setExpenses] = useState([]);
-    const [newExpenseDescription, setNewExpenseDescription] = useState('');
-    const [newExpenseAmount, setNewExpenseAmount] = useState('');
-    const [startDate, setStartDate] = useState('');
-    const [endDate, setEndDate] = useState('');
-    const [modalConfig, setModalConfig] = useState({ show: false, title: '', message: '', onConfirm: null, onCancel: null });
-
-    // Fetch orders in real-time
-    useEffect(() => {
-        if (!db) return;
-
-        const q = query(collection(db, `artifacts/${appId}/public/data/orders`));
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const fetchedOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            // Sort orders by timestamp descending
-            fetchedOrders.sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
-            setOrders(fetchedOrders);
-        }, (error) => {
-            console.error("Error fetching orders:", error);
-        });
-
-        // Refresh every 30 seconds (though onSnapshot handles real-time, this ensures a fallback/re-fetch if needed)
-        const interval = setInterval(() => {
-            // This interval will trigger onSnapshot again if there are no changes,
-            // but onSnapshot is more efficient for real-time updates.
-            // This is primarily for the "reload every 30 seconds" requirement.
-            console.log("Refreshing orders data...");
-        }, 30000);
-
-        return () => {
-            unsubscribe();
-            clearInterval(interval);
+            );
         };
-    }, [db]);
 
-    // Fetch expenses
-    useEffect(() => {
-        if (!db) return;
+        // Admin Login Page
+        const AdminLoginPage = ({ setView, setIsAdmin }) => {
+            const [username, setUsername] = React.useState('');
+            const [password, setPassword] = React.useState('');
+            const [error, setError] = React.useState('');
 
-        const q = query(collection(db, `artifacts/${appId}/public/data/expenses`));
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const fetchedExpenses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setExpenses(fetchedExpenses);
-        }, (error) => {
-            console.error("Error fetching expenses:", error);
-        });
+            const handleLogin = () => {
+                if (username === 'panda' && password === '123') {
+                    setIsAdmin(true);
+                    setView('admin-dashboard');
+                } else {
+                    setError('ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง');
+                }
+            };
 
-        return () => unsubscribe();
-    }, [db]);
-
-    const handleUpdateOrderStatus = async (orderId, status) => {
-        try {
-            await updateDoc(doc(db, `artifacts/${appId}/public/data/orders`, orderId), { status });
-            setModalConfig({
-                show: true,
-                title: 'อัปเดตสถานะ',
-                message: `สถานะคำสั่งซื้อ ${orderId} ถูกเปลี่ยนเป็น ${status === 'accepted' ? 'รับแล้ว' : 'เคลียร์แล้ว'}`,
-                onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                confirmText: 'ตกลง'
-            });
-        } catch (e) {
-            console.error("Error updating order status: ", e);
-            setModalConfig({
-                show: true,
-                title: 'เกิดข้อผิดพลาด',
-                message: 'ไม่สามารถอัปเดตสถานะได้',
-                onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                confirmText: 'ตกลง'
-            });
-        }
-    };
-
-    const handleAddExpense = async () => {
-        if (!newExpenseDescription || !newExpenseAmount || isNaN(parseFloat(newExpenseAmount))) {
-            setModalConfig({
-                show: true,
-                title: 'ข้อมูลไม่ครบถ้วน',
-                message: 'กรุณากรอกรายละเอียดและจำนวนเงินค่าใช้จ่ายให้ถูกต้อง',
-                onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                confirmText: 'ตกลง'
-            });
-            return;
-        }
-
-        try {
-            await addDoc(collection(db, `artifacts/${appId}/public/data/expenses`), {
-                description: newExpenseDescription,
-                amount: parseFloat(newExpenseAmount),
-                timestamp: serverTimestamp(),
-            });
-            setNewExpenseDescription('');
-            setNewExpenseAmount('');
-            setModalConfig({
-                show: true,
-                title: 'เพิ่มค่าใช้จ่ายสำเร็จ',
-                message: 'ค่าใช้จ่ายถูกบันทึกแล้ว',
-                onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                confirmText: 'ตกลง'
-            });
-        } catch (e) {
-            console.error("Error adding expense: ", e);
-            setModalConfig({
-                show: true,
-                title: 'เกิดข้อผิดพลาด',
-                message: 'ไม่สามารถเพิ่มค่าใช้จ่ายได้',
-                onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
-                confirmText: 'ตกลง'
-            });
-        }
-    };
-
-    const getFilteredData = (data) => {
-        let filtered = data;
-        if (startDate) {
-            const start = new Date(startDate);
-            filtered = filtered.filter(item => item.timestamp && item.timestamp.toDate() >= start);
-        }
-        if (endDate) {
-            const end = new Date(endDate);
-            end.setHours(23, 59, 59, 999); // Set to end of day
-            filtered = filtered.filter(item => item.timestamp && item.timestamp.toDate() <= end);
-        }
-        return filtered;
-    };
-
-    const filteredOrders = getFilteredData(orders.filter(order => order.status === 'accepted' || order.status === 'cleared'));
-    const filteredExpenses = getFilteredData(expenses);
-
-    // Revenue Summary Calculations
-    const totalRevenue = filteredOrders.reduce((sum, order) => sum + order.totalPrice, 0);
-    const totalOrdersCount = filteredOrders.length;
-    const averageOrderValue = totalOrdersCount > 0 ? totalRevenue / totalOrdersCount : 0;
-
-    // Analysis: Top Selling Items
-    const itemSales = {};
-    filteredOrders.forEach(order => {
-        order.items.forEach(item => {
-            itemSales[item.name] = (itemSales[item.name] || 0) + item.quantity;
-        });
-    });
-    const sortedItems = Object.entries(itemSales).sort(([, a], [, b]) => b - a);
-
-    // Accounting: Net Profit
-    const totalExpenses = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-    const netProfit = totalRevenue - totalExpenses;
-
-    return (
-        <div className="min-h-screen flex flex-col bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 text-white font-noto-sans-lao">
-            {/* Header */}
-            <div className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg p-4 flex justify-between items-center shadow-md sticky top-0 z-10 rounded-b-xl">
-                <button
-                    onClick={() => { setIsAdmin(false); setView('home'); }}
-                    className="text-white text-xl p-2 rounded-full hover:bg-white hover:bg-opacity-30 transition-all duration-300"
-                    aria-label="Logout"
-                >
-                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H5a3 3 0 01-3-3V7a3 3 0 013-3h5a3 3 0 013 3v1" />
-                    </svg>
-                </button>
-                <h2 className="text-3xl font-extrabold text-white drop-shadow-lg">แผงควบคุมแอดมิน</h2>
-                <div className="w-6"></div> {/* Spacer */}
-            </div>
-
-            {/* Admin Tabs */}
-            <div className="flex justify-center p-4 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg m-4 rounded-xl shadow-lg overflow-x-auto whitespace-nowrap">
-                <button
-                    onClick={() => setActiveTab('incoming-orders')}
-                    className={`flex-1 py-3 px-4 text-lg font-bold rounded-l-lg transition-all duration-300 ${
-                        activeTab === 'incoming-orders' ? 'bg-purple-600 text-white shadow-inner' : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
-                    }`}
-                >
-                    ອໍເດີເຂົ້າ
-                </button>
-                <button
-                    onClick={() => setActiveTab('revenue-summary')}
-                    className={`flex-1 py-3 px-4 text-lg font-bold transition-all duration-300 ${
-                        activeTab === 'revenue-summary' ? 'bg-purple-600 text-white shadow-inner' : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
-                    }`}
-                >
-                    ສະຫຼຸບລາຍຮັບ
-                </button>
-                <button
-                    onClick={() => setActiveTab('analysis')}
-                    className={`flex-1 py-3 px-4 text-lg font-bold transition-all duration-300 ${
-                        activeTab === 'analysis' ? 'bg-purple-600 text-white shadow-inner' : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
-                    }`}
-                >
-                    ວິເຄາະ
-                </button>
-                <button
-                    onClick={() => setActiveTab('accounting')}
-                    className={`flex-1 py-3 px-4 text-lg font-bold rounded-r-lg transition-all duration-300 ${
-                        activeTab === 'accounting' ? 'bg-purple-600 text-white shadow-inner' : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
-                    }`}
-                >
-                    ລະບົບບັນຊີ
-                </button>
-            </div>
-
-            {/* Date Range Filter (for summary, analysis, accounting) */}
-            {(activeTab === 'revenue-summary' || activeTab === 'analysis' || activeTab === 'accounting') && (
-                <div className="p-4 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg m-4 rounded-xl shadow-lg flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
-                    <label htmlFor="startDate" className="text-white text-lg font-semibold">จาก:</label>
-                    <input
-                        type="date"
-                        id="startDate"
-                        value={startDate}
-                        onChange={(e) => setStartDate(e.target.value)}
-                        className="p-3 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
-                    />
-                    <label htmlFor="endDate" className="text-white text-lg font-semibold">ถึง:</label>
-                    <input
-                        type="date"
-                        id="endDate"
-                        value={endDate}
-                        onChange={(e) => setEndDate(e.target.value)}
-                        className="p-3 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
-                    />
+            return (
+                <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 text-white font-noto-sans-lao">
+                    <div className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg p-8 rounded-xl shadow-2xl w-full max-w-md animate-fade-in-up">
+                        <h2 className="text-4xl font-extrabold mb-8 text-center text-white drop-shadow-lg">แอดมินล็อกอิน</h2>
+                        <div className="mb-6">
+                            <label htmlFor="username" className="block text-white text-lg font-semibold mb-2">ชื่อผู้ใช้:</label>
+                            <input
+                                type="text"
+                                id="username"
+                                value={username}
+                                onChange={(e) => setUsername(e.target.value)}
+                                className="w-full p-4 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
+                                placeholder="panda"
+                            />
+                        </div>
+                        <div className="mb-8">
+                            <label htmlFor="password" className="block text-white text-lg font-semibold mb-2">รหัสผ่าน:</label>
+                            <input
+                                type="password"
+                                id="password"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="w-full p-4 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
+                                placeholder="123"
+                            />
+                        </div>
+                        {error && <p className="text-red-300 text-center mb-6 text-lg animate-bounce-effect">{error}</p>}
+                        <button
+                            onClick={handleLogin}
+                            className="w-full bg-purple-700 text-white py-4 rounded-xl text-2xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 ease-in-out animate-bounce-effect"
+                        >
+                            เข้าสู่ระบบ
+                        </button>
+                        <button
+                            onClick={() => setView('home')}
+                            className="mt-4 w-full bg-gray-600 text-white py-3 rounded-xl text-xl font-bold shadow-lg hover:shadow-xl transform hover:scale-105 transition duration-300 ease-in-out"
+                        >
+                            กลับหน้าหลัก
+                        </button>
+                    </div>
                 </div>
-            )}
+            );
+        };
 
-            {/* Tab Content */}
-            <div className="flex-grow p-4 overflow-y-auto">
-                {activeTab === 'incoming-orders' && (
-                    <div className="grid grid-cols-1 gap-6">
-                        {orders.filter(order => order.status === 'pending').length === 0 ? (
-                            <p className="text-center text-xl text-white font-semibold mt-8">ไม่มีออเดอร์ใหม่</p>
-                        ) : (
-                            orders.filter(order => order.status === 'pending').map((order) => (
-                                <div key={order.id} className="bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg rounded-xl p-6 shadow-xl animate-fade-in-up">
-                                    <h3 className="text-2xl font-bold mb-3 text-white drop-shadow-md">โต๊ะที่: {order.tableNumber}</h3>
-                                    <p className="text-gray-100 text-sm mb-4">เวลา: {order.timestamp?.toDate().toLocaleString()}</p>
-                                    <ul className="space-y-2 mb-4">
-                                        {order.items.map((item, idx) => (
-                                            <li key={idx} className="flex justify-between text-lg text-white">
-                                                <span>{item.name} x {item.quantity}</span>
-                                                <span>{(item.price * item.quantity).toLocaleString()} ກີບ</span>
+        // Admin Dashboard Component
+        const AdminDashboard = ({ setView, setIsAdmin }) => {
+            const { db } = React.useContext(AppContext);
+            const [activeTab, setActiveTab] = React.useState('incoming-orders');
+            const [orders, setOrders] = React.useState([]);
+            const [expenses, setExpenses] = React.useState([]);
+            const [newExpenseDescription, setNewExpenseDescription] = React.useState('');
+            const [newExpenseAmount, setNewExpenseAmount] = React.useState('');
+            const [startDate, setStartDate] = React.useState('');
+            const [endDate, setEndDate] = React.useState('');
+            const [modalConfig, setModalConfig] = React.useState({ show: false, title: '', message: '', onConfirm: null, onCancel: null });
+
+            // Fetch orders in real-time
+            React.useEffect(() => {
+                if (!db) return;
+
+                const q = query(collection(db, `artifacts/${appId}/public/data/orders`));
+                const unsubscribe = onSnapshot(q, (snapshot) => {
+                    const fetchedOrders = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    // Sort orders by timestamp descending
+                    fetchedOrders.sort((a, b) => (b.timestamp?.toDate() || 0) - (a.timestamp?.toDate() || 0));
+                    setOrders(fetchedOrders);
+                }, (error) => {
+                    console.error("Error fetching orders:", error);
+                });
+
+                // Refresh every 30 seconds (though onSnapshot handles real-time, this ensures a fallback/re-fetch if needed)
+                const interval = setInterval(() => {
+                    // This interval will trigger onSnapshot again if there are no changes,
+                    // but onSnapshot is more efficient for real-time updates.
+                    // This is primarily for the "reload every 30 seconds" requirement.
+                    console.log("Refreshing orders data...");
+                }, 30000);
+
+                return () => {
+                    unsubscribe();
+                    clearInterval(interval);
+                };
+            }, [db]);
+
+            // Fetch expenses
+            React.useEffect(() => {
+                if (!db) return;
+
+                const q = query(collection(db, `artifacts/${appId}/public/data/expenses`));
+                const unsubscribe = onSnapshot(q, (snapshot) => {
+                    const fetchedExpenses = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    setExpenses(fetchedExpenses);
+                }, (error) => {
+                    console.error("Error fetching expenses:", error);
+                });
+
+                return () => unsubscribe();
+            }, [db]);
+
+            const handleUpdateOrderStatus = async (orderId, status) => {
+                try {
+                    await updateDoc(doc(db, `artifacts/${appId}/public/data/orders`, orderId), { status });
+                    setModalConfig({
+                        show: true,
+                        title: 'อัปเดตสถานะ',
+                        message: `สถานะคำสั่งซื้อ ${orderId} ถูกเปลี่ยนเป็น ${status === 'accepted' ? 'รับแล้ว' : 'เคลียร์แล้ว'}`,
+                        onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
+                        confirmText: 'ตกลง'
+                    });
+                } catch (e) {
+                    console.error("Error updating order status: ", e);
+                    setModalConfig({
+                        show: true,
+                        title: 'เกิดข้อผิดพลาด',
+                        message: 'ไม่สามารถอัปเดตสถานะได้',
+                        onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
+                        confirmText: 'ตกลง'
+                    });
+                }
+            };
+
+            const handleAddExpense = async () => {
+                if (!newExpenseDescription || !newExpenseAmount || isNaN(parseFloat(newExpenseAmount))) {
+                    setModalConfig({
+                        show: true,
+                        title: 'ข้อมูลไม่ครบถ้วน',
+                        message: 'กรุณากรอกรายละเอียดและจำนวนเงินค่าใช้จ่ายให้ถูกต้อง',
+                        onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
+                        confirmText: 'ตกลง'
+                    });
+                    return;
+                }
+
+                try {
+                    await addDoc(collection(db, `artifacts/${appId}/public/data/expenses`), {
+                        description: newExpenseDescription,
+                        amount: parseFloat(newExpenseAmount),
+                        timestamp: serverTimestamp(),
+                    });
+                    setNewExpenseDescription('');
+                    setNewExpenseAmount('');
+                    setModalConfig({
+                        show: true,
+                        title: 'เพิ่มค่าใช้จ่ายสำเร็จ',
+                        message: 'ค่าใช้จ่ายถูกบันทึกแล้ว',
+                        onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
+                        confirmText: 'ตกลง'
+                    });
+                } catch (e) {
+                    console.error("Error adding expense: ", e);
+                    setModalConfig({
+                        show: true,
+                        title: 'เกิดข้อผิดพลาด',
+                        message: 'ไม่สามารถเพิ่มค่าใช้จ่ายได้',
+                        onConfirm: () => setModalConfig({ ...modalConfig, show: false }),
+                        confirmText: 'ตกลง'
+                    });
+                }
+            };
+
+            const getFilteredData = (data) => {
+                let filtered = data;
+                if (startDate) {
+                    const start = new Date(startDate);
+                    filtered = filtered.filter(item => item.timestamp && item.timestamp.toDate() >= start);
+                }
+                if (endDate) {
+                    const end = new Date(endDate);
+                    end.setHours(23, 59, 59, 999); // Set to end of day
+                    filtered = filtered.filter(item => item.timestamp && item.timestamp.toDate() <= end);
+                }
+                return filtered;
+            };
+
+            const filteredOrders = getFilteredData(orders.filter(order => order.status === 'accepted' || order.status === 'cleared'));
+            const filteredExpenses = getFilteredData(expenses);
+
+            // Revenue Summary Calculations
+            const totalRevenue = filteredOrders.reduce((sum, order) => sum + order.totalPrice, 0);
+            const totalOrdersCount = filteredOrders.length;
+            const averageOrderValue = totalOrdersCount > 0 ? totalRevenue / totalOrdersCount : 0;
+
+            // Analysis: Top Selling Items
+            const itemSales = {};
+            filteredOrders.forEach(order => {
+                order.items.forEach(item => {
+                    itemSales[item.name] = (itemSales[item.name] || 0) + item.quantity;
+                });
+            });
+            const sortedItems = Object.entries(itemSales).sort(([, a], [, b]) => b - a);
+
+            // Accounting: Net Profit
+            const totalExpenses = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const netProfit = totalRevenue - totalExpenses;
+
+            return (
+                <div className="min-h-screen flex flex-col bg-gradient-to-br from-pink-400 via-purple-400 to-blue-400 text-white font-noto-sans-lao">
+                    {/* Header */}
+                    <div className="bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg p-4 flex justify-between items-center shadow-md sticky top-0 z-10 rounded-b-xl">
+                        <button
+                            onClick={() => { setIsAdmin(false); setView('home'); }}
+                            className="text-white text-xl p-2 rounded-full hover:bg-white hover:bg-opacity-30 transition-all duration-300"
+                            aria-label="Logout"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H5a3 0 01-3-3V7a3 3 0 013-3h5a3 3 0 013 3v1" />
+                            </svg>
+                        </button>
+                        <h2 className="text-3xl font-extrabold text-white drop-shadow-lg">แผงควบคุมแอดมิน</h2>
+                        <div className="w-6"></div> {/* Spacer */}
+                    </div>
+
+                    {/* Admin Tabs */}
+                    <div className="flex justify-center p-4 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg m-4 rounded-xl shadow-lg overflow-x-auto whitespace-nowrap">
+                        <button
+                            onClick={() => setActiveTab('incoming-orders')}
+                            className={`flex-1 py-3 px-4 text-lg font-bold rounded-l-lg transition-all duration-300 ${
+                                activeTab === 'incoming-orders' ? 'bg-purple-600 text-white shadow-inner' : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
+                            }`}
+                        >
+                            ອໍເດີເຂົ້າ
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('revenue-summary')}
+                            className={`flex-1 py-3 px-4 text-lg font-bold transition-all duration-300 ${
+                                activeTab === 'revenue-summary' ? 'bg-purple-600 text-white shadow-inner' : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
+                            }`}
+                        >
+                            ສະຫຼຸບລາຍຮັບ
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('analysis')}
+                            className={`flex-1 py-3 px-4 text-lg font-bold transition-all duration-300 ${
+                                activeTab === 'analysis' ? 'bg-purple-600 text-white shadow-inner' : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
+                            }`}
+                        >
+                            ວິເຄາະ
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('accounting')}
+                            className={`flex-1 py-3 px-4 text-lg font-bold rounded-r-lg transition-all duration-300 ${
+                                activeTab === 'accounting' ? 'bg-purple-600 text-white shadow-inner' : 'bg-white bg-opacity-20 text-white hover:bg-opacity-30'
+                            }`}
+                        >
+                            ລະບົບບັນຊີ
+                        </button>
+                    </div>
+
+                    {/* Date Range Filter (for summary, analysis, accounting) */}
+                    {(activeTab === 'revenue-summary' || activeTab === 'analysis' || activeTab === 'accounting') && (
+                        <div className="p-4 bg-white bg-opacity-20 backdrop-filter backdrop-blur-lg m-4 rounded-xl shadow-lg flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4">
+                            <label htmlFor="startDate" className="text-white text-lg font-semibold">จาก:</label>
+                            <input
+                                type="date"
+                                id="startDate"
+                                value={startDate}
+                                onChange={(e) => setStartDate(e.target.value)}
+                                className="p-3 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
+                            />
+                            <label htmlFor="endDate" className="text-white text-lg font-semibold">ถึง:</label>
+                            <input
+                                type="date"
+                                id="endDate"
+                                value={endDate}
+                                onChange={(e) => setEndDate(e.target.value)}
+                                className="p-3 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
+                            />
+                        </div>
+                    )}
+
+                    {/* Tab Content */}
+                    <div className="flex-grow p-4 overflow-y-auto">
+                        {activeTab === 'incoming-orders' && (
+                            <div className="grid grid-cols-1 gap-6">
+                                {orders.filter(order => order.status === 'pending').length === 0 ? (
+                                    <p className="text-center text-xl text-white font-semibold mt-8">ไม่มีออเดอร์ใหม่</p>
+                                ) : (
+                                    orders.filter(order => order.status === 'pending').map((order) => (
+                                        <div key={order.id} className="bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg rounded-xl p-6 shadow-xl animate-fade-in-up">
+                                            <h3 className="text-2xl font-bold mb-3 text-white drop-shadow-md">โต๊ะที่: {order.tableNumber}</h3>
+                                            <p className="text-gray-100 text-sm mb-4">เวลา: {order.timestamp?.toDate().toLocaleString()}</p>
+                                            <ul className="space-y-2 mb-4">
+                                                {order.items.map((item, idx) => (
+                                                    <li key={idx} className="flex justify-between text-lg text-white">
+                                                        <span>{item.name} x {item.quantity}</span>
+                                                        <span>{(item.price * item.quantity).toLocaleString()} ກີບ</span>
+                                                    </li>
+                                                ))}
+                                            </ul>
+                                            <p className="text-3xl font-extrabold text-white text-right mb-6 drop-shadow-lg">รวม: {order.totalPrice.toLocaleString()} ກີບ</p>
+                                            <div className="flex space-x-4">
+                                                <button
+                                                    onClick={() => handleUpdateOrderStatus(order.id, 'accepted')}
+                                                    className="flex-1 bg-green-500 text-white py-3 rounded-lg font-bold text-xl shadow-md hover:bg-green-600 transition duration-300 transform hover:scale-105"
+                                                >
+                                                    รับ
+                                                </button>
+                                                <button
+                                                    onClick={() => handleUpdateOrderStatus(order.id, 'cleared')}
+                                                    className="flex-1 bg-blue-500 text-white py-3 rounded-lg font-bold text-xl shadow-md hover:bg-blue-600 transition duration-300 transform hover:scale-105"
+                                                >
+                                                    เคลียร์
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
+                            </div>
+                        )}
+
+                        {activeTab === 'revenue-summary' && (
+                            <div className="bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg rounded-xl p-6 shadow-xl text-center animate-fade-in-up">
+                                <h3 className="text-3xl font-bold mb-6 text-white drop-shadow-md">ສະຫຼຸບລາຍຮັບ</h3>
+                                <div className="space-y-4">
+                                    <p className="text-xl text-white">ยอดรวม: <span className="font-extrabold text-3xl">{totalRevenue.toLocaleString()} ກີບ</span></p>
+                                    <p className="text-xl text-white">จำนวนออเดอร์: <span className="font-extrabold text-3xl">{totalOrdersCount}</span></p>
+                                    <p className="text-xl text-white">ค่าเฉลี่ยต่อออเดอร์: <span className="font-extrabold text-3xl">{averageOrderValue.toLocaleString(undefined, { maximumFractionDigits: 2 })} ກີບ</span></p>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'analysis' && (
+                            <div className="bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg rounded-xl p-6 shadow-xl animate-fade-in-up">
+                                <h3 className="text-3xl font-bold mb-6 text-white drop-shadow-md text-center">ວິເຄາະ: เมนูขายดีที่สุด</h3>
+                                {sortedItems.length === 0 ? (
+                                    <p className="text-center text-xl text-white font-semibold">ไม่มีข้อมูลการขาย</p>
+                                ) : (
+                                    <ol className="list-decimal list-inside space-y-3 text-white text-xl">
+                                        {sortedItems.map(([name, count], index) => (
+                                            <li key={index} className="flex justify-between items-center bg-white bg-opacity-10 p-3 rounded-lg shadow-sm">
+                                                <span className="font-semibold">{name}</span>
+                                                <span className="font-bold text-2xl">{count} รายการ</span>
                                             </li>
                                         ))}
-                                    </ul>
-                                    <p className="text-3xl font-extrabold text-white text-right mb-6 drop-shadow-lg">รวม: {order.totalPrice.toLocaleString()} ກີບ</p>
-                                    <div className="flex space-x-4">
+                                    </ol>
+                                )}
+                            </div>
+                        )}
+
+                        {activeTab === 'accounting' && (
+                            <div className="bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg rounded-xl p-6 shadow-xl animate-fade-in-up">
+                                <h3 className="text-3xl font-bold mb-6 text-white drop-shadow-md text-center">ລະບົບບັນຊີ</h3>
+
+                                <div className="mb-8">
+                                    <h4 className="text-2xl font-bold mb-4 text-white drop-shadow-md">เพิ่มค่าใช้จ่าย</h4>
+                                    <div className="space-y-4">
+                                        <input
+                                            type="text"
+                                            placeholder="รายละเอียดค่าใช้จ่าย"
+                                            value={newExpenseDescription}
+                                            onChange={(e) => setNewExpenseDescription(e.target.value)}
+                                            className="w-full p-3 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
+                                        />
+                                        <input
+                                            type="number"
+                                            placeholder="จำนวนเงิน (ກີບ)"
+                                            value={newExpenseAmount}
+                                            onChange={(e) => setNewExpenseAmount(e.target.value)}
+                                            className="w-full p-3 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
+                                        />
                                         <button
-                                            onClick={() => handleUpdateOrderStatus(order.id, 'accepted')}
-                                            className="flex-1 bg-green-500 text-white py-3 rounded-lg font-bold text-xl shadow-md hover:bg-green-600 transition duration-300 transform hover:scale-105"
+                                            onClick={handleAddExpense}
+                                            className="w-full bg-purple-700 text-white py-3 rounded-lg font-bold text-xl shadow-md hover:bg-purple-800 transition duration-300 transform hover:scale-105"
                                         >
-                                            รับ
-                                        </button>
-                                        <button
-                                            onClick={() => handleUpdateOrderStatus(order.id, 'cleared')}
-                                            className="flex-1 bg-blue-500 text-white py-3 rounded-lg font-bold text-xl shadow-md hover:bg-blue-600 transition duration-300 transform hover:scale-105"
-                                        >
-                                            เคลียร์
+                                            เพิ่มค่าใช้จ่าย
                                         </button>
                                     </div>
                                 </div>
-                            ))
-                        )}
-                    </div>
-                )}
 
-                {activeTab === 'revenue-summary' && (
-                    <div className="bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg rounded-xl p-6 shadow-xl text-center animate-fade-in-up">
-                        <h3 className="text-3xl font-bold mb-6 text-white drop-shadow-md">ສະຫຼຸບລາຍຮັບ</h3>
-                        <div className="space-y-4">
-                            <p className="text-xl text-white">ยอดรวม: <span className="font-extrabold text-3xl">{totalRevenue.toLocaleString()} ກີບ</span></p>
-                            <p className="text-xl text-white">จำนวนออเดอร์: <span className="font-extrabold text-3xl">{totalOrdersCount}</span></p>
-                            <p className="text-xl text-white">ค่าเฉลี่ยต่อออเดอร์: <span className="font-extrabold text-3xl">{averageOrderValue.toLocaleString(undefined, { maximumFractionDigits: 2 })} ກີບ</span></p>
-                        </div>
-                    </div>
-                )}
-
-                {activeTab === 'analysis' && (
-                    <div className="bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg rounded-xl p-6 shadow-xl animate-fade-in-up">
-                        <h3 className="text-3xl font-bold mb-6 text-white drop-shadow-md text-center">ວິເຄາະ: เมนูขายดีที่สุด</h3>
-                        {sortedItems.length === 0 ? (
-                            <p className="text-center text-xl text-white font-semibold">ไม่มีข้อมูลการขาย</p>
-                        ) : (
-                            <ol className="list-decimal list-inside space-y-3 text-white text-xl">
-                                {sortedItems.map(([name, count], index) => (
-                                    <li key={index} className="flex justify-between items-center bg-white bg-opacity-10 p-3 rounded-lg shadow-sm">
-                                        <span className="font-semibold">{name}</span>
-                                        <span className="font-bold text-2xl">{count} รายการ</span>
-                                    </li>
-                                ))}
-                            </ol>
-                        )}
-                    </div>
-                )}
-
-                {activeTab === 'accounting' && (
-                    <div className="bg-white bg-opacity-25 backdrop-filter backdrop-blur-lg rounded-xl p-6 shadow-xl animate-fade-in-up">
-                        <h3 className="text-3xl font-bold mb-6 text-white drop-shadow-md text-center">ລະບົບບັນຊີ</h3>
-
-                        <div className="mb-8">
-                            <h4 className="text-2xl font-bold mb-4 text-white drop-shadow-md">เพิ่มค่าใช้จ่าย</h4>
-                            <div className="space-y-4">
-                                <input
-                                    type="text"
-                                    placeholder="รายละเอียดค่าใช้จ่าย"
-                                    value={newExpenseDescription}
-                                    onChange={(e) => setNewExpenseDescription(e.target.value)}
-                                    className="w-full p-3 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
-                                />
-                                <input
-                                    type="number"
-                                    placeholder="จำนวนเงิน (ກີບ)"
-                                    value={newExpenseAmount}
-                                    onChange={(e) => setNewExpenseAmount(e.target.value)}
-                                    className="w-full p-3 rounded-lg bg-white bg-opacity-30 text-white placeholder-gray-200 focus:outline-none focus:ring-2 focus:ring-purple-300 transition duration-300 text-lg"
-                                />
-                                <button
-                                    onClick={handleAddExpense}
-                                    className="w-full bg-purple-700 text-white py-3 rounded-lg font-bold text-xl shadow-md hover:bg-purple-800 transition duration-300 transform hover:scale-105"
-                                >
-                                    เพิ่มค่าใช้จ่าย
-                                </button>
+                                <div className="space-y-4 mt-8">
+                                    <h4 className="text-2xl font-bold mb-4 text-white drop-shadow-md">สรุปการเงิน</h4>
+                                    <p className="text-xl text-white">รายรับทั้งหมด: <span className="font-extrabold text-2xl">{totalRevenue.toLocaleString()} ກີບ</span></p>
+                                    <p className="text-xl text-white">ค่าใช้จ่ายทั้งหมด: <span className="font-extrabold text-2xl">{totalExpenses.toLocaleString()} ກີບ</span></p>
+                                    <p className="text-xl text-white">กำไรสุทธิ: <span className={`font-extrabold text-3xl ${netProfit >= 0 ? 'text-green-300' : 'text-red-300'}`}>{netProfit.toLocaleString()} ກີບ</span></p>
+                                </div>
                             </div>
-                        </div>
-
-                        <div className="space-y-4 mt-8">
-                            <h4 className="text-2xl font-bold mb-4 text-white drop-shadow-md">สรุปการเงิน</h4>
-                            <p className="text-xl text-white">รายรับทั้งหมด: <span className="font-extrabold text-2xl">{totalRevenue.toLocaleString()} ກີບ</span></p>
-                            <p className="text-xl text-white">ค่าใช้จ่ายทั้งหมด: <span className="font-extrabold text-2xl">{totalExpenses.toLocaleString()} ກີບ</span></p>
-                            <p className="text-xl text-white">กำไรสุทธิ: <span className={`font-extrabold text-3xl ${netProfit >= 0 ? 'text-green-300' : 'text-red-300'}`}>{netProfit.toLocaleString()} ກີບ</span></p>
-                        </div>
+                        )}
                     </div>
-                )}
-            </div>
 
-            {/* Global Modal for general messages */}
-            <Modal
-                show={modalConfig.show}
-                title={modalConfig.title}
-                message={modalConfig.message}
-                onConfirm={modalConfig.onConfirm}
-                onCancel={modalConfig.onCancel}
-                confirmText={modalConfig.confirmText}
-                cancelText={modalConfig.cancelText}
-            />
-        </div>
-    );
-};
+                    {/* Global Modal for general messages */}
+                    <Modal
+                        show={modalConfig.show}
+                        title={modalConfig.title}
+                        message={modalConfig.message}
+                        onConfirm={modalConfig.onConfirm}
+                        onCancel={modalConfig.onCancel}
+                        confirmText={modalConfig.confirmText}
+                        cancelText={modalConfig.cancelText}
+                    />
+                </div>
+            );
+        };
 
-// Main App Component
-export default function App() {
-    const [view, setView] = useState('splash'); // 'splash', 'home', 'customer', 'admin-login', 'admin-dashboard'
-    const [showSplash, setShowSplash] = useState(true);
-    const [isAdmin, setIsAdmin] = useState(false);
-    const [db, setDb] = useState(null);
-    const [auth, setAuth] = useState(null);
-    const [userId, setUserId] = useState(null);
+        // Main App Component
+        const App = () => {
+            const [view, setView] = React.useState('splash'); // 'splash', 'home', 'customer', 'admin-login', 'admin-dashboard'
+            const [showSplash, setShowSplash] = React.useState(true);
+            const [isAdmin, setIsAdmin] = React.useState(false);
+            const [db, setDb] = React.useState(null);
+            const [auth, setAuth] = React.useState(null);
+            const [userId, setUserId] = React.useState(null);
 
-    useEffect(() => {
-        // Initialize Firebase
-        try {
-            const app = initializeApp(firebaseConfig);
-            const firestoreDb = getFirestore(app);
-            const firebaseAuth = getAuth(app);
-            setDb(firestoreDb);
-            setAuth(firebaseAuth);
+            React.useEffect(() => {
+                // Initialize Firebase
+                try {
+                    const app = initializeApp(firebaseConfig);
+                    const firestoreDb = getFirestore(app);
+                    const firebaseAuth = getAuth(app);
+                    setDb(firestoreDb);
+                    setAuth(firebaseAuth);
 
-            // Sign in anonymously or with custom token
-            const signIn = async () => {
-                if (initialAuthToken) {
-                    await signInWithCustomToken(firebaseAuth, initialAuthToken);
-                } else {
-                    await signInAnonymously(firebaseAuth);
+                    // Sign in anonymously or with custom token
+                    const signIn = async () => {
+                        if (initialAuthToken) {
+                            await signInWithCustomToken(firebaseAuth, initialAuthToken);
+                        } else {
+                            await signInAnonymously(firebaseAuth);
+                        }
+                    };
+                    signIn();
+
+                    // Listen for auth state changes to get userId
+                    const unsubscribeAuth = onAuthStateChanged(firebaseAuth, (user) => {
+                        if (user) {
+                            setUserId(user.uid);
+                        } else {
+                            // Generate a random UUID for unauthenticated users if no __initial_auth_token
+                            setUserId(crypto.randomUUID());
+                        }
+                    });
+
+                    return () => unsubscribeAuth();
+                } catch (error) {
+                    console.error("Failed to initialize Firebase:", error);
+                    // Handle error, maybe show an error message to the user
                 }
-            };
-            signIn();
+            }, []);
 
-            // Listen for auth state changes to get userId
-            const unsubscribeAuth = onAuthStateChanged(firebaseAuth, (user) => {
-                if (user) {
-                    setUserId(user.uid);
-                } else {
-                    setUserId(crypto.randomUUID()); // Fallback for unauthenticated users
-                }
-            });
+            return (
+                <AppContext.Provider value={{ db, auth, userId }}>
+                    {showSplash && <SplashScreen onComplete={setShowSplash} />}
+                    {!showSplash && (
+                        <>
+                            {view === 'home' && <HomePage setView={setView} />}
+                            {view === 'customer' && <CustomerOrderPage setView={setView} />}
+                            {view === 'admin-login' && <AdminLoginPage setView={setView} setIsAdmin={setIsAdmin} />}
+                            {view === 'admin-dashboard' && isAdmin && <AdminDashboard setView={setView} setIsAdmin={setIsAdmin} />}
+                        </>
+                    )}
+                </AppContext.Provider>
+            );
+        };
 
-            return () => unsubscribeAuth();
-        } catch (error) {
-            console.error("Failed to initialize Firebase:", error);
-            // Handle error, maybe show an error message to the user
-        }
-    }, []);
-
-    // Tailwind CSS for Noto Sans Lao and animations
-    const tailwindConfig = `
-        <style>
-            @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Lao:wght@100..900&display=swap');
-
-            body {
-                font-family: 'Noto Sans Lao', sans-serif;
-                overflow: hidden; /* Prevent body scroll */
-            }
-
-            .font-noto-sans-lao {
-                font-family: 'Noto Sans Lao', sans-serif;
-            }
-
-            /* Custom Animations */
-            @keyframes fade-out {
-                0% { opacity: 1; }
-                80% { opacity: 1; }
-                100% { opacity: 0; visibility: hidden; }
-            }
-            .animate-fade-out {
-                animation: fade-out 2s forwards;
-            }
-
-            @keyframes fade-in-up {
-                from {
-                    opacity: 0;
-                    transform: translateY(20px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-            .animate-fade-in-up {
-                animation: fade-in-up 0.5s ease-out forwards;
-            }
-
-            @keyframes bounce-effect {
-                0%, 100% {
-                    transform: translateY(0);
-                }
-                25% {
-                    transform: translateY(-5px);
-                }
-                50% {
-                    transform: translateY(0);
-                }
-                75% {
-                    transform: translateY(-2px);
-                }
-            }
-            .animate-bounce-effect:hover {
-                animation: bounce-effect 0.8s ease-in-out infinite;
-            }
-
-            @keyframes bounce-in {
-                0% {
-                    transform: scale(0.5);
-                    opacity: 0;
-                }
-                70% {
-                    transform: scale(1.05);
-                    opacity: 1;
-                }
-                100% {
-                    transform: scale(1);
-                }
-            }
-            .animate-bounce-in {
-                animation: bounce-in 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55) forwards;
-            }
-
-            /* Responsive adjustments for smaller screens */
-            @media (max-width: 640px) {
-                .text-5xl { font-size: 3rem; /* ~48px */ }
-                .text-4xl { font-size: 2.25rem; /* ~36px */ }
-                .text-3xl { font-size: 1.875rem; /* ~30px */ }
-                .text-2xl { font-size: 1.5rem; /* ~24px */ }
-                .text-xl { font-size: 1.25rem; /* ~20px */ }
-                .text-lg { font-size: 1.125rem; /* ~18px */ }
-                .p-4 { padding: 1rem; }
-                .m-4 { margin: 1rem; }
-            }
-        </style>
-    `;
-
-    return (
-        <>
-            <div dangerouslySetInnerHTML={{ __html: tailwindConfig }} />
-            <AppContext.Provider value={{ db, auth, userId }}>
-                {showSplash && <SplashScreen onComplete={setShowSplash} />}
-                {!showSplash && (
-                    <>
-                        {view === 'home' && <HomePage setView={setView} />}
-                        {view === 'customer' && <CustomerOrderPage setView={setView} />}
-                        {view === 'admin-login' && <AdminLoginPage setView={setView} setIsAdmin={setIsAdmin} />}
-                        {view === 'admin-dashboard' && isAdmin && <AdminDashboard setView={setView} setIsAdmin={setIsAdmin} />}
-                    </>
-                )}
-            </AppContext.Provider>
-        </>
-    );
-}
+        // Render the React App
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(React.createElement(App));
+    </script>
+</body>
+</html>
