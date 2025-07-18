@@ -346,7 +346,8 @@
     <div id="app-container" class="container hidden">
 
         <!-- Home Page -->
-        <div id="home-page" class="flex flex-col items-center justify-center h-full w-full text-center">
+        <!-- This page will now be hidden by default and only shown if explicitly navigated to -->
+        <div id="home-page" class="flex flex-col items-center justify-center h-full w-full text-center hidden">
             <img src="https://placehold.co/300x300/FF69B4/FFFFFF?text=😊" alt="ยิ้ม" class="w-[300px] h-[300px] rounded-full mb-8 animate-bounce">
             <h1 class="text-4xl font-bold mb-8 text-shadow-lg">ສັ່ງອາຫານ & ເຄື່ອງດື່ມ</h1>
             <button id="start-order-btn" class="btn btn-primary mb-4 w-full max-w-xs">ເລີ່ມສັ່ງອາຫານ</button>
@@ -354,7 +355,8 @@
         </div>
 
         <!-- Customer Mode (Menu & Cart) -->
-        <div id="customer-mode" class="hidden w-full h-full flex flex-col">
+        <!-- This page will now be shown by default after splash screen -->
+        <div id="customer-mode" class="w-full h-full flex flex-col">
             <div class="flex justify-between items-center mb-4 w-full">
                 <h2 class="text-3xl font-bold">ເມນູ</h2>
                 <div class="flex gap-2">
@@ -380,7 +382,7 @@
             </div>
 
             <!-- Floating Cart Button -->
-            <button id="floating-cart-btn" class="hidden">
+            <button id="floating-cart-btn" class=""> <!-- floating cart shown by default in customer mode -->
                 <i class="fas fa-shopping-cart"></i>
                 <span id="cart-count">0</span>
             </button>
@@ -567,7 +569,7 @@
         const cartCountSpan = document.getElementById('cart-count');
         const viewCartTopBtn = document.getElementById('view-cart-top-btn');
         const cartCountTopSpan = document.getElementById('cart-count-top');
-        const homeFromCustomerBtn = document.getElementById('home-from-customer-btn'); // New Home button for customer mode
+        const homeFromCustomerBtn = document.getElementById('home-from-customer-btn');
 
         const cartOverlay = document.getElementById('cart-overlay');
         const cartItemsList = document.getElementById('cart-items-list');
@@ -587,16 +589,17 @@
         const adminUsernameInput = document.getElementById('admin-username');
         const adminPasswordInput = document.getElementById('admin-password');
         const adminLoginBtn = document.getElementById('admin-login-btn');
-        const backToHomeFromAdminLoginBtn = document.getElementById('back-to-home-from-admin-login'); // Renamed to be more generic
+        const backToHomeFromAdminLoginBtn = document.getElementById('back-to-home-from-admin-login');
 
         const adminDashboard = document.getElementById('admin-dashboard');
         const adminLogoutBtn = document.getElementById('admin-logout-btn');
         const incomingOrdersTab = document.getElementById('incoming-orders-tab');
+        // Fix: Removed incorrect assignment to 'document'
         const revenueSummaryTab = document.getElementById('revenue-summary-tab');
         const analysisTab = document.getElementById('analysis-tab');
         const accountingTab = document.getElementById('accounting-tab');
         const historyTab = document.getElementById('history-tab');
-        const homeFromAdminBtn = document.getElementById('home-from-admin-btn'); // New Home button for admin dashboard
+        const homeFromAdminBtn = document.getElementById('home-from-admin-btn');
 
         const incomingOrdersSection = document.getElementById('incoming-orders-section');
         const pendingOrdersList = document.getElementById('pending-orders-list');
@@ -624,12 +627,12 @@
         const closeMessageModalBtn = document.getElementById('close-message-modal-btn');
 
         // --- Global State Variables ---
-        let currentView = 'home'; // 'home', 'customer', 'admin-login', 'admin-dashboard'
+        let currentView = 'customer'; // Changed default view to 'customer'
         let cart = [];
         let menuItems = [];
         let isAdminLoggedIn = false;
-        let currentCustomerOrderId = null; // To track the current customer's pending order
-        let currentCustomerTableNumber = null; // To track the current customer's table number
+        let currentCustomerOrderId = null;
+        let currentCustomerTableNumber = null;
 
         // --- Menu Data (Hardcoded for now, can be managed by admin later) ---
         const foodMenu = [
@@ -1220,15 +1223,16 @@
 
         // --- Event Listeners ---
 
-        // Splash screen fade out
+        // Splash screen fade out and directly show customer mode
         window.addEventListener('load', () => {
             setTimeout(() => {
                 splashScreen.classList.add('hidden');
                 appContainer.classList.remove('hidden');
+                switchView('customer'); // Directly switch to customer mode
             }, 2000); // 2 seconds splash
         });
 
-        // Home page buttons
+        // Home page buttons (these buttons will now only be used if user navigates back to home)
         startOrderBtn.addEventListener('click', () => switchView('customer'));
         adminModeBtn.addEventListener('click', () => switchView('admin-login'));
 
@@ -1236,7 +1240,7 @@
         foodTabBtn.addEventListener('click', () => renderMenu('food'));
         drinkTabBtn.addEventListener('click', () => renderMenu('drink'));
 
-        // New Home button for customer mode
+        // Home button for customer mode
         homeFromCustomerBtn.addEventListener('click', () => switchView('home'));
 
         // Menu item quantity controls (delegated event listener)
@@ -1288,7 +1292,7 @@
         accountingTab.addEventListener('click', () => switchAdminTab('accounting'));
         historyTab.addEventListener('click', () => switchAdminTab('history'));
 
-        // New Home button for admin dashboard
+        // Home button for admin dashboard
         homeFromAdminBtn.addEventListener('click', () => switchView('home'));
 
         // Admin Logout
